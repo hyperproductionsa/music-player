@@ -5,22 +5,43 @@
 
   const isUnlocked = () => new Date() >= new Date(comingSoon);
   const audio = new Audio();
-  const getAudio = (a, t) => `${baseUrl}/aac/${a.folder}/${t.file}`;
+  // ✅ FIXED: using /m4a/ instead of /aac/
+  const getAudio = (a, t) => `${baseUrl}/m4a/${a.folder}/${t.file}`;
   const getImage = (a) => `${baseUrl}/images/${a.cover}`;
 
   let curAlbum = null, curTrack = null, curIdx = 0, isPlaying = false, timer = null, albumIdx = 0;
+  let isTracklistView = false;
 
   // DOM
   const $ = id => document.getElementById(id);
   const artImg = $('artImg'), csOverlay = $('csOverlay'), csTitle = $('csTitle'), csSub = $('csSub'), csDate = $('csDate');
-  const albumList = $('albumList'), tracklist = $('tracklist'), tracklistWrap = $('tracklistWrap'), tlTitle = $('tlAlbumTitle'), tlArtist = $('tlAlbumArtist');
+  const albumList = $('albumList'), tracklist = $('tracklist'), tracklistWrap = $('tracklistWrap'), tlTitle = $('tlTitle'), tlArtist = $('tlArtist');
   const npPcTrack = $('npPcTrack'), npPcArtist = $('npPcArtist'), npPcFill = $('npPcFill'), npPcCur = $('npPcCur'), npPcTot = $('npPcTot');
   const pcPlay = $('pcPlay'), pcPrev = $('pcPrev'), pcNext = $('pcNext');
   const pmArt = $('pmArt'), pmTitle = $('pmTitle'), pmArtist = $('pmArtist'), pmPlay = $('pmPlay'), pmNext = $('pmNext'), pmExpand = $('pmExpand');
   const pf = $('playerFull'), pfArt = $('pfArt'), pfTitle = $('pfTitle'), pfArtist = $('pfArtist'), pfFill = $('pfFill'), pfCur = $('pfCur'), pfTot = $('pfTot');
   const pfPlay = $('pfPlay'), pfPrev = $('pfPrev'), pfNext = $('pfNext'), pfClose = $('pfClose');
+  const backBtn = $('backBtn'), headerBadge = $('headerBadge');
 
   const allAlbums = [...albums, { ...comingSoonAlbum, isCS: true }];
+
+  // Show/Hide views
+  function showAlbumList() {
+    isTracklistView = false;
+    albumList.style.display = 'flex';
+    tracklistWrap.style.display = 'none';
+    backBtn.style.display = 'none';
+    headerBadge.style.display = 'inline';
+    headerBadge.textContent = '5 albums';
+  }
+
+  function showTracklist() {
+    isTracklistView = true;
+    albumList.style.display = 'none';
+    tracklistWrap.style.display = 'flex';
+    backBtn.style.display = 'inline';
+    headerBadge.style.display = 'none';
+  }
 
   // Render Album List
   function renderAlbums() {
@@ -44,7 +65,7 @@
 
   // Render Tracklist
   function renderTracks(album, locked = false) {
-    tracklistWrap.style.display = 'flex';
+    showTracklist();
     if (!album || locked) {
       tlTitle.textContent = 'Coming Soon';
       tlArtist.textContent = '—';
@@ -76,7 +97,6 @@
     albumIdx = idx;
     const unlocked = isUnlocked();
 
-    // Handle HTC5 locked
     if (album.isCS && !unlocked) {
       curAlbum = null; curTrack = null;
       artImg.src = getImage(album);
@@ -90,7 +110,6 @@
       return;
     }
 
-    // HTC5 unlocked or other albums
     if (album.isCS && unlocked) {
       curAlbum = { id: 'htc5', title: album.title, artist: album.artist, year: album.year, cover: album.cover, folder: 'HTC5', tracks: album.tracks };
     } else {
@@ -162,6 +181,9 @@
   function openFull() { pf.classList.add('active'); }
   function closeFull() { pf.classList.remove('active'); }
 
+  // Back button
+  backBtn.onclick = showAlbumList;
+
   // Events
   pcPlay.onclick = togglePlay; pcPrev.onclick = prevTrack; pcNext.onclick = nextTrack;
   pmPlay.onclick = togglePlay; pmNext.onclick = nextTrack; pmExpand.onclick = openFull;
@@ -170,10 +192,11 @@
 
   // Init
   renderAlbums();
+  showAlbumList();
   loadAlbum(4); // Start with HTC5 (coming soon)
 
   // Responsive
   const main = document.getElementById('main');
   const resize = () => main.style.flexDirection = window.innerWidth <= 860 ? 'column' : 'row';
   resize(); window.onresize = resize;
-})(); 
+})();
