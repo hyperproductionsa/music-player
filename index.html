@@ -14,13 +14,14 @@
   <!-- HEADER -->
   <header>
     <h1><i class="fas fa-headphones"></i> HTs Collections</h1>
-    <span>5 albums</span>
+    <button id="backBtn" style="display:none;"><i class="fas fa-arrow-left"></i> Back</button>
+    <span id="headerBadge">5 albums</span>
   </header>
 
   <!-- MAIN CONTENT -->
   <main id="main">
 
-    <!-- LEFT: COVER ART + NOW PLAYING (PC) -->
+    <!-- LEFT: COVER ART -->
     <section class="art-section" id="artSection">
       <div class="art-wrap" id="artWrap">
         <img id="artImg" src="https://cdn.htcoll.shop/images/HTC5.jpg" alt="cover" />
@@ -32,7 +33,7 @@
           <small><i class="fas fa-calendar"></i> <span id="csDate">25 Sep 2026</span></small>
         </div>
       </div>
-      <!-- PC Now Playing (hidden on mobile) -->
+      <!-- PC Now Playing -->
       <div class="np-pc" id="npPc">
         <div class="np-pc-track" id="npPcTrack">Select a track</div>
         <div class="np-pc-artist" id="npPcArtist">—</div>
@@ -49,15 +50,15 @@
       </div>
     </section>
 
-    <!-- RIGHT: ALBUM LIST + TRACKLIST -->
+    <!-- RIGHT: ALBUM LIST / TRACKLIST (toggle) -->
     <section class="list-section" id="listSection">
       <!-- Album List -->
       <div class="album-list" id="albumList"></div>
-      <!-- Tracklist (hidden until album selected) -->
+      <!-- Tracklist (hidden by default) -->
       <div class="tracklist-wrap" id="tracklistWrap" style="display:none;">
-        <div class="tracklist-header" id="tracklistHeader">
-          <span id="tlAlbumTitle">HTs Collections</span>
-          <span id="tlAlbumArtist">HyperSOUL-X · 2019</span>
+        <div class="tracklist-header">
+          <span class="tl-title" id="tlTitle">HTs Collections</span>
+          <span class="tl-artist" id="tlArtist">HyperSOUL-X · 2019</span>
         </div>
         <div class="tracklist" id="tracklist"></div>
       </div>
