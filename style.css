@@ -3,7 +3,7 @@
    ============================================================ */
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,Inter,sans-serif}
 body{background:#0b0b0b;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px}
-#app{max-width:1360px;width:100%;background:#0f0f0f;border-radius:36px;padding:24px 28px 20px;border:1px solid #2a2a2a;box-shadow:0 20px 40px rgba(0,0,0,.8),0 0 0 1px rgba(229,222,105,.15);min-height:600px;display:flex;flex-direction:column}
+#app{max-width:1360px;width:100%;background:#0f0f0f;border-radius:36px;padding:24px 28px 20px;border:1px solid #2a2a2a;box-shadow:0 20px 40px rgba(0,0,0,.8),0 0 0 1px rgba(229,222,105,.15);min-height:600px;display:flex;flex-direction:column;position:relative}
 
 /* ============================================================
    HEADER
@@ -11,7 +11,10 @@ body{background:#0b0b0b;min-height:100vh;display:flex;justify-content:center;ali
 header{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #e5de69;padding-bottom:14px;margin-bottom:20px;flex-shrink:0}
 header h1{color:#e5de69;font-size:1.5rem;font-weight:600}
 header h1 i{margin-right:10px}
-header span{color:#888;font-size:.85rem;background:#1a1a1a;padding:6px 16px;border-radius:30px;border:1px solid #2a2a2a}
+header #backBtn{background:none;border:none;color:#e5de69;font-size:.9rem;font-weight:600;cursor:pointer;padding:6px 14px;border-radius:20px;transition:.2s}
+header #backBtn:hover{background:#1e1d12}
+header #backBtn i{margin-right:6px}
+header span{color:#fff;font-size:.85rem;background:#1a1a1a;padding:6px 16px;border-radius:30px;border:1px solid #2a2a2a}
 
 /* ============================================================
    MAIN LAYOUT
@@ -28,8 +31,8 @@ main{display:flex;gap:28px;flex:1;min-height:0}
 .cs-overlay div:first-child{color:#e5de69;font-size:3rem;margin-bottom:10px}
 .cs-badge{color:#e5de69;font-size:1.2rem;font-weight:700;background:#1e1d12;padding:8px 24px;border-radius:40px;border:2px solid #e5de69;margin-bottom:12px}
 .cs-overlay h2{color:#fff;font-size:2rem}
-.cs-overlay p{color:#aaa;font-size:1rem;margin:6px 0}
-.cs-overlay small{color:#888;font-size:.9rem}
+.cs-overlay p{color:#fff;font-size:1rem;margin:6px 0}
+.cs-overlay small{color:#fff;font-size:.9rem}
 .cs-overlay small i{color:#e5de69}
 
 /* PC Now Playing */
@@ -47,10 +50,10 @@ main{display:flex;gap:28px;flex:1;min-height:0}
 /* ============================================================
    RIGHT: LIST SECTION
    ============================================================ */
-.list-section{flex:1;display:flex;flex-direction:column;min-width:0;gap:14px;overflow:hidden}
+.list-section{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
 
 /* Album List */
-.album-list{display:flex;flex-direction:column;gap:8px;flex-shrink:0;max-height:280px;overflow-y:auto;padding-right:4px}
+.album-list{display:flex;flex-direction:column;gap:8px;flex:1;overflow-y:auto;padding-right:4px}
 .album-item{display:flex;align-items:center;gap:14px;padding:10px 14px;background:#141414;border-radius:12px;border:1px solid #262626;cursor:pointer;transition:.2s}
 .album-item:hover{background:#1d1d1d;border-color:#e5de6960}
 .album-item.active{background:#1a1910;border-color:#e5de69}
@@ -58,17 +61,17 @@ main{display:flex;gap:28px;flex:1;min-height:0}
 .album-item .ai-art img{width:100%;height:100%;object-fit:cover}
 .album-item .ai-info{flex:1;min-width:0}
 .album-item .ai-info .ai-title{color:#fff;font-weight:600;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.album-item .ai-info .ai-artist{color:#888;font-size:.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.album-item .ai-info .ai-artist{color:#aaa;font-size:.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .album-item .ai-badge{color:#e5de69;font-size:.7rem;font-weight:600;background:#1e1d12;padding:2px 10px;border-radius:12px;border:1px solid #e5de6940;flex-shrink:0}
 .album-item .ai-play{color:#e5de69;font-size:1.2rem;opacity:0;transition:.2s}
 .album-item:hover .ai-play{opacity:.5}
 .album-item.active .ai-play{opacity:1}
 
 /* Tracklist */
-.tracklist-wrap{flex:1;display:flex;flex-direction:column;min-height:0;background:#141414;border-radius:12px;border:1px solid #262626;overflow:hidden}
+.tracklist-wrap{display:flex;flex-direction:column;flex:1;min-height:0;background:#141414;border-radius:12px;border:1px solid #262626;overflow:hidden}
 .tracklist-header{padding:10px 16px;background:#1a1a1a;border-bottom:1px solid #262626;flex-shrink:0}
 .tracklist-header .tl-title{color:#fff;font-weight:600;font-size:.95rem}
-.tracklist-header .tl-artist{color:#888;font-size:.8rem}
+.tracklist-header .tl-artist{color:#aaa;font-size:.8rem}
 .tracklist{flex:1;overflow-y:auto;padding:4px 0}
 .track-item{display:flex;align-items:center;gap:12px;padding:8px 14px;cursor:pointer;transition:.15s;border-bottom:1px solid #1a1a1a}
 .track-item:hover{background:#1d1d1d}
@@ -76,19 +79,19 @@ main{display:flex;gap:28px;flex:1;min-height:0}
 .track-item .ti-play{color:#e5de69;font-size:1rem;width:20px;text-align:center;flex-shrink:0}
 .track-item .ti-info{flex:1;min-width:0}
 .track-item .ti-info .ti-title{color:#fff;font-weight:600;font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.track-item .ti-info .ti-artist{color:#888;font-size:.75rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.track-item .ti-info .ti-artist{color:#aaa;font-size:.75rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .track-item.active .ti-info .ti-title{color:#e5de69}
 .track-item .ti-dur{color:#666;font-size:.7rem;flex-shrink:0}
 
 /* ============================================================
    MOBILE BOTTOM PLAYER (sticky)
    ============================================================ */
-.player-mobile{display:none;position:sticky;bottom:0;background:#1a1a1a;padding:10px 14px;border-top:1px solid #2a2a2a;align-items:center;justify-content:space-between;border-radius:16px 16px 0 0;margin-top:12px;flex-shrink:0;min-height:64px;gap:10px}
+.player-mobile{display:none;position:fixed;bottom:0;left:0;right:0;background:#1a1a1a;padding:10px 14px;border-top:1px solid #2a2a2a;align-items:center;justify-content:space-between;border-radius:0;z-index:100;min-height:64px;gap:10px}
 .pm-left{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
 .pm-left img{width:44px;height:44px;border-radius:8px;object-fit:cover;border:1px solid #333;flex-shrink:0}
 .pm-info{flex:1;min-width:0;height:44px;display:flex;flex-direction:column;justify-content:center;overflow:hidden}
 .pm-title{color:#fff;font-weight:600;font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;animation:scroll-title 8s linear infinite;width:fit-content;max-width:100%}
-.pm-artist{color:#888;font-size:.7rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;animation:scroll-title 8s linear infinite;width:fit-content;max-width:100%}
+.pm-artist{color:#aaa;font-size:.7rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;animation:scroll-title 8s linear infinite;width:fit-content;max-width:100%}
 @keyframes scroll-title{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 .pm-controls{display:flex;align-items:center;gap:14px;color:#e5de69;flex-shrink:0}
 .pm-controls i{font-size:1.6rem;cursor:pointer}
@@ -127,7 +130,7 @@ main{display:flex;gap:28px;flex:1;min-height:0}
    ============================================================ */
 @media(max-width:860px){
   body{padding:0}
-  #app{border-radius:0;padding:16px 16px 0;box-shadow:none;border:none;min-height:100vh;height:100vh;max-height:100vh;overflow:hidden}
+  #app{border-radius:0;padding:16px 16px 80px;box-shadow:none;border:none;min-height:100vh;height:100vh;max-height:100vh;overflow:hidden;position:relative}
   header{padding-bottom:10px;margin-bottom:12px}
   header h1{font-size:1.1rem}
   header span{font-size:.7rem;padding:4px 12px}
@@ -142,7 +145,7 @@ main{display:flex;gap:28px;flex:1;min-height:0}
   .np-pc{display:none}
   
   .list-section{flex:1;min-height:0}
-  .album-list{max-height:200px;gap:6px}
+  .album-list{flex:1;gap:6px;padding-bottom:4px}
   .album-item{padding:8px 12px}
   .album-item .ai-art{width:36px;height:36px}
   .album-item .ai-info .ai-title{font-size:.8rem}
@@ -163,7 +166,7 @@ main{display:flex;gap:28px;flex:1;min-height:0}
 }
 
 @media(max-width:480px){
-  #app{padding:12px 12px 0}
+  #app{padding:12px 12px 75px}
   .art-section{max-width:240px}
   .album-item .ai-art{width:32px;height:32px}
   .album-item .ai-info .ai-title{font-size:.75rem}
@@ -171,4 +174,4 @@ main{display:flex;gap:28px;flex:1;min-height:0}
   .pm-left img{width:36px;height:36px}
   .pm-title{font-size:.75rem}
   .pm-controls i{font-size:1.2rem}
-}
+} 
