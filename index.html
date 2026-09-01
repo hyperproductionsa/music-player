@@ -8,16 +8,23 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<div class="app" id="app">
+
+<div id="app">
+
+  <!-- HEADER -->
   <header>
     <h1><i class="fas fa-headphones"></i> HTs Collections</h1>
     <span>5 albums</span>
   </header>
+
+  <!-- MAIN CONTENT -->
   <main id="main">
-    <section class="art" id="artSection">
+
+    <!-- LEFT: COVER ART + NOW PLAYING (PC) -->
+    <section class="art-section" id="artSection">
       <div class="art-wrap" id="artWrap">
-        <img id="artImg" src="https://cdn.htcoll.shop/images/HTC1.jpg" alt="cover" />
-        <div class="cs-overlay" id="csOverlay" style="display:none;">
+        <img id="artImg" src="https://cdn.htcoll.shop/images/HTC5.jpg" alt="cover" />
+        <div class="cs-overlay" id="csOverlay">
           <div><i class="fas fa-lock"></i></div>
           <div class="cs-badge"><i class="fas fa-clock"></i> COMING SOON</div>
           <h2 id="csTitle">HTs Collections V</h2>
@@ -25,48 +32,83 @@
           <small><i class="fas fa-calendar"></i> <span id="csDate">25 Sep 2026</span></small>
         </div>
       </div>
-      <div class="np" id="np">
-        <div class="np-track" id="npTrack">Select a track</div>
-        <div class="np-artist" id="npArtist">—</div>
-        <div class="np-bar">
-          <span class="np-time" id="npCur">0:00</span>
-          <div class="np-progress"><div class="np-fill" id="npFill"></div></div>
-          <span class="np-time" id="npTot">0:00</span>
+      <!-- PC Now Playing (hidden on mobile) -->
+      <div class="np-pc" id="npPc">
+        <div class="np-pc-track" id="npPcTrack">Select a track</div>
+        <div class="np-pc-artist" id="npPcArtist">—</div>
+        <div class="np-pc-bar">
+          <span class="np-pc-time" id="npPcCur">0:00</span>
+          <div class="np-pc-progress"><div class="np-pc-fill" id="npPcFill"></div></div>
+          <span class="np-pc-time" id="npPcTot">0:00</span>
         </div>
-        <div class="np-btns">
-          <i class="fas fa-step-backward" id="btnPrev"></i>
-          <i class="fas fa-play-circle" id="btnPlay"></i>
-          <i class="fas fa-step-forward" id="btnNext"></i>
+        <div class="np-pc-btns">
+          <i class="fas fa-step-backward" id="pcPrev"></i>
+          <i class="fas fa-play-circle" id="pcPlay"></i>
+          <i class="fas fa-step-forward" id="pcNext"></i>
         </div>
       </div>
     </section>
-    <section class="tracks" id="tracksSection">
-      <div class="albums" id="albums"></div>
-      <div class="list-wrap">
-        <div class="list-head"><span>#</span><span>Title</span><span>Artist</span><span></span></div>
-        <div class="list" id="list"></div>
+
+    <!-- RIGHT: ALBUM LIST + TRACKLIST -->
+    <section class="list-section" id="listSection">
+      <!-- Album List -->
+      <div class="album-list" id="albumList"></div>
+      <!-- Tracklist (hidden until album selected) -->
+      <div class="tracklist-wrap" id="tracklistWrap" style="display:none;">
+        <div class="tracklist-header" id="tracklistHeader">
+          <span id="tlAlbumTitle">HTs Collections</span>
+          <span id="tlAlbumArtist">HyperSOUL-X · 2019</span>
+        </div>
+        <div class="tracklist" id="tracklist"></div>
       </div>
     </section>
+
   </main>
-  <!-- Mobile -->
-  <div class="mini" id="mini">
-    <div class="mini-left"><img id="miniArt" src="https://cdn.htcoll.shop/images/HTC1.jpg" /><div><div id="miniTitle">Select</div><div id="miniArtist">—</div></div></div>
-    <div><i class="fas fa-play-circle" id="miniPlay"></i><i class="fas fa-forward" id="miniNext"></i></div>
-    <div><i class="fas fa-chevron-up" id="miniExpand"></i></div>
-  </div>
-  <div class="full" id="full">
-    <div class="full-head"><i class="fas fa-chevron-down" id="fullClose"></i><span>Now Playing</span><i class="fas fa-ellipsis-h"></i></div>
-    <img id="fullArt" src="https://cdn.htcoll.shop/images/HTC1.jpg" />
-    <div class="full-info"><div id="fullTitle">Select</div><div id="fullArtist">—</div></div>
-    <div class="full-bar"><span id="fullCur">0:00</span><div class="full-progress"><div class="full-fill" id="fullFill"></div></div><span id="fullTot">0:00</span></div>
-    <div class="full-btns">
-      <i class="fas fa-step-backward" id="fullPrev"></i>
-      <i class="fas fa-play-circle" id="fullPlay"></i>
-      <i class="fas fa-step-forward" id="fullNext"></i>
+
+  <!-- MOBILE BOTTOM PLAYER (sticky) -->
+  <div class="player-mobile" id="playerMobile">
+    <div class="pm-left">
+      <img id="pmArt" src="https://cdn.htcoll.shop/images/HTC5.jpg" alt="cover" />
+      <div class="pm-info">
+        <div class="pm-title" id="pmTitle">Select a track</div>
+        <div class="pm-artist" id="pmArtist">—</div>
+      </div>
+    </div>
+    <div class="pm-controls">
+      <i class="fas fa-play-circle" id="pmPlay"></i>
+      <i class="fas fa-forward" id="pmNext"></i>
+    </div>
+    <div class="pm-expand" id="pmExpand">
+      <i class="fas fa-chevron-up"></i>
     </div>
   </div>
+
+  <!-- MOBILE FULL PLAYER (overlay) -->
+  <div class="player-full" id="playerFull">
+    <div class="pf-header">
+      <i class="fas fa-chevron-down" id="pfClose"></i>
+      <span>Now Playing</span>
+      <i class="fas fa-ellipsis-h"></i>
+    </div>
+    <img id="pfArt" src="https://cdn.htcoll.shop/images/HTC5.jpg" alt="cover" />
+    <div class="pf-info">
+      <div class="pf-title" id="pfTitle">Select a track</div>
+      <div class="pf-artist" id="pfArtist">—</div>
+    </div>
+    <div class="pf-bar">
+      <span class="pf-time" id="pfCur">0:00</span>
+      <div class="pf-progress"><div class="pf-fill" id="pfFill"></div></div>
+      <span class="pf-time" id="pfTot">0:00</span>
+    </div>
+    <div class="pf-btns">
+      <i class="fas fa-step-backward" id="pfPrev"></i>
+      <i class="fas fa-play-circle" id="pfPlay"></i>
+      <i class="fas fa-step-forward" id="pfNext"></i>
+    </div>
+  </div>
+
 </div>
-<script src="data.json" type="application/json" id="dataJson"></script>
+
 <script src="player.js"></script>
 </body>
 </html>
