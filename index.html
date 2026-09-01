@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>HTs Collections</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div class="app" id="app">
+  <header>
+    <h1><i class="fas fa-headphones"></i> HTs Collections</h1>
+    <span>5 albums</span>
+  </header>
+  <main id="main">
+    <section class="art" id="artSection">
+      <div class="art-wrap" id="artWrap">
+        <img id="artImg" src="https://cdn.htcoll.shop/images/HTC1.jpg" alt="cover" />
+        <div class="cs-overlay" id="csOverlay" style="display:none;">
+          <div><i class="fas fa-lock"></i></div>
+          <div class="cs-badge"><i class="fas fa-clock"></i> COMING SOON</div>
+          <h2 id="csTitle">HTs Collections V</h2>
+          <p id="csSub">HyperSOUL-X · 2026 · 14 tracks</p>
+          <small><i class="fas fa-calendar"></i> <span id="csDate">25 Sep 2026</span></small>
+        </div>
+      </div>
+      <div class="np" id="np">
+        <div class="np-track" id="npTrack">Select a track</div>
+        <div class="np-artist" id="npArtist">—</div>
+        <div class="np-bar">
+          <span class="np-time" id="npCur">0:00</span>
+          <div class="np-progress"><div class="np-fill" id="npFill"></div></div>
+          <span class="np-time" id="npTot">0:00</span>
+        </div>
+        <div class="np-btns">
+          <i class="fas fa-step-backward" id="btnPrev"></i>
+          <i class="fas fa-play-circle" id="btnPlay"></i>
+          <i class="fas fa-step-forward" id="btnNext"></i>
+        </div>
+      </div>
+    </section>
+    <section class="tracks" id="tracksSection">
+      <div class="albums" id="albums"></div>
+      <div class="list-wrap">
+        <div class="list-head"><span>#</span><span>Title</span><span>Artist</span><span></span></div>
+        <div class="list" id="list"></div>
+      </div>
+    </section>
+  </main>
+  <!-- Mobile -->
+  <div class="mini" id="mini">
+    <div class="mini-left"><img id="miniArt" src="https://cdn.htcoll.shop/images/HTC1.jpg" /><div><div id="miniTitle">Select</div><div id="miniArtist">—</div></div></div>
+    <div><i class="fas fa-play-circle" id="miniPlay"></i><i class="fas fa-forward" id="miniNext"></i></div>
+    <div><i class="fas fa-chevron-up" id="miniExpand"></i></div>
+  </div>
+  <div class="full" id="full">
+    <div class="full-head"><i class="fas fa-chevron-down" id="fullClose"></i><span>Now Playing</span><i class="fas fa-ellipsis-h"></i></div>
+    <img id="fullArt" src="https://cdn.htcoll.shop/images/HTC1.jpg" />
+    <div class="full-info"><div id="fullTitle">Select</div><div id="fullArtist">—</div></div>
+    <div class="full-bar"><span id="fullCur">0:00</span><div class="full-progress"><div class="full-fill" id="fullFill"></div></div><span id="fullTot">0:00</span></div>
+    <div class="full-btns">
+      <i class="fas fa-step-backward" id="fullPrev"></i>
+      <i class="fas fa-play-circle" id="fullPlay"></i>
+      <i class="fas fa-step-forward" id="fullNext"></i>
+    </div>
+  </div>
+</div>
+<script src="data.json" type="application/json" id="dataJson"></script>
+<script src="player.js"></script>
+</body>
+</html>

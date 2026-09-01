@@ -1,0 +1,118 @@
+{
+  "baseUrl": "https://cdn.htcoll.shop",
+  "comingSoon": "2026-09-25",
+  "albums": [
+    {
+      "id": "htc1",
+      "title": "HTs Collections",
+      "artist": "HyperSOUL-X",
+      "year": "2019",
+      "cover": "HTC1.jpg",
+      "tracks": [
+        {"title":"The Earth Leakage","artist":"HyperSOUL-X","mix":"Main HT","file":"01"},
+        {"title":"Isoka Lam'","artist":"HyperSOUL-X, Zee, DVO","mix":"Afro HT","file":"02"},
+        {"title":"Bekezela","artist":"Ma-b, HyperSOUL-X","mix":"HyperSOUL-X's HT Mix","file":"03"},
+        {"title":"Leave The Fear","artist":"HyperSOUL-X, Black Opal","mix":"Afro HT","file":"04"},
+        {"title":"The Fusion","artist":"HyperSOUL-X","mix":"Main HT","file":"05"},
+        {"title":"Lerato","artist":"DJ Epitonic SA, Hakeem","mix":"HyperSOUL-X's Emotional HT Mix","file":"06"},
+        {"title":"Virgin Mary","artist":"HyperSOUL-X","mix":"Main HT","file":"07"},
+        {"title":"The Working Knowledge","artist":"HyperSOUL-X","mix":"Main HT","file":"08"},
+        {"title":"Charlie","artist":"The Lashes, Papisto","mix":"HyperSOUL-X's HT Mix","file":"09"},
+        {"title":"Tell Me","artist":"HyperSOUL-X, Kowkie","mix":"Afro HT","file":"10"}
+      ]
+    },
+    {
+      "id": "htc2",
+      "title": "HTs Collections, Vol. 2",
+      "artist": "HyperSOUL-X",
+      "year": "2020",
+      "cover": "HTC2.jpg",
+      "tracks": [
+        {"title":"The Lion's Den","artist":"HyperSOUL-X","mix":"Main HT","file":"01"},
+        {"title":"Southern Cries","artist":"HyperSOUL-X","mix":"Main HT","file":"02"},
+        {"title":"Appreciating Benny T","artist":"HyperSOUL-X","mix":"Main HT","file":"03"},
+        {"title":"The Prime Meridian","artist":"HyperSOUL-X","mix":"Main HT","file":"04"},
+        {"title":"The New Moon","artist":"HyperSOUL-X","mix":"Main HT","file":"05"},
+        {"title":"The Equator","artist":"HyperSOUL-X","mix":"Main HT","file":"06"},
+        {"title":"The Ardour","artist":"HyperSOUL-X","mix":"Main HT","file":"07"},
+        {"title":"Kea Senya","artist":"HyperSOUL-X","mix":"Main HT","file":"08"},
+        {"title":"H.L.O.G.I.","artist":"HyperSOUL-X","mix":"Main HT","file":"09"},
+        {"title":"Family Affair","artist":"HyperSOUL-X","mix":"Main HT","file":"10"},
+        {"title":"The Morning After","artist":"HyperSOUL-X","mix":"Main HT","file":"11"}
+      ]
+    },
+    {
+      "id": "htc3",
+      "title": "HTs Collections, Vol. 3",
+      "artist": "HyperSOUL-X",
+      "year": "2022",
+      "cover": "HTC3.jpg",
+      "tracks": [
+        {"title":"O Ya Kae","artist":"HyperSOUL-X, OKAY GOD","mix":"Main HT","file":"01"},
+        {"title":"Kore","artist":"HyperSOUL-X","mix":"Main HT","file":"02"},
+        {"title":"Let There Be House","artist":"HyperSOUL-X","mix":"Main HT","file":"03"},
+        {"title":"Wara Wara","artist":"HyperSOUL-X","mix":"Main HT","file":"04"},
+        {"title":"Bison","artist":"HyperSOUL-X","mix":"Main HT","file":"05"},
+        {"title":"Peace","artist":"HyperSOUL-X","mix":"Main HT","file":"06"},
+        {"title":"Peri-Peri","artist":"HyperSOUL-X","mix":"Main HT","file":"07"},
+        {"title":"Mood","artist":"HyperSOUL-X","mix":"Main HT","file":"08"},
+        {"title":"Malo","artist":"HyperSOUL-X","mix":"Main HT","file":"09"},
+        {"title":"Something","artist":"HyperSOUL-X","mix":"Main HT","file":"10"},
+        {"title":"The Fall","artist":"HyperSOUL-X","mix":"Main HT","file":"11"},
+        {"title":"Twenty-Six","artist":"HyperSOUL-X","mix":"Main HT","file":"12"},
+        {"title":"Pretty Sky","artist":"HyperSOUL-X","mix":"Main HT","file":"13"},
+        {"title":"BackGround","artist":"HyperSOUL-X","mix":"Main HT","file":"14"}
+      ]
+    },
+    {
+      "id": "htc4",
+      "title": "HTs Collections, Vol. 4",
+      "artist": "HyperSOUL-X",
+      "year": "2024",
+      "cover": "HTC4.jpg",
+      "tracks": [
+        {"title":"Magugu Yangu","artist":"HyperSOUL-X","mix":"Main HT","file":"01"},
+        {"title":"Yin","artist":"HyperSOUL-X","mix":"Main HT","file":"02"},
+        {"title":"Eden","artist":"HyperSOUL-X","mix":"Main HT","file":"03"},
+        {"title":"Maji Matamu","artist":"HyperSOUL-X","mix":"Main HT","file":"04"},
+        {"title":"Yelele","artist":"HyperSOUL-X","mix":"Main HT","file":"05"},
+        {"title":"Zoo","artist":"HyperSOUL-X","mix":"Main HT","file":"06"},
+        {"title":"C'mon","artist":"HyperSOUL-X","mix":"Main HT","file":"07"},
+        {"title":"Mama Yeh","artist":"HyperSOUL-X","mix":"Main HT","file":"08"},
+        {"title":"Woko","artist":"HyperSOUL-X","mix":"Main HT","file":"09"},
+        {"title":"Mirame","artist":"HyperSOUL-X","mix":"Main HT","file":"10"},
+        {"title":"Ijo","artist":"HyperSOUL-X","mix":"Main HT","file":"11"},
+        {"title":"Juntos","artist":"HyperSOUL-X","mix":"Main HT","file":"12"},
+        {"title":"Centric","artist":"HyperSOUL-X","mix":"Main HT","file":"13"},
+        {"title":"Bekani","artist":"HyperSOUL-X","mix":"Main HT","file":"14"},
+        {"title":"I Don't Know Why","artist":"HyperSOUL-X","mix":"Main HT","file":"15"},
+        {"title":"Bailar","artist":"HyperSOUL-X","mix":"Main HT","file":"16"}
+      ]
+    }
+  ],
+  "comingSoonAlbum": {
+    "id": "htc5",
+    "title": "HTs Collections V",
+    "artist": "HyperSOUL-X",
+    "year": "2026",
+    "cover": "HTC5.jpg",
+    "releaseDate": "2026-09-25",
+    "trackCount": 14,
+    "tracks": [
+      {"title":"Moya","artist":"HyperSOUL-X, Sontshikazi","mix":"Main HT","file":"01"},
+      {"title":"Ndiani","artist":"HyperSOUL-X","mix":"Main HT","file":"02"},
+      {"title":"Happysoul","artist":"HyperSOUL-X, Mogau SA","mix":"Afro HT","file":"03"},
+      {"title":"Menelisi","artist":"HyperSOUL-X, Sontshikazi","mix":"Main HT","file":"04"},
+      {"title":"Ndiwe","artist":"HyperSOUL-X","mix":"Main HT","file":"05"},
+      {"title":"The Awakening","artist":"HyperSOUL-X","mix":"Main HT","file":"06"},
+      {"title":"Free","artist":"HyperSOUL-X, PreciousGift","mix":"Main HT","file":"07"},
+      {"title":"Mugomo","artist":"HyperSOUL-X","mix":"Main HT","file":"08"},
+      {"title":"The Threshold","artist":"HyperSOUL-X","mix":"Main HT","file":"09"},
+      {"title":"Pendula","artist":"HyperSOUL-X, Idd Aziz","mix":"Revised HT","file":"10"},
+      {"title":"Tjate","artist":"HyperSOUL-X, LadyKay The Poet","mix":"Spoken HT","file":"11"},
+      {"title":"Your Light","artist":"HyperSOUL-X, Lulu Bolaydie","mix":"Amapiano HT","file":"12"},
+      {"title":"Void","artist":"HyperSOUL-X, Zee Royal","mix":"Main HT","file":"13"},
+      {"title":"Kgetha Nna","artist":"HyperSOUL-X, PreciousGift","mix":"Main HT","file":"14"}
+    ]
+  }
+}
