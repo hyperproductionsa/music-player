@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>HTs Collections · Music Player</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- MAIN VIEW -->
+<div class="app-container" id="appContainer">
+
+  <!-- HEADER -->
+  <div class="app-header">
+    <h1><i class="fas fa-headphones-alt"></i> HTs Collections</h1>
+    <span>5 albums</span>
+  </div>
+
+  <!-- LIBRARY VIEW (PC & Mobile list) -->
+  <div class="library-view" id="libraryView">
+    <!-- Coming Soon Card -->
+    <div class="coming-soon-card" id="comingSoonCard">
+      <div class="coming-soon-badge"><i class="fas fa-clock"></i> COMING SOON</div>
+      <h2 id="csTitle">HTs Collections V</h2>
+      <div class="sub" id="csSub">HyperSOUL-X · 2026 · 14 tracks</div>
+      <div class="artwork-container">
+        <img id="csArtwork" src="HTC5.jpg" alt="HTs Collections V" class="album-artwork" />
+        <div class="yt-overlay">
+          <iframe id="htc5Iframe" src="https://www.youtube.com/embed/RRT_IjrrE44?controls=0&modestbranding=1&rel=0&enablejsapi=1" allowfullscreen></iframe>
+        </div>
+      </div>
+      <div class="track-count">
+        <i class="fas fa-music"></i> <span id="csTrackCount">14</span> tracks
+        <span style="margin-left: auto; color: #555;"><i class="fas fa-calendar-alt"></i> <span id="csReleaseDate">25 Sep 2026</span></span>
+      </div>
+    </div>
+
+    <!-- Album List -->
+    <div class="album-list" id="albumList"></div>
+  </div>
+
+  <!-- MINI PLAYER (always visible at bottom) -->
+  <div class="mini-player" id="miniPlayer">
+    <div class="mini-player-left" id="miniPlayerLeft">
+      <img id="miniArtwork" src="HTC1.jpg" alt="Now Playing" class="mini-artwork" />
+      <div class="mini-info">
+        <div class="mini-title" id="miniTitle">HTs Collections</div>
+        <div class="mini-artist" id="miniArtist">HyperSOUL-X</div>
+      </div>
+    </div>
+    <div class="mini-controls">
+      <i class="fas fa-play-circle" id="miniPlayBtn"></i>
+      <i class="fas fa-forward" id="miniNextBtn"></i>
+    </div>
+    <div class="mini-expand" id="miniExpandBtn">
+      <i class="fas fa-chevron-up"></i>
+    </div>
+  </div>
+
+  <!-- FULL PLAYER VIEW (mobile app-like) -->
+  <div class="full-player" id="fullPlayer">
+    <div class="full-player-header">
+      <i class="fas fa-chevron-down" id="fullCloseBtn"></i>
+      <span>Now Playing</span>
+      <i class="fas fa-ellipsis-h"></i>
+    </div>
+
+    <div class="full-player-artwork">
+      <img id="fullArtwork" src="HTC1.jpg" alt="Now Playing" />
+      <div class="full-video-overlay">
+        <iframe id="fullIframe" src="https://www.youtube.com/embed/RRT_IjrrE44?controls=0&modestbranding=1&rel=0&enablejsapi=1" allowfullscreen></iframe>
+      </div>
+    </div>
+
+    <div class="full-player-info">
+      <div class="full-title" id="fullTitle">HTs Collections</div>
+      <div class="full-artist" id="fullArtist">HyperSOUL-X</div>
+    </div>
+
+    <div class="full-progress">
+      <span class="time-elapsed" id="timeElapsed">0:00</span>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+      </div>
+      <span class="time-total" id="timeTotal">3:45</span>
+    </div>
+
+    <div class="full-controls">
+      <i class="fas fa-step-backward" id="fullPrevBtn"></i>
+      <i class="fas fa-play-circle" id="fullPlayBtn"></i>
+      <i class="fas fa-step-forward" id="fullNextBtn"></i>
+    </div>
+
+    <div class="full-extra-controls">
+      <i class="fas fa-heart"></i>
+      <i class="fas fa-random"></i>
+      <i class="fas fa-repeat"></i>
+      <i class="fas fa-list-ul"></i>
+    </div>
+  </div>
+</div>
+
+<script src="data.json" type="application/json" id="dataJson"></script>
+<script>
+  fetch('data.json')
+    .then(response => response.json())
+    .then(data => initPlayer(data))
+    .catch(err => {
+      console.error('Error loading data.json:', err);
+      const jsonScript = document.getElementById('dataJson');
+      if (jsonScript) {
+        try {
+          const data = JSON.parse(jsonScript.textContent);
+          initPlayer(data);
+        } catch (e) {
+          console.error('Fallback failed:', e);
+        }
+      }
+    });
+
+  function initPlayer(data) {
+    const albums = data.albums;
+    const comingSoon = data.comingSoon;
+
+    let currentAlbum = null;
+    let currentTrackIndex = 0;
+    let isPlaying = false;
+
+    // DOM refs
+    const albumListEl = document.getElementById('albumList');
+    const csArtwork = document.getElementById('csArtwork');
+    const csTitle = document.getElementById('csTitle');
+    const csSub = document.getElementById('csSub');
+    const csTrackCount = document.getElementById('csTrackCount');
+    const csReleaseDate = document.getElementById('csReleaseDate');
+    const htc5Iframe = document.getElementById('htc5Iframe');
+
+    const miniArtwork = document.getElementById('miniArtwork');
+    const miniTitle = document.getElementById('miniTitle');
+    const miniArtist = document.getElementById('miniArtist');
+    const miniPlayBtn = document.getElementById('miniPlayBtn');
+    const miniNextBtn = document.getElementById('miniNextBtn');
+    const miniExpandBtn = document.getElementById('miniExpandBtn');
+
+    const fullArtwork = document.getElementById('fullArtwork');
+    const fullIframe = document.getElementById('fullIframe');
+    const fullTitle = document.getElementById('fullTitle');
+    const fullArtist = document.getElementById('fullArtist');
+    const fullPlayBtn = document.getElementById('fullPlayBtn');
+    const fullPrevBtn = document.getElementById('fullPrevBtn');
+    const fullNextBtn = document.getElementById('fullNextBtn');
+    const fullCloseBtn = document.getElementById('fullCloseBtn');
+    const progressFill = document.getElementById('progressFill');
+
+    const libraryView = document.getElementById('libraryView');
+    const fullPlayer = document.getElementById('fullPlayer');
+    const miniPlayer = document.getElementById('miniPlayer');
+
+    // Set coming soon data
+    csTitle.textContent = comingSoon.title;
+    csSub.textContent = `${comingSoon.artist} · ${comingSoon.year} · ${comingSoon.tracks.length} tracks`;
+    csTrackCount.textContent = comingSoon.tracks.length;
+    csReleaseDate.textContent = comingSoon.releaseDate;
+    csArtwork.src = comingSoon.cover;
+    htc5Iframe.src = `https://www.youtube.com/embed/${comingSoon.tracks[0].url}?controls=0&modestbranding=1&rel=0&enablejsapi=1`;
+
+    // Render album list
+    function renderAlbums() {
+      albumListEl.innerHTML = albums.map((album, idx) => {
+        const firstTrack = album.tracks[0];
+        return `
+          <div class="album-item" data-album-index="${idx}">
+            <div class="album-thumb">
+              <img src="${album.cover}" alt="${album.title}" class="album-artwork-small" />
+              <div class="yt-overlay-small">
+                <iframe src="https://www.youtube.com/embed/${firstTrack.url}?controls=0&modestbranding=1&rel=0" allowfullscreen></iframe>
+              </div>
+            </div>
+            <div class="album-info">
+              <div class="title">${album.title}</div>
+              <div class="artist"><i class="fas fa-user-circle"></i> ${album.artist} · ${album.year}</div>
+              <div class="meta"><i class="fas fa-layer-group"></i> ${album.tracks.length} tracks</div>
+            </div>
+            <i class="fas fa-play-circle album-play-icon"></i>
+          </div>
+        `;
+      }).join('');
+
+      document.querySelectorAll('.album-item').forEach((item) => {
+        item.addEventListener('click', function() {
+          const idx = parseInt(this.dataset.albumIndex);
+          loadAlbum(albums[idx]);
+          // On mobile, auto-open full player
+          if (window.innerWidth <= 860) {
+            openFullPlayer();
+          }
+        });
+      });
+    }
+
+    // Load album
+    function loadAlbum(album) {
+      currentAlbum = album;
+      currentTrackIndex = 0;
+      playTrack(0);
+      document.querySelectorAll('.album-item').forEach((el, i) => {
+        el.classList.toggle('active', albums[i] === album);
+      });
+      miniArtwork.src = album.cover;
+      fullArtwork.src = album.cover;
+    }
+
+    // Play track
+    function playTrack(index) {
+      if (!currentAlbum) return;
+      const track = currentAlbum.tracks[index];
+      if (!track) return;
+      currentTrackIndex = index;
+      const videoId = track.url;
+      
+      const iframeSrc = `https://www.youtube.com/embed/${videoId}?controls=0&modestbranding=1&rel=0&enablejsapi=1&autoplay=1`;
+      fullIframe.src = iframeSrc;
+      
+      miniTitle.textContent = track.title;
+      miniArtist.textContent = currentAlbum.artist;
+      fullTitle.textContent = `${currentAlbum.title} · ${track.title}`;
+      fullArtist.textContent = track.artist + (track.mix ? ` · ${track.mix}` : '');
+      
+      isPlaying = true;
+      updatePlayButtons();
+    }
+
+    function togglePlay() {
+      if (!currentAlbum) return;
+      isPlaying = !isPlaying;
+      if (isPlaying) {
+        let src = fullIframe.src;
+        if (src.includes('autoplay=1')) {
+          fullIframe.src = fullIframe.src;
+        } else {
+          fullIframe.src = src + (src.includes('?') ? '&autoplay=1' : '?autoplay=1');
+        }
+      } else {
+        const src = fullIframe.src.replace('&autoplay=1', '').replace('?autoplay=1', '');
+        fullIframe.src = src;
+      }
+      updatePlayButtons();
+    }
+
+    function updatePlayButtons() {
+      const icon = isPlaying ? 'fa-pause-circle' : 'fa-play-circle';
+      miniPlayBtn.className = `fas ${icon}`;
+      fullPlayBtn.className = `fas ${icon}`;
+    }
+
+    function nextTrack() {
+      if (!currentAlbum) return;
+      const newIndex = (currentTrackIndex + 1) % currentAlbum.tracks.length;
+      playTrack(newIndex);
+    }
+
+    function prevTrack() {
+      if (!currentAlbum) return;
+      const newIndex = (currentTrackIndex - 1 + currentAlbum.tracks.length) % currentAlbum.tracks.length;
+      playTrack(newIndex);
+    }
+
+    function openFullPlayer() {
+      fullPlayer.classList.add('active');
+      libraryView.style.display = 'none';
+      miniPlayer.style.display = 'none';
+    }
+
+    function closeFullPlayer() {
+      fullPlayer.classList.remove('active');
+      libraryView.style.display = '';
+      miniPlayer.style.display = '';
+    }
+
+    // Event listeners
+    miniPlayBtn.addEventListener('click', togglePlay);
+    miniNextBtn.addEventListener('click', nextTrack);
+    miniExpandBtn.addEventListener('click', openFullPlayer);
+    
+    fullPlayBtn.addEventListener('click', togglePlay);
+    fullPrevBtn.addEventListener('click', prevTrack);
+    fullNextBtn.addEventListener('click', nextTrack);
+    fullCloseBtn.addEventListener('click', closeFullPlayer);
+
+    // Load first album
+    renderAlbums();
+    loadAlbum(albums[0]);
+
+    // Simulate progress (for demo)
+    let progress = 0;
+    setInterval(() => {
+      if (isPlaying) {
+        progress = (progress + 0.5) % 100;
+        progressFill.style.width = progress + '%';
+      }
+    }, 500);
+
+    console.log('HTs Collections Player ready!');
+  }
+</script>
+</body>
+</html>

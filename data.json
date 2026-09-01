@@ -1,0 +1,114 @@
+{
+  "albums": [
+    {
+      "id": "htc1",
+      "title": "HTs Collections",
+      "artist": "HyperSOUL-X",
+      "year": "2019",
+      "cover": "HTC1.jpg",
+      "tracks": [
+        { "title": "The Earth Leakage", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "RRT_IjrrE44" },
+        { "title": "Isoka Lam'", "artist": "HyperSOUL-X, Zee, DVO", "mix": "Afro HT", "url": "NCi1JFaLvDg" },
+        { "title": "Bekezela", "artist": "Ma-b, HyperSOUL-X", "mix": "HyperSOUL-X's HT Mix", "url": "TsiYnD2cCN4" },
+        { "title": "Leave The Fear", "artist": "HyperSOUL-X, Black Opal", "mix": "Afro HT", "url": "2Rxrth7rpmI" },
+        { "title": "The Fusion", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "hJFrv6WskIA" },
+        { "title": "Lerato", "artist": "DJ Epitonic SA, Hakeem", "mix": "HyperSOUL-X's Emotional HT Mix", "url": "RlY96Xza_8I" },
+        { "title": "Virgin Mary", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "4GL0xjz2wuQ" },
+        { "title": "The Working Knowledge", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "kdFHSS188aQ" },
+        { "title": "Charlie", "artist": "The Lashes, Papisto", "mix": "HyperSOUL-X's HT Mix", "url": "HnOzRbUw-cQ" },
+        { "title": "Tell Me", "artist": "HyperSOUL-X, Kowkie", "mix": "Afro HT", "url": "rutJ2Bnz5-4" }
+      ]
+    },
+    {
+      "id": "htc2",
+      "title": "HTs Collections, Vol. 2",
+      "artist": "HyperSOUL-X",
+      "year": "2020",
+      "cover": "HTC2.jpg",
+      "tracks": [
+        { "title": "The Lion's Den", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "SEbcslT92kk" },
+        { "title": "Southern Cries", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "MtNFkP9Jpqc" },
+        { "title": "Appreciating Benny T", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "5WLMDhjwOFA" },
+        { "title": "The Prime Meridian", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "e3bxcc3Fwoo" },
+        { "title": "The New Moon", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "sE-3dJYglA0" },
+        { "title": "The Equator", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "EVycmqm-7To" },
+        { "title": "The Ardour", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "DtiqVtBLvzQ" },
+        { "title": "Kea Senya", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "gMC6ZB2pYlw" },
+        { "title": "H.L.O.G.I.", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "XvGxzeda9FI" },
+        { "title": "Family Affair", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "sH55DMpXty4" },
+        { "title": "The Morning After", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "E2QRfM52TbI" }
+      ]
+    },
+    {
+      "id": "htc3",
+      "title": "HTs Collections, Vol. 3",
+      "artist": "HyperSOUL-X",
+      "year": "2022",
+      "cover": "HTC3.jpg",
+      "tracks": [
+        { "title": "O Ya Kae", "artist": "HyperSOUL-X, OKAY GOD", "mix": "Main HT", "url": "IOtkL8SYZ2k" },
+        { "title": "Kore", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "T1mM0vszOXg" },
+        { "title": "Let There Be House", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "gKczWMWlpBs" },
+        { "title": "Wara Wara", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "YLL0GdIHgD4" },
+        { "title": "Bison", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "zCXIht4XchQ" },
+        { "title": "Peace", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "Oe-dhVhbyS4" },
+        { "title": "Peri-Peri", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "JbiYhrBRCkU" },
+        { "title": "Mood", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "EHMiBowmuxA" },
+        { "title": "Malo", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "kstfBz--UX8" },
+        { "title": "Something", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "F0iTDyg6sCw" },
+        { "title": "The Fall", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "sOK4x6LGU7s" },
+        { "title": "Twenty-Six", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "IRJELYP5iS4" },
+        { "title": "Pretty Sky", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "eHarUiU7uLM" },
+        { "title": "BackGround", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "1TEV9dkWJX0" }
+      ]
+    },
+    {
+      "id": "htc4",
+      "title": "HTs Collections, Vol. 4",
+      "artist": "HyperSOUL-X",
+      "year": "2024",
+      "cover": "HTC4.jpg",
+      "tracks": [
+        { "title": "Magugu Yangu", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "gkPR37Ml-ds" },
+        { "title": "Yin", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "PvBClwPm3ew" },
+        { "title": "Eden", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "4mgXuLqxjiE" },
+        { "title": "Maji Matamu", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "lPsv6X3Eu8o" },
+        { "title": "Yelele", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "2Qam0bxAbBA" },
+        { "title": "Zoo", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "1zUVaKmZ12o" },
+        { "title": "C'mon", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "wBmyvNpwZB8" },
+        { "title": "Mama Yeh", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "rmerZC_Xcew" },
+        { "title": "Woko", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "qG58gLv1iSQ" },
+        { "title": "Mirame", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "OUthX9wtKeg" },
+        { "title": "Ijo", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "xYyx0DPLM3M" },
+        { "title": "Juntos", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "Mhx4nMafP7g" },
+        { "title": "Centric", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "C3VtrzyAPqI" },
+        { "title": "Bekani", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "UMoz7Tvhc0I" },
+        { "title": "I Don't Know Why", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "i65TI5NL-Cs" },
+        { "title": "Bailar", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "ANCt5Fgjxl0" }
+      ]
+    }
+  ],
+  "comingSoon": {
+    "title": "HTs Collections V",
+    "artist": "HyperSOUL-X",
+    "year": "2026",
+    "cover": "HTC5.jpg",
+    "releaseDate": "25 Sep 2026",
+    "tracks": [
+      { "title": "Moya", "artist": "HyperSOUL-X, Sontshikazi", "mix": "Main HT", "url": "RRT_IjrrE44" },
+      { "title": "Ndiani", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "NCi1JFaLvDg" },
+      { "title": "Happysoul", "artist": "HyperSOUL-X, Mogau SA", "mix": "Afro HT", "url": "TsiYnD2cCN4" },
+      { "title": "Menelisi", "artist": "HyperSOUL-X, Sontshikazi", "mix": "Main HT", "url": "2Rxrth7rpmI" },
+      { "title": "Ndiwe", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "hJFrv6WskIA" },
+      { "title": "The Awakening", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "RlY96Xza_8I" },
+      { "title": "Free", "artist": "HyperSOUL-X, PreciousGift", "mix": "Main HT", "url": "4GL0xjz2wuQ" },
+      { "title": "Mugomo", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "kdFHSS188aQ" },
+      { "title": "The Threshold", "artist": "HyperSOUL-X", "mix": "Main HT", "url": "HnOzRbUw-cQ" },
+      { "title": "Pendula", "artist": "HyperSOUL-X, Idd Aziz", "mix": "Revised HT", "url": "rutJ2Bnz5-4" },
+      { "title": "Tjate", "artist": "HyperSOUL-X, LadyKay The Poet", "mix": "Spoken HT", "url": "SEbcslT92kk" },
+      { "title": "Your Light", "artist": "HyperSOUL-X, Lulu Bolaydie", "mix": "Amapiano HT", "url": "MtNFkP9Jpqc" },
+      { "title": "Void", "artist": "HyperSOUL-X, Zee Royal", "mix": "Main HT", "url": "5WLMDhjwOFA" },
+      { "title": "Kgetha Nna", "artist": "HyperSOUL-X, PreciousGift", "mix": "Main HT", "url": "e3bxcc3Fwoo" }
+    ]
+  }
+}
