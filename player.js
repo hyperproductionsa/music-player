@@ -8,17 +8,12 @@
   const getAudio = (a, t) => `${baseUrl}/m4a/${a.folder}/${t.file}`;
   const getImage = (a) => `${baseUrl}/images/${a.cover}`;
 
-  // Track the currently PLAYING album and track (separate from browsing)
   let playingAlbum = null;
   let playingTrack = null;
   let playingIdx = 0;
   let isPlaying = false;
   let timer = null;
-
-  // Track the album being VIEWED (for tracklist display)
   let viewedAlbum = null;
-
-  // Store full state for each album: which track was last played
   const albumStates = {};
 
   // DOM
@@ -66,11 +61,33 @@
   const allAlbums = [...albums, { ...comingSoonAlbum, isCS: true }];
 
   // ============================================================
-  // UPDATE ARTWORK (separate from now playing)
+  // SMART CAROUSEL - Only scroll if text overflows
+  // ============================================================
+  function updateMobileText(title, artist) {
+    if (!pmTitle || !pmArtist) return;
+    
+    pmTitle.textContent = title || 'Select a track';
+    pmArtist.textContent = artist || '—';
+    
+    // Check title overflow
+    pmTitle.classList.remove('scroll');
+    void pmTitle.offsetWidth;
+    if (pmTitle.scrollWidth > pmTitle.clientWidth) {
+      pmTitle.classList.add('scroll');
+    }
+    
+    // Check artist overflow
+    pmArtist.classList.remove('scroll');
+    void pmArtist.offsetWidth;
+    if (pmArtist.scrollWidth > pmArtist.clientWidth) {
+      pmArtist.classList.add('scroll');
+    }
+  }
+
+  // ============================================================
+  // UPDATE ARTWORK
   // ============================================================
   function updateArtwork() {
-    // If playing, show playing album artwork
-    // Otherwise show HTC5 (Coming Soon)
     if (playingAlbum) {
       artImg.src = getImage(playingAlbum);
       csOverlay.style.display = 'none';
@@ -91,25 +108,21 @@
     if (!playingTrack || !playingAlbum) {
       npPcTrack.textContent = 'Select a track';
       npPcArtist.textContent = '—';
-      pmTitle.textContent = 'Select a track';
-      pmArtist.textContent = '—';
       pfTitle.textContent = 'Select a track';
       pfArtist.textContent = '—';
+      updateMobileText('Select a track', '—');
       return;
     }
     const title = playingTrack.mix ? `${playingTrack.title} (${playingTrack.mix})` : playingTrack.title;
     npPcTrack.textContent = title;
     npPcArtist.textContent = playingTrack.artist;
-    pmTitle.textContent = title;
-    pmArtist.textContent = playingTrack.artist;
     pfTitle.textContent = title;
     pfArtist.textContent = playingTrack.artist;
+    updateMobileText(title, playingTrack.artist);
     
-    // Artwork stays with the PLAYING album
     const art = getImage(playingAlbum);
     pmArt.src = art;
     pfArt.src = art;
-    // Also update the main artwork
     updateArtwork();
   }
 
@@ -173,7 +186,6 @@
     albumList.innerHTML = sorted.map((a) => {
       const idx = allAlbums.indexOf(a);
       const isCS = a.isCS || false;
-      // Check if this album is currently playing
       const isPlayingAlbum = playingAlbum && playingAlbum.id === a.id;
       const hasState = albumStates[a.id] !== undefined;
       return `
@@ -197,8 +209,6 @@
     showTracklist();
     tlTitle.textContent = album.title;
     tlArtist.textContent = `${album.artist} · ${album.year}`;
-
-    // Store which album is being viewed
     viewedAlbum = album;
 
     if (isLocked || album.isCS) {
@@ -226,16 +236,12 @@
       return;
     }
 
-    // Get the saved state for this album
     const state = albumStates[album.id];
     const savedIdx = state ? state.playingIdx : 0;
 
     tracklist.innerHTML = album.tracks.map((t, i) => {
-      // Check if this track matches the saved state for this album
       const isSavedTrack = (state && i === savedIdx);
-      // Check if this is currently playing
       const isActive = (playingAlbum && playingAlbum.id === album.id && i === playingIdx);
-      
       const title = t.mix ? `${t.title} (${t.mix})` : t.title;
       return `
         <div class="track-item ${isActive ? 'active' : ''}" data-idx="${i}">
@@ -250,7 +256,6 @@
     }).join('');
     tracklist.querySelectorAll('.track-item:not(.locked)').forEach(el => {
       el.onclick = () => {
-        // When clicking a track, play it from the viewed album
         const albumToPlay = viewedAlbum;
         if (!albumToPlay || albumToPlay.isCS) return;
         const trackIdx = parseInt(el.dataset.idx);
@@ -260,49 +265,33 @@
   }
 
   // ============================================================
-  // LOAD ALBUM (for viewing, NOT playing)
+  // LOAD ALBUM
   // ============================================================
   function loadAlbum(idx) {
     const album = allAlbums[idx];
     const isLocked = album.isCS || false;
-
-    // Update the viewed album
     viewedAlbum = album;
-
-    // DON'T change the artwork - it should stay with playing song
-    // DON'T change the now playing UI
-
     renderTracklist(album, isLocked);
   }
 
   // ============================================================
-  // PLAY TRACK (starts playing the selected track)
+  // PLAY TRACK
   // ============================================================
   function playTrack(idx, album) {
-    // If album not provided, use viewedAlbum
-    if (!album) {
-      album = viewedAlbum;
-    }
+    if (!album) album = viewedAlbum;
     if (!album || album.isCS) return;
     
     const track = album.tracks[idx];
     if (!track) return;
 
-    // Set as playing album/track
     playingAlbum = album;
     playingTrack = track;
     playingIdx = idx;
 
-    // Save state for this album
-    albumStates[album.id] = { 
-      playingIdx: idx,
-      albumTitle: album.title,
-      albumArtist: album.artist
-    };
+    albumStates[album.id] = { playingIdx: idx };
 
     const url = getAudio(album, track);
     
-    // If same track, toggle play/pause
     if (audio.src === url) {
       if (isPlaying) {
         audio.pause();
@@ -318,16 +307,14 @@
       return;
     }
 
-    // New track - load and play
     audio.src = url;
     audio.load();
 
-    // Update NOW PLAYING (shows PLAYING track)
     updateNowPlaying();
     setupMediaSession();
 
     renderTracklist(album, false);
-    renderAlbums(); // Update album list to show playing indicator
+    renderAlbums();
     audio.play().then(() => {
       isPlaying = true;
       updatePlayBtn();
@@ -339,11 +326,10 @@
   }
 
   // ============================================================
-  // CONTROLS - ALWAYS work on the PLAYING album
+  // CONTROLS
   // ============================================================
   function togglePlay() {
     if (!playingTrack) {
-      // If nothing is playing but there's a viewed album, play first track
       if (viewedAlbum && !viewedAlbum.isCS) {
         playTrack(0, viewedAlbum);
       }
@@ -406,21 +392,15 @@
 
   function nextTrack() {
     if (!playingAlbum) return;
-    // Always skip on the PLAYING album
     const nextIdx = (playingIdx + 1) % playingAlbum.tracks.length;
-    // Update the state for the playing album
     albumStates[playingAlbum.id] = { playingIdx: nextIdx };
-    // Play the next track on the playing album
     playTrack(nextIdx, playingAlbum);
   }
 
   function prevTrack() {
     if (!playingAlbum) return;
-    // Always go previous on the PLAYING album
     const prevIdx = (playingIdx - 1 + playingAlbum.tracks.length) % playingAlbum.tracks.length;
-    // Update the state for the playing album
     albumStates[playingAlbum.id] = { playingIdx: prevIdx };
-    // Play the previous track on the playing album
     playTrack(prevIdx, playingAlbum);
   }
 
@@ -429,7 +409,6 @@
   // ============================================================
   function goBack() {
     showAlbumList();
-    // Artwork stays with playing song, or shows HTC5 if nothing playing
     updateArtwork();
   }
 
@@ -459,12 +438,10 @@
   // ============================================================
   renderAlbums();
   showAlbumList();
-
-  // Default artwork: HTC5 (Coming Soon)
   updateArtwork();
+  updateMobileText('Select a track', '—');
   pmArt.src = getImage(allAlbums[4]);
 
-  // Responsive
   const main = document.getElementById('main');
   const resize = () => main.style.flexDirection = window.innerWidth <= 860 ? 'column' : 'row';
   resize();
