@@ -55,6 +55,40 @@
   const allAlbums = [...albums, { ...comingSoonAlbum, isCS: true }];
 
   // ============================================================
+  // MEDIA SESSION API
+  // ============================================================
+  function setupMediaSession(album, track) {
+    if (!('mediaSession' in navigator)) return;
+    
+    const title = track.mix ? `${track.title} (${track.mix})` : track.title;
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: title,
+      artist: track.artist,
+      album: album.title,
+      artwork: [{ src: getImage(album), sizes: '512x512', type: 'image/jpeg' }]
+    });
+
+    navigator.mediaSession.setActionHandler('play', () => {
+      audio.play();
+      isPlaying = true;
+      updatePlayBtn();
+      startProgress();
+    });
+    navigator.mediaSession.setActionHandler('pause', () => {
+      audio.pause();
+      isPlaying = false;
+      updatePlayBtn();
+      clearInterval(timer);
+    });
+    navigator.mediaSession.setActionHandler('previoustrack', () => {
+      if (curAlbum) prevTrack();
+    });
+    navigator.mediaSession.setActionHandler('nexttrack', () => {
+      if (curAlbum) nextTrack();
+    });
+  }
+
+  // ============================================================
   // VIEW FUNCTIONS
   // ============================================================
   function showAlbumList() {
@@ -147,18 +181,13 @@
   }
 
   // ============================================================
-  // LOAD & PLAY
+  // LOAD & PLAY - Music NEVER stops
   // ============================================================
   function loadAlbum(idx) {
     const album = allAlbums[idx];
     const isLocked = album.isCS || false;
 
-    audio.pause();
-    audio.src = '';
-    isPlaying = false;
-    clearInterval(timer);
-    updatePlayBtn();
-
+    // Update artwork
     artImg.src = getImage(album);
     if (isLocked) {
       csOverlay.style.display = 'flex';
@@ -170,17 +199,24 @@
     }
 
     pmArt.src = getImage(album);
-    curAlbum = isLocked ? null : album;
-    curTrack = null;
-    curIdx = 0;
-
-    npPcTrack.textContent = 'Select a track';
-    npPcArtist.textContent = isLocked ? `${album.artist} · ${album.year}` : '—';
-    npPcFill.style.width = '0%';
-    npPcCur.textContent = '0:00';
-    npPcTot.textContent = '0:00';
-    pmTitle.textContent = 'Select a track';
-    pmArtist.textContent = isLocked ? `${album.artist} · ${album.year}` : '—';
+    
+    // Only reset track info if switching to a different album
+    // But NEVER stop the music
+    if (curAlbum && curAlbum.id !== album.id) {
+      curAlbum = isLocked ? null : album;
+      curTrack = null;
+      curIdx = 0;
+      npPcTrack.textContent = 'Select a track';
+      npPcArtist.textContent = isLocked ? `${album.artist} · ${album.year}` : '—';
+      npPcFill.style.width = '0%';
+      npPcCur.textContent = '0:00';
+      npPcTot.textContent = '0:00';
+      pmTitle.textContent = 'Select a track';
+      pmArtist.textContent = isLocked ? `${album.artist} · ${album.year}` : '—';
+    } else if (!curAlbum) {
+      // First time loading
+      curAlbum = isLocked ? null : album;
+    }
 
     renderTracklist(album, isLocked);
   }
@@ -193,6 +229,24 @@
     curTrack = track;
     curIdx = idx;
     const url = getAudio(curAlbum, track);
+    
+    // If same track, just play/pause
+    if (audio.src === url) {
+      if (isPlaying) {
+        audio.pause();
+        isPlaying = false;
+        clearInterval(timer);
+      } else {
+        audio.play().then(() => {
+          isPlaying = true;
+          startProgress();
+        }).catch(() => {});
+      }
+      updatePlayBtn();
+      return;
+    }
+
+    // New track - load and play
     audio.src = url;
     audio.load();
 
@@ -206,15 +260,7 @@
     pfArt.src = getImage(curAlbum);
     pmArt.src = getImage(curAlbum);
 
-    // Media Session
-    if ('mediaSession' in navigator) {
-      navigator.mediaSession.metadata = new MediaMetadata({
-        title: title,
-        artist: track.artist,
-        album: curAlbum.title,
-        artwork: [{ src: getImage(curAlbum), sizes: '512x512', type: 'image/jpeg' }]
-      });
-    }
+    setupMediaSession(curAlbum, track);
 
     renderTracklist(curAlbum, false);
     audio.play().then(() => {
@@ -307,17 +353,21 @@
     csSub.textContent = `${defaultAlbum.artist} · ${defaultAlbum.year} · ${defaultAlbum.trackCount} tracks`;
     csDate.textContent = new Date(defaultAlbum.releaseDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
     pmArt.src = getImage(defaultAlbum);
-    npPcTrack.textContent = 'Select a track';
-    npPcArtist.textContent = '—';
-    npPcFill.style.width = '0%';
-    npPcCur.textContent = '0:00';
-    npPcTot.textContent = '0:00';
-    pmTitle.textContent = 'Select a track';
-    pmArtist.textContent = '—';
-    audio.pause();
-    audio.src = '';
-    isPlaying = false;
-    updatePlayBtn();
+    
+    // Update now playing to show current track if playing
+    if (curTrack) {
+      const title = curTrack.mix ? `${curTrack.title} (${curTrack.mix})` : curTrack.title;
+      npPcTrack.textContent = title;
+      npPcArtist.textContent = curTrack.artist;
+      pmTitle.textContent = title;
+      pmArtist.textContent = curTrack.artist;
+    } else {
+      npPcTrack.textContent = 'Select a track';
+      npPcArtist.textContent = '—';
+      pmTitle.textContent = 'Select a track';
+      pmArtist.textContent = '—';
+    }
+    // Music continues playing!
   }
 
   function openFull() { pf.classList.add('active'); }
@@ -361,4 +411,4 @@
   const resize = () => main.style.flexDirection = window.innerWidth <= 860 ? 'column' : 'row';
   resize();
   window.onresize = resize;
-})();
+})(); 
