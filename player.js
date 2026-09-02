@@ -8,7 +8,18 @@
   const getAudio = (a, t) => `${baseUrl}/m4a/${a.folder}/${t.file}`;
   const getImage = (a) => `${baseUrl}/images/${a.cover}`;
 
-  let curAlbum = null, curTrack = null, curIdx = 0, isPlaying = false, timer = null;
+  // Track the currently PLAYING album and track (separate from browsing)
+  let playingAlbum = null;
+  let playingTrack = null;
+  let playingIdx = 0;
+  let isPlaying = false;
+  let timer = null;
+
+  // Track the album being VIEWED (for tracklist display)
+  let viewedAlbum = null;
+
+  // Store full state for each album: which track was last played
+  const albumStates = {};
 
   // DOM
   const $ = id => document.getElementById(id);
@@ -55,10 +66,10 @@
   const allAlbums = [...albums, { ...comingSoonAlbum, isCS: true }];
 
   // ============================================================
-  // UPDATE NOW PLAYING UI (persistent)
+  // UPDATE NOW PLAYING UI (shows PLAYING track, not viewed)
   // ============================================================
-  function updateNowPlaying(track, album) {
-    if (!track || !album) {
+  function updateNowPlaying() {
+    if (!playingTrack || !playingAlbum) {
       npPcTrack.textContent = 'Select a track';
       npPcArtist.textContent = '—';
       pmTitle.textContent = 'Select a track';
@@ -67,29 +78,32 @@
       pfArtist.textContent = '—';
       return;
     }
-    const title = track.mix ? `${track.title} (${track.mix})` : track.title;
+    const title = playingTrack.mix ? `${playingTrack.title} (${playingTrack.mix})` : playingTrack.title;
     npPcTrack.textContent = title;
-    npPcArtist.textContent = track.artist;
+    npPcArtist.textContent = playingTrack.artist;
     pmTitle.textContent = title;
-    pmArtist.textContent = track.artist;
+    pmArtist.textContent = playingTrack.artist;
     pfTitle.textContent = title;
-    pfArtist.textContent = track.artist;
-    pfArt.src = getImage(album);
-    pmArt.src = getImage(album);
+    pfArtist.textContent = playingTrack.artist;
+    
+    // Artwork stays with the PLAYING album
+    const art = getImage(playingAlbum);
+    pmArt.src = art;
+    pfArt.src = art;
   }
 
   // ============================================================
   // MEDIA SESSION API
   // ============================================================
-  function setupMediaSession(album, track) {
-    if (!('mediaSession' in navigator)) return;
+  function setupMediaSession() {
+    if (!('mediaSession' in navigator) || !playingTrack || !playingAlbum) return;
     
-    const title = track.mix ? `${track.title} (${track.mix})` : track.title;
+    const title = playingTrack.mix ? `${playingTrack.title} (${playingTrack.mix})` : playingTrack.title;
     navigator.mediaSession.metadata = new MediaMetadata({
       title: title,
-      artist: track.artist,
-      album: album.title,
-      artwork: [{ src: getImage(album), sizes: '512x512', type: 'image/jpeg' }]
+      artist: playingTrack.artist,
+      album: playingAlbum.title,
+      artwork: [{ src: getImage(playingAlbum), sizes: '512x512', type: 'image/jpeg' }]
     });
 
     navigator.mediaSession.setActionHandler('play', () => {
@@ -105,10 +119,10 @@
       clearInterval(timer);
     });
     navigator.mediaSession.setActionHandler('previoustrack', () => {
-      if (curAlbum) prevTrack();
+      if (playingAlbum) prevTrack();
     });
     navigator.mediaSession.setActionHandler('nexttrack', () => {
-      if (curAlbum) nextTrack();
+      if (playingAlbum) nextTrack();
     });
   }
 
@@ -138,11 +152,13 @@
     albumList.innerHTML = sorted.map((a) => {
       const idx = allAlbums.indexOf(a);
       const isCS = a.isCS || false;
+      // Check if this album has a saved state
+      const hasState = albumStates[a.id] !== undefined;
       return `
         <div class="album-item" data-idx="${idx}">
           <div class="ai-art"><img src="${getImage(a)}" alt="${a.title}" /></div>
           <div class="ai-info">
-            <div class="ai-title">${a.title}</div>
+            <div class="ai-title">${a.title} ${hasState ? '▶' : ''}</div>
             <div class="ai-artist">${a.artist} · ${a.year}</div>
           </div>
           ${isCS ? `<div class="ai-badge">🔜</div>` : ''}
@@ -159,6 +175,9 @@
     showTracklist();
     tlTitle.textContent = album.title;
     tlArtist.textContent = `${album.artist} · ${album.year}`;
+
+    // Store which album is being viewed
+    viewedAlbum = album;
 
     if (isLocked || album.isCS) {
       tracklist.innerHTML = `
@@ -185,17 +204,25 @@
       return;
     }
 
+    // Get the saved state for this album
+    const state = albumStates[album.id];
+    const savedIdx = state ? state.playingIdx : 0;
+
     tracklist.innerHTML = album.tracks.map((t, i) => {
-      const active = curTrack === t;
+      // Check if this track matches the saved state for this album
+      const isSavedTrack = (state && i === savedIdx);
+      // Check if this is currently playing
+      const isActive = (playingAlbum && playingAlbum.id === album.id && i === playingIdx);
+      
       const title = t.mix ? `${t.title} (${t.mix})` : t.title;
       return `
-        <div class="track-item ${active ? 'active' : ''}" data-idx="${i}">
-          <div class="ti-play"><i class="fas ${active ? 'fa-play-circle' : 'fa-play'}"></i></div>
+        <div class="track-item ${isActive ? 'active' : ''}" data-idx="${i}">
+          <div class="ti-play"><i class="fas ${isActive ? 'fa-play-circle' : 'fa-play'}"></i></div>
           <div class="ti-info">
             <div class="ti-title">${title}</div>
             <div class="ti-artist">${t.artist}</div>
           </div>
-          <div class="ti-dur">${active ? '▶' : '♫'}</div>
+          <div class="ti-dur">${isActive ? '▶' : (isSavedTrack ? '●' : '♫')}</div>
         </div>
       `;
     }).join('');
@@ -205,13 +232,16 @@
   }
 
   // ============================================================
-  // LOAD & PLAY
+  // LOAD ALBUM (for viewing, NOT playing)
   // ============================================================
   function loadAlbum(idx) {
     const album = allAlbums[idx];
     const isLocked = album.isCS || false;
 
-    // Update artwork
+    // Update the viewed album
+    viewedAlbum = album;
+
+    // Update artwork to show the selected album
     artImg.src = getImage(album);
     if (isLocked) {
       csOverlay.style.display = 'flex';
@@ -222,30 +252,35 @@
       csOverlay.style.display = 'none';
     }
 
-    // Only reset if switching to a different album
-    if (curAlbum && curAlbum.id !== album.id) {
-      curAlbum = isLocked ? null : album;
-      curTrack = null;
-      curIdx = 0;
-      // DON'T reset now playing - keep showing current track
-      // Update the album art in the mini player
-      pmArt.src = getImage(album);
-    } else if (!curAlbum) {
-      curAlbum = isLocked ? null : album;
-      pmArt.src = getImage(album);
-    }
+    // DON'T change the playing album or track
+    // DON'T change the now playing UI
 
     renderTracklist(album, isLocked);
   }
 
+  // ============================================================
+  // PLAY TRACK (starts playing the selected track)
+  // ============================================================
   function playTrack(idx) {
-    if (!curAlbum) return;
-    const track = curAlbum.tracks[idx];
+    const album = viewedAlbum || allAlbums[0];
+    if (!album || album.isCS) return;
+    
+    const track = album.tracks[idx];
     if (!track) return;
 
-    curTrack = track;
-    curIdx = idx;
-    const url = getAudio(curAlbum, track);
+    // Set as playing album/track
+    playingAlbum = album;
+    playingTrack = track;
+    playingIdx = idx;
+
+    // Save state for this album (FULL ALBUM STATE)
+    albumStates[album.id] = { 
+      playingIdx: idx,
+      albumTitle: album.title,
+      albumArtist: album.artist
+    };
+
+    const url = getAudio(album, track);
     
     // If same track, toggle play/pause
     if (audio.src === url) {
@@ -267,11 +302,12 @@
     audio.src = url;
     audio.load();
 
-    // Update NOW PLAYING (persistent)
-    updateNowPlaying(track, curAlbum);
-    setupMediaSession(curAlbum, track);
+    // Update NOW PLAYING (shows PLAYING track)
+    updateNowPlaying();
+    setupMediaSession();
 
-    renderTracklist(curAlbum, false);
+    renderTracklist(album, false);
+    renderAlbums(); // Update album list to show playing indicator
     audio.play().then(() => {
       isPlaying = true;
       updatePlayBtn();
@@ -283,11 +319,14 @@
   }
 
   // ============================================================
-  // CONTROLS
+  // CONTROLS - ALWAYS work on the PLAYING track
   // ============================================================
   function togglePlay() {
-    if (!curTrack) {
-      // If no track is selected, do nothing
+    if (!playingTrack) {
+      // If nothing is playing but there's a viewed album, play first track
+      if (viewedAlbum && !viewedAlbum.isCS) {
+        playTrack(0);
+      }
       return;
     }
     if (isPlaying) {
@@ -346,11 +385,21 @@
   }
 
   function nextTrack() {
-    if (curAlbum) playTrack((curIdx + 1) % curAlbum.tracks.length);
+    if (!playingAlbum) return;
+    const album = playingAlbum;
+    const nextIdx = (playingIdx + 1) % album.tracks.length;
+    // Save the new state
+    albumStates[album.id] = { playingIdx: nextIdx };
+    playTrack(nextIdx);
   }
 
   function prevTrack() {
-    if (curAlbum) playTrack((curIdx - 1 + curAlbum.tracks.length) % curAlbum.tracks.length);
+    if (!playingAlbum) return;
+    const album = playingAlbum;
+    const prevIdx = (playingIdx - 1 + album.tracks.length) % album.tracks.length;
+    // Save the new state
+    albumStates[album.id] = { playingIdx: prevIdx };
+    playTrack(prevIdx);
   }
 
   // ============================================================
@@ -365,15 +414,8 @@
     csSub.textContent = `${defaultAlbum.artist} · ${defaultAlbum.year} · ${defaultAlbum.trackCount} tracks`;
     csDate.textContent = new Date(defaultAlbum.releaseDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
     
-    // DON'T reset now playing - keep showing current track
-    // Only update the mini player album art
-    if (curAlbum) {
-      pmArt.src = getImage(curAlbum);
-    } else {
-      pmArt.src = getImage(defaultAlbum);
-    }
-    
-    // Music continues playing, UI stays showing current track
+    // DON'T change the playing album or now playing
+    // Artwork stays with the playing song
   }
 
   function openFull() { pf.classList.add('active'); }
