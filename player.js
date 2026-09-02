@@ -244,15 +244,16 @@
   showAlbumList();
 
   // Set default artwork to HTC5 (coming soon)
-  artImg.src = getImage(allAlbums[4]);
+  const defaultAlbum = allAlbums[4]; // HTC5
+  artImg.src = getImage(defaultAlbum);
   csOverlay.style.display = 'flex';
-  csTitle.textContent = allAlbums[4].title;
-  csSub.textContent = `${allAlbums[4].artist} · ${allAlbums[4].year} · ${allAlbums[4].trackCount} tracks`;
-  csDate.textContent = new Date(allAlbums[4].releaseDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
-  pmArt.src = getImage(allAlbums[4]);
+  csTitle.textContent = defaultAlbum.title;
+  csSub.textContent = `${defaultAlbum.artist} · ${defaultAlbum.year} · ${defaultAlbum.trackCount} tracks`;
+  csDate.textContent = new Date(defaultAlbum.releaseDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+  pmArt.src = getImage(defaultAlbum);
 
   // Responsive
   const main = document.getElementById('main');
   const resize = () => main.style.flexDirection = window.innerWidth <= 860 ? 'column' : 'row';
   resize(); window.onresize = resize;
-})();
+})(); 
