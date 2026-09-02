@@ -14,7 +14,7 @@
   <!-- HEADER -->
   <header>
     <h1><i class="fas fa-headphones"></i> HTs Collections</h1>
-    <button id="backBtn" style="display:none;"><i class="fas fa-arrow-left"></i> Back</button>
+    <button id="backBtn"><i class="fas fa-arrow-left"></i> Back</button>
     <span id="headerBadge">5 albums</span>
   </header>
 
@@ -39,7 +39,7 @@
         <div class="np-pc-artist" id="npPcArtist">—</div>
         <div class="np-pc-bar">
           <span class="np-pc-time" id="npPcCur">0:00</span>
-          <div class="np-pc-progress"><div class="np-pc-fill" id="npPcFill"></div></div>
+          <div class="np-pc-progress" id="npPcProgress"><div class="np-pc-fill" id="npPcFill"></div></div>
           <span class="np-pc-time" id="npPcTot">0:00</span>
         </div>
         <div class="np-pc-btns">
@@ -50,29 +50,29 @@
       </div>
     </section>
 
-    <!-- RIGHT: ALBUM LIST / TRACKLIST (toggle) -->
+    <!-- RIGHT: ALBUM LIST & TRACKLIST -->
     <section class="list-section" id="listSection">
-      <!-- Album List -->
-      <div class="album-list" id="albumList"></div>
+      <!-- Album List (visible by default) -->
+      <div id="albumList"></div>
       <!-- Tracklist (hidden by default) -->
-      <div class="tracklist-wrap" id="tracklistWrap" style="display:none;">
-        <div class="tracklist-header">
-          <span class="tl-title" id="tlTitle">HTs Collections</span>
-          <span class="tl-artist" id="tlArtist">HyperSOUL-X · 2019</span>
+      <div id="tracklistWrap" style="display:none;">
+        <div id="tracklistHeader">
+          <span id="tlTitle">HTs Collections</span>
+          <span id="tlArtist">HyperSOUL-X · 2019</span>
         </div>
-        <div class="tracklist" id="tracklist"></div>
+        <div id="tracklist"></div>
       </div>
     </section>
 
   </main>
 
-  <!-- MOBILE BOTTOM PLAYER (sticky) -->
-  <div class="player-mobile" id="playerMobile">
+  <!-- MOBILE BOTTOM PLAYER -->
+  <div id="playerMobile">
     <div class="pm-left">
       <img id="pmArt" src="https://cdn.htcoll.shop/images/HTC5.jpg" alt="cover" />
       <div class="pm-info">
-        <div class="pm-title" id="pmTitle">Select a track</div>
-        <div class="pm-artist" id="pmArtist">—</div>
+        <div id="pmTitle">Select a track</div>
+        <div id="pmArtist">—</div>
       </div>
     </div>
     <div class="pm-controls">
@@ -84,8 +84,8 @@
     </div>
   </div>
 
-  <!-- MOBILE FULL PLAYER (overlay) -->
-  <div class="player-full" id="playerFull">
+  <!-- MOBILE FULL PLAYER -->
+  <div id="playerFull">
     <div class="pf-header">
       <i class="fas fa-chevron-down" id="pfClose"></i>
       <span>Now Playing</span>
@@ -93,13 +93,13 @@
     </div>
     <img id="pfArt" src="https://cdn.htcoll.shop/images/HTC5.jpg" alt="cover" />
     <div class="pf-info">
-      <div class="pf-title" id="pfTitle">Select a track</div>
-      <div class="pf-artist" id="pfArtist">—</div>
+      <div id="pfTitle">Select a track</div>
+      <div id="pfArtist">—</div>
     </div>
     <div class="pf-bar">
-      <span class="pf-time" id="pfCur">0:00</span>
-      <div class="pf-progress"><div class="pf-fill" id="pfFill"></div></div>
-      <span class="pf-time" id="pfTot">0:00</span>
+      <span id="pfCur">0:00</span>
+      <div class="pf-progress" id="pfProgress"><div class="pf-fill" id="pfFill"></div></div>
+      <span id="pfTot">0:00</span>
     </div>
     <div class="pf-btns">
       <i class="fas fa-step-backward" id="pfPrev"></i>
@@ -112,5 +112,4 @@
 
 <script src="player.js"></script>
 </body>
-</html>
-
+</html> 
