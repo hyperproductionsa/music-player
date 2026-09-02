@@ -55,6 +55,30 @@
   const allAlbums = [...albums, { ...comingSoonAlbum, isCS: true }];
 
   // ============================================================
+  // UPDATE NOW PLAYING UI (persistent)
+  // ============================================================
+  function updateNowPlaying(track, album) {
+    if (!track || !album) {
+      npPcTrack.textContent = 'Select a track';
+      npPcArtist.textContent = '—';
+      pmTitle.textContent = 'Select a track';
+      pmArtist.textContent = '—';
+      pfTitle.textContent = 'Select a track';
+      pfArtist.textContent = '—';
+      return;
+    }
+    const title = track.mix ? `${track.title} (${track.mix})` : track.title;
+    npPcTrack.textContent = title;
+    npPcArtist.textContent = track.artist;
+    pmTitle.textContent = title;
+    pmArtist.textContent = track.artist;
+    pfTitle.textContent = title;
+    pfArtist.textContent = track.artist;
+    pfArt.src = getImage(album);
+    pmArt.src = getImage(album);
+  }
+
+  // ============================================================
   // MEDIA SESSION API
   // ============================================================
   function setupMediaSession(album, track) {
@@ -181,7 +205,7 @@
   }
 
   // ============================================================
-  // LOAD & PLAY - Music NEVER stops
+  // LOAD & PLAY
   // ============================================================
   function loadAlbum(idx) {
     const album = allAlbums[idx];
@@ -198,24 +222,17 @@
       csOverlay.style.display = 'none';
     }
 
-    pmArt.src = getImage(album);
-    
-    // Only reset track info if switching to a different album
-    // But NEVER stop the music
+    // Only reset if switching to a different album
     if (curAlbum && curAlbum.id !== album.id) {
       curAlbum = isLocked ? null : album;
       curTrack = null;
       curIdx = 0;
-      npPcTrack.textContent = 'Select a track';
-      npPcArtist.textContent = isLocked ? `${album.artist} · ${album.year}` : '—';
-      npPcFill.style.width = '0%';
-      npPcCur.textContent = '0:00';
-      npPcTot.textContent = '0:00';
-      pmTitle.textContent = 'Select a track';
-      pmArtist.textContent = isLocked ? `${album.artist} · ${album.year}` : '—';
+      // DON'T reset now playing - keep showing current track
+      // Update the album art in the mini player
+      pmArt.src = getImage(album);
     } else if (!curAlbum) {
-      // First time loading
       curAlbum = isLocked ? null : album;
+      pmArt.src = getImage(album);
     }
 
     renderTracklist(album, isLocked);
@@ -230,7 +247,7 @@
     curIdx = idx;
     const url = getAudio(curAlbum, track);
     
-    // If same track, just play/pause
+    // If same track, toggle play/pause
     if (audio.src === url) {
       if (isPlaying) {
         audio.pause();
@@ -250,16 +267,8 @@
     audio.src = url;
     audio.load();
 
-    const title = track.mix ? `${track.title} (${track.mix})` : track.title;
-    npPcTrack.textContent = title;
-    npPcArtist.textContent = track.artist;
-    pmTitle.textContent = title;
-    pmArtist.textContent = track.artist;
-    pfTitle.textContent = title;
-    pfArtist.textContent = track.artist;
-    pfArt.src = getImage(curAlbum);
-    pmArt.src = getImage(curAlbum);
-
+    // Update NOW PLAYING (persistent)
+    updateNowPlaying(track, curAlbum);
     setupMediaSession(curAlbum, track);
 
     renderTracklist(curAlbum, false);
@@ -277,7 +286,10 @@
   // CONTROLS
   // ============================================================
   function togglePlay() {
-    if (!curTrack) return;
+    if (!curTrack) {
+      // If no track is selected, do nothing
+      return;
+    }
     if (isPlaying) {
       audio.pause();
       isPlaying = false;
@@ -352,22 +364,16 @@
     csTitle.textContent = defaultAlbum.title;
     csSub.textContent = `${defaultAlbum.artist} · ${defaultAlbum.year} · ${defaultAlbum.trackCount} tracks`;
     csDate.textContent = new Date(defaultAlbum.releaseDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
-    pmArt.src = getImage(defaultAlbum);
     
-    // Update now playing to show current track if playing
-    if (curTrack) {
-      const title = curTrack.mix ? `${curTrack.title} (${curTrack.mix})` : curTrack.title;
-      npPcTrack.textContent = title;
-      npPcArtist.textContent = curTrack.artist;
-      pmTitle.textContent = title;
-      pmArtist.textContent = curTrack.artist;
+    // DON'T reset now playing - keep showing current track
+    // Only update the mini player album art
+    if (curAlbum) {
+      pmArt.src = getImage(curAlbum);
     } else {
-      npPcTrack.textContent = 'Select a track';
-      npPcArtist.textContent = '—';
-      pmTitle.textContent = 'Select a track';
-      pmArtist.textContent = '—';
+      pmArt.src = getImage(defaultAlbum);
     }
-    // Music continues playing!
+    
+    // Music continues playing, UI stays showing current track
   }
 
   function openFull() { pf.classList.add('active'); }
@@ -411,4 +417,4 @@
   const resize = () => main.style.flexDirection = window.innerWidth <= 860 ? 'column' : 'row';
   resize();
   window.onresize = resize;
-})(); 
+})();
