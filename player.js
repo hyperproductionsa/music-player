@@ -8,7 +8,7 @@
   const getAudio = (a, t) => `${baseUrl}/m4a/${a.folder}/${t.file}`;
   const getImage = (a) => `${baseUrl}/images/${a.cover}`;
 
-  let curAlbum = null, curTrack = null, curIdx = 0, isPlaying = false, timer = null, albumIdx = 0;
+  let curAlbum = null, curTrack = null, curIdx = 0, isPlaying = false, timer = null;
   let isTracklistView = false;
 
   // DOM
@@ -32,17 +32,15 @@
         title: title,
         artist: track.artist,
         album: album.title,
-        artwork: [
-          { src: getImage(album), sizes: '512x512', type: 'image/jpeg' }
-        ]
+        artwork: [{ src: getImage(album), sizes: '512x512', type: 'image/jpeg' }]
       });
     }
   }
 
   const allAlbums = [...albums, { ...comingSoonAlbum, isCS: true }];
 
-  // Show/Hide views
-  function showAlbumList() {
+  // View functions
+  function showAlbumListView() {
     isTracklistView = false;
     albumList.style.display = 'flex';
     tracklistWrap.style.display = 'none';
@@ -51,7 +49,7 @@
     headerBadge.textContent = '5 albums';
   }
 
-  function showTracklist() {
+  function showTracklistView() {
     isTracklistView = true;
     albumList.style.display = 'none';
     tracklistWrap.style.display = 'flex';
@@ -59,15 +57,14 @@
     headerBadge.style.display = 'none';
   }
 
-  // Render Album List (HTC5 first)
+  // Render album list (HTC5 first)
   function renderAlbums() {
-    const sortedAlbums = [...allAlbums].reverse();
-    albumList.innerHTML = sortedAlbums.map((a, i) => {
-      const originalIdx = allAlbums.length - 1 - i;
-      const isActive = originalIdx === albumIdx;
+    const sorted = [...allAlbums].reverse();
+    albumList.innerHTML = sorted.map((a, i) => {
+      const idx = allAlbums.length - 1 - i;
       const isCS = a.isCS || false;
       return `
-        <div class="album-item ${isActive ? 'active' : ''}" data-idx="${originalIdx}">
+        <div class="album-item" data-idx="${idx}">
           <div class="ai-art"><img src="${getImage(a)}" alt="${a.title}" /></div>
           <div class="ai-info">
             <div class="ai-title">${a.title}</div>
@@ -78,54 +75,45 @@
         </div>
       `;
     }).join('');
-    albumList.querySelectorAll('.album-item').forEach(el => el.onclick = () => loadAlbum(+el.dataset.idx));
+    albumList.querySelectorAll('.album-item').forEach(el => {
+      el.onclick = () => loadAlbum(parseInt(el.dataset.idx));
+    });
   }
 
-  // Render Tracklist
-  function renderTracks(album, locked = false) {
-    showTracklist();
-    if (!album || locked) {
-      tlTitle.textContent = 'Coming Soon';
-      tlArtist.textContent = '—';
-      tracklist.innerHTML = `
-        <div class="track-item" style="opacity:.5;cursor:default;pointer-events:none;padding:8px 14px;color:#666;border-bottom:1px solid #1a1a1a;">
-          <div class="ti-play" style="color:#666;"><i class="fas fa-lock"></i></div>
-          <div class="ti-info">
-            <div class="ti-title" style="color:#666;">This album is coming soon</div>
-            <div class="ti-artist" style="color:#555;">Available 25 Sep 2026</div>
-          </div>
-          <div class="ti-dur" style="color:#444;">🔒</div>
-        </div>
-      `;
-      // Also show the tracks but grayed out
-      if (album && album.tracks) {
-        tracklist.innerHTML = album.tracks.map((t, i) => {
-          const title = t.mix ? `${t.title} (${t.mix})` : t.title;
-          return `
-            <div class="track-item" style="opacity:.4;cursor:default;pointer-events:none;padding:8px 14px;border-bottom:1px solid #1a1a1a;">
-              <div class="ti-play" style="color:#444;"><i class="fas fa-lock"></i></div>
-              <div class="ti-info">
-                <div class="ti-title" style="color:#666;">${title}</div>
-                <div class="ti-artist" style="color:#555;">${t.artist}</div>
-              </div>
-              <div class="ti-dur" style="color:#444;">🔒</div>
-            </div>
-          `;
-        }).join('');
-        // Add a "Coming Soon" message at the top
-        tracklist.innerHTML = `
-          <div class="track-item" style="opacity:.6;cursor:default;pointer-events:none;padding:8px 14px;background:#1a1a1a;border-bottom:1px solid #2a2a2a;">
-            <div class="ti-info" style="text-align:center;">
-              <div class="ti-title" style="color:#e5de69;font-size:.9rem;"><i class="fas fa-clock"></i> Coming 25 Sep 2026</div>
-              <div class="ti-artist" style="color:#888;">${album.tracks.length} tracks · Preview only</div>
-            </div>
-          </div>
-        ` + tracklist.innerHTML;
-      }
-      return;
-    }
+  // Render tracklist
+  function renderTracklist(album, isLocked = false) {
+    showTracklistView();
+    
+    if (!album) return;
+    
     tlTitle.textContent = album.title;
     tlArtist.textContent = `${album.artist} · ${album.year}`;
+    
+    if (isLocked || album.isCS) {
+      tracklist.innerHTML = `
+        <div class="track-item locked" style="background:#1a1a1a;border-bottom:1px solid #2a2a2a;padding:12px 14px;cursor:default;">
+          <div class="ti-info" style="text-align:center;">
+            <div class="ti-title" style="color:#e5de69;font-size:.9rem;"><i class="fas fa-clock"></i> Coming ${new Date(album.releaseDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+            <div class="ti-artist" style="color:#888;">${album.trackCount || album.tracks.length} tracks</div>
+          </div>
+        </div>
+      `;
+      album.tracks.forEach((t, i) => {
+        const title = t.mix ? `${t.title} (${t.mix})` : t.title;
+        tracklist.innerHTML += `
+          <div class="track-item locked" style="opacity:.5;cursor:default;pointer-events:none;">
+            <div class="ti-play" style="color:#444;"><i class="fas fa-lock"></i></div>
+            <div class="ti-info">
+              <div class="ti-title" style="color:#666;">${title}</div>
+              <div class="ti-artist" style="color:#555;">${t.artist}</div>
+            </div>
+            <div class="ti-dur" style="color:#444;">🔒</div>
+          </div>
+        `;
+      });
+      return;
+    }
+    
     tracklist.innerHTML = album.tracks.map((t, i) => {
       const active = curTrack === t;
       const title = t.mix ? `${t.title} (${t.mix})` : t.title;
@@ -140,78 +128,96 @@
         </div>
       `;
     }).join('');
-    tracklist.querySelectorAll('.track-item').forEach(el => el.onclick = () => playTrack(+el.dataset.idx));
+    tracklist.querySelectorAll('.track-item:not(.locked)').forEach(el => {
+      el.onclick = () => playTrack(parseInt(el.dataset.idx));
+    });
   }
 
-  // Load Album
+  // Load album
   function loadAlbum(idx) {
     const album = allAlbums[idx];
-    albumIdx = idx;
-    const unlocked = isUnlocked();
-
-    // Stop current audio
+    const isLocked = album.isCS || false;
+    
     audio.pause();
     audio.src = '';
     isPlaying = false;
     clearInterval(timer);
     updatePlayBtn();
-
-    // HTC5 - Coming Soon (locked or unlocked)
-    if (album.isCS) {
-      curAlbum = null;
-      curTrack = null;
-      artImg.src = getImage(album);
+    
+    artImg.src = getImage(album);
+    if (isLocked) {
       csOverlay.style.display = 'flex';
       csTitle.textContent = album.title;
-      csSub.textContent = `${album.artist} · ${album.year} · ${album.trackCount} tracks`;
+      csSub.textContent = `${album.artist} · ${album.year} · ${album.trackCount || album.tracks.length} tracks`;
       csDate.textContent = new Date(album.releaseDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
-      
-      // Show tracklist with locked tracks
-      renderTracks(album, true);
-      renderAlbums();
-      updatePlayBtn();
-      return;
+    } else {
+      csOverlay.style.display = 'none';
     }
-
-    // Regular album (HTC1-4)
-    curAlbum = album;
-    csOverlay.style.display = 'none';
-    artImg.src = getImage(curAlbum);
-    curTrack = null; curIdx = 0;
+    
+    pmArt.src = getImage(album);
+    curAlbum = isLocked ? null : album;
+    curTrack = null;
+    curIdx = 0;
+    
     npPcTrack.textContent = 'Select a track';
-    npPcArtist.textContent = `${curAlbum.artist} · ${curAlbum.year}`;
-    npPcFill.style.width = '0%'; npPcCur.textContent = '0:00'; npPcTot.textContent = '0:00';
-    pfFill.style.width = '0%'; pfCur.textContent = '0:00'; pfTot.textContent = '0:00';
-    pmArt.src = getImage(curAlbum); pmTitle.textContent = 'Select a track'; pmArtist.textContent = '—';
-    renderTracks(curAlbum);
-    renderAlbums();
-    updatePlayBtn();
+    npPcArtist.textContent = isLocked ? `${album.artist} · ${album.year}` : '—';
+    npPcFill.style.width = '0%';
+    npPcCur.textContent = '0:00';
+    npPcTot.textContent = '0:00';
+    pmTitle.textContent = 'Select a track';
+    pmArtist.textContent = isLocked ? `${album.artist} · ${album.year}` : '—';
+    
+    renderTracklist(album, isLocked);
   }
 
-  // Play Track (only for unlocked albums)
+  // Play track
   function playTrack(idx) {
     if (!curAlbum) return;
     const track = curAlbum.tracks[idx];
     if (!track) return;
-    curTrack = track; curIdx = idx;
+    
+    curTrack = track;
+    curIdx = idx;
     const url = getAudio(curAlbum, track);
-    audio.src = url; audio.load();
+    audio.src = url;
+    audio.load();
+    
     const title = track.mix ? `${track.title} (${track.mix})` : track.title;
-    npPcTrack.textContent = title; npPcArtist.textContent = track.artist;
-    pmTitle.textContent = title; pmArtist.textContent = track.artist;
-    pfTitle.textContent = title; pfArtist.textContent = track.artist;
+    npPcTrack.textContent = title;
+    npPcArtist.textContent = track.artist;
+    pmTitle.textContent = title;
+    pmArtist.textContent = track.artist;
+    pfTitle.textContent = title;
+    pfArtist.textContent = track.artist;
     pfArt.src = getImage(curAlbum);
     pmArt.src = getImage(curAlbum);
+    
     updateMediaSession(curAlbum, track);
-    renderTracks(curAlbum);
-    audio.play().then(() => { isPlaying = true; updatePlayBtn(); startProgress(); }).catch(() => { isPlaying = false; updatePlayBtn(); });
+    renderTracklist(curAlbum, false);
+    
+    audio.play().then(() => {
+      isPlaying = true;
+      updatePlayBtn();
+      startProgress();
+    }).catch(() => {
+      isPlaying = false;
+      updatePlayBtn();
+    });
   }
 
-  // Toggle Play
+  // Play controls
   function togglePlay() {
     if (!curTrack) return;
-    if (isPlaying) { audio.pause(); isPlaying = false; clearInterval(timer); }
-    else { audio.play().then(() => { isPlaying = true; startProgress(); }).catch(() => {}); }
+    if (isPlaying) {
+      audio.pause();
+      isPlaying = false;
+      clearInterval(timer);
+    } else {
+      audio.play().then(() => {
+        isPlaying = true;
+        startProgress();
+      }).catch(() => {});
+    }
     updatePlayBtn();
   }
 
@@ -227,16 +233,20 @@
     timer = setInterval(() => {
       if (audio.duration && !isNaN(audio.duration)) {
         const p = (audio.currentTime / audio.duration) * 100;
-        npPcFill.style.width = p + '%'; pfFill.style.width = p + '%';
-        const cm = Math.floor(audio.currentTime / 60), cs = Math.floor(audio.currentTime % 60);
-        const tm = Math.floor(audio.duration / 60), ts = Math.floor(audio.duration % 60);
-        npPcCur.textContent = `${cm}:${String(cs).padStart(2,'0')}`; pfCur.textContent = npPcCur.textContent;
-        npPcTot.textContent = `${tm}:${String(ts).padStart(2,'0')}`; pfTot.textContent = npPcTot.textContent;
+        npPcFill.style.width = p + '%';
+        pfFill.style.width = p + '%';
+        const cm = Math.floor(audio.currentTime / 60);
+        const cs = Math.floor(audio.currentTime % 60);
+        const tm = Math.floor(audio.duration / 60);
+        const ts = Math.floor(audio.duration % 60);
+        npPcCur.textContent = `${cm}:${String(cs).padStart(2,'0')}`;
+        pfCur.textContent = npPcCur.textContent;
+        npPcTot.textContent = `${tm}:${String(ts).padStart(2,'0')}`;
+        pfTot.textContent = npPcTot.textContent;
       }
     }, 200);
   }
 
-  // Seek function
   function seekTo(e, progressEl, fillEl, curTimeEl, totalTimeEl) {
     const rect = progressEl.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width;
@@ -244,28 +254,27 @@
     if (audio.duration && !isNaN(audio.duration)) {
       audio.currentTime = percent * audio.duration;
       fillEl.style.width = (percent * 100) + '%';
-      const cm = Math.floor(audio.currentTime / 60), cs = Math.floor(audio.currentTime % 60);
+      const cm = Math.floor(audio.currentTime / 60);
+      const cs = Math.floor(audio.currentTime % 60);
       curTimeEl.textContent = `${cm}:${String(cs).padStart(2,'0')}`;
-      const tm = Math.floor(audio.duration / 60), ts = Math.floor(audio.duration % 60);
+      const tm = Math.floor(audio.duration / 60);
+      const ts = Math.floor(audio.duration % 60);
       totalTimeEl.textContent = `${tm}:${String(ts).padStart(2,'0')}`;
     }
   }
 
-  // Progress bar click events
-  npPcProgress.addEventListener('click', (e) => seekTo(e, npPcProgress, npPcFill, npPcCur, npPcTot));
-  pfProgress.addEventListener('click', (e) => seekTo(e, pfProgress, pfFill, pfCur, pfTot));
+  function nextTrack() {
+    if (curAlbum) playTrack((curIdx + 1) % curAlbum.tracks.length);
+  }
+  function prevTrack() {
+    if (curAlbum) playTrack((curIdx - 1 + curAlbum.tracks.length) % curAlbum.tracks.length);
+  }
 
-  function nextTrack() { if (curAlbum) playTrack((curIdx + 1) % curAlbum.tracks.length); }
-  function prevTrack() { if (curAlbum) playTrack((curIdx - 1 + curAlbum.tracks.length) % curAlbum.tracks.length); }
-
-  // Mobile full player
   function openFull() { pf.classList.add('active'); }
   function closeFull() { pf.classList.remove('active'); }
 
-  // Back button
-  backBtn.onclick = function() {
-    showAlbumList();
-    // Reset to HTC5 cover
+  function goBack() {
+    showAlbumListView();
     const defaultAlbum = allAlbums[4];
     artImg.src = getImage(defaultAlbum);
     csOverlay.style.display = 'flex';
@@ -273,7 +282,6 @@
     csSub.textContent = `${defaultAlbum.artist} · ${defaultAlbum.year} · ${defaultAlbum.trackCount} tracks`;
     csDate.textContent = new Date(defaultAlbum.releaseDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
     pmArt.src = getImage(defaultAlbum);
-    // Reset now playing
     npPcTrack.textContent = 'Select a track';
     npPcArtist.textContent = '—';
     npPcFill.style.width = '0%';
@@ -281,27 +289,36 @@
     npPcTot.textContent = '0:00';
     pmTitle.textContent = 'Select a track';
     pmArtist.textContent = '—';
-    // Stop audio
     audio.pause();
     audio.src = '';
     isPlaying = false;
     updatePlayBtn();
-  };
+  }
 
-  // Events
-  pcPlay.onclick = togglePlay; pcPrev.onclick = prevTrack; pcNext.onclick = nextTrack;
-  pmPlay.onclick = togglePlay; pmNext.onclick = nextTrack; pmExpand.onclick = openFull;
-  pfPlay.onclick = togglePlay; pfPrev.onclick = prevTrack; pfNext.onclick = nextTrack; pfClose.onclick = closeFull;
+  // Event listeners
+  pcPlay.onclick = togglePlay;
+  pcPrev.onclick = prevTrack;
+  pcNext.onclick = nextTrack;
+  pmPlay.onclick = togglePlay;
+  pmNext.onclick = nextTrack;
+  pmExpand.onclick = openFull;
+  pfPlay.onclick = togglePlay;
+  pfPrev.onclick = prevTrack;
+  pfNext.onclick = nextTrack;
+  pfClose.onclick = closeFull;
+  backBtn.onclick = goBack;
   audio.onended = nextTrack;
+  npPcProgress.addEventListener('click', (e) => seekTo(e, npPcProgress, npPcFill, npPcCur, npPcTot));
+  pfProgress.addEventListener('click', (e) => seekTo(e, pfProgress, pfFill, pfCur, pfTot));
 
   // ============================================================
-  // INIT - Album List ONLY, no tracklist visible
+  // INIT - Album list visible, NO auto-load
   // ============================================================
   renderAlbums();
-  showAlbumList(); // This hides tracklist and shows album list
-
-  // Set default artwork to HTC5 (coming soon)
-  const defaultAlbum = allAlbums[4]; // HTC5
+  showAlbumListView(); // ← This is the key fix
+  
+  // Set default artwork to HTC5 (Coming Soon)
+  const defaultAlbum = allAlbums[4];
   artImg.src = getImage(defaultAlbum);
   csOverlay.style.display = 'flex';
   csTitle.textContent = defaultAlbum.title;
@@ -312,5 +329,6 @@
   // Responsive
   const main = document.getElementById('main');
   const resize = () => main.style.flexDirection = window.innerWidth <= 860 ? 'column' : 'row';
-  resize(); window.onresize = resize;
-})();
+  resize();
+  window.onresize = resize;
+})(); 
