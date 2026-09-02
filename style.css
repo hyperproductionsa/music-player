@@ -76,18 +76,21 @@ main{display:flex;gap:28px;flex:1;min-height:0}
 .track-item.locked .ti-info .ti-artist{color:#555}
 .track-item.locked .ti-dur{color:#444}
 
-/* MOBILE */
+/* MOBILE BOTTOM PLAYER */
 #playerMobile{display:none;position:fixed;bottom:0;left:0;right:0;background:#1a1a1a;padding:10px 14px;border-top:1px solid #2a2a2a;align-items:center;justify-content:space-between;z-index:100;min-height:64px;gap:10px}
 .pm-left{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
 .pm-left img{width:44px;height:44px;border-radius:8px;object-fit:cover;border:1px solid #333;flex-shrink:0}
-.pm-info{flex:1;min-width:0;height:44px;display:flex;flex-direction:column;justify-content:center;overflow:hidden}
-#pmTitle{color:#fff;font-weight:600;font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;animation:scroll-title 8s linear infinite;width:fit-content;max-width:100%}
-#pmArtist{color:#aaa;font-size:.7rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;animation:scroll-title 8s linear infinite;width:fit-content;max-width:100%}
+.pm-info{flex:1;min-width:0;height:44px;display:flex;flex-direction:column;justify-content:center;overflow:hidden;position:relative}
+.pm-title{color:#fff;font-weight:600;font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
+.pm-title.scroll{animation:scroll-title 12s linear infinite;width:fit-content;max-width:none;padding-right:30px}
+.pm-artist{color:#aaa;font-size:.7rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
+.pm-artist.scroll{animation:scroll-title 12s linear infinite;width:fit-content;max-width:none;padding-right:30px}
 @keyframes scroll-title{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 .pm-controls{display:flex;align-items:center;gap:14px;color:#e5de69;flex-shrink:0}
 .pm-controls i{font-size:1.6rem;cursor:pointer}
 .pm-expand{color:#666;padding:0 4px;cursor:pointer;flex-shrink:0}
 
+/* MOBILE FULL PLAYER */
 #playerFull{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:#0f0f0f;flex-direction:column;padding:20px 24px 30px;z-index:1000}
 #playerFull.active{display:flex}
 .pf-header{display:flex;justify-content:space-between;align-items:center;padding-bottom:16px;color:#fff;flex-shrink:0}
@@ -154,4 +157,4 @@ main{display:flex;gap:28px;flex:1;min-height:0}
   .pm-left img{width:36px;height:36px}
   #pmTitle{font-size:.75rem}
   .pm-controls i{font-size:1.2rem}
-             }
+}
