@@ -249,7 +249,13 @@
       `;
     }).join('');
     tracklist.querySelectorAll('.track-item:not(.locked)').forEach(el => {
-      el.onclick = () => playTrack(parseInt(el.dataset.idx));
+      el.onclick = () => {
+        // When clicking a track, play it from the viewed album
+        const albumToPlay = viewedAlbum;
+        if (!albumToPlay || albumToPlay.isCS) return;
+        const trackIdx = parseInt(el.dataset.idx);
+        playTrack(trackIdx, albumToPlay);
+      };
     });
   }
 
@@ -272,8 +278,11 @@
   // ============================================================
   // PLAY TRACK (starts playing the selected track)
   // ============================================================
-  function playTrack(idx) {
-    const album = viewedAlbum || allAlbums[0];
+  function playTrack(idx, album) {
+    // If album not provided, use viewedAlbum
+    if (!album) {
+      album = viewedAlbum;
+    }
     if (!album || album.isCS) return;
     
     const track = album.tracks[idx];
@@ -336,7 +345,7 @@
     if (!playingTrack) {
       // If nothing is playing but there's a viewed album, play first track
       if (viewedAlbum && !viewedAlbum.isCS) {
-        playTrack(0);
+        playTrack(0, viewedAlbum);
       }
       return;
     }
@@ -402,7 +411,7 @@
     // Update the state for the playing album
     albumStates[playingAlbum.id] = { playingIdx: nextIdx };
     // Play the next track on the playing album
-    playTrack(nextIdx);
+    playTrack(nextIdx, playingAlbum);
   }
 
   function prevTrack() {
@@ -412,7 +421,7 @@
     // Update the state for the playing album
     albumStates[playingAlbum.id] = { playingIdx: prevIdx };
     // Play the previous track on the playing album
-    playTrack(prevIdx);
+    playTrack(prevIdx, playingAlbum);
   }
 
   // ============================================================
