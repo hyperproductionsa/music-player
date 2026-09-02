@@ -87,7 +87,41 @@
     if (!album || locked) {
       tlTitle.textContent = 'Coming Soon';
       tlArtist.textContent = '—';
-      tracklist.innerHTML = `<div class="track-item" style="opacity:.4;cursor:default;pointer-events:none;justify-content:center;padding:20px;color:#666;">🔒 This album is coming soon</div>`;
+      tracklist.innerHTML = `
+        <div class="track-item" style="opacity:.5;cursor:default;pointer-events:none;padding:8px 14px;color:#666;border-bottom:1px solid #1a1a1a;">
+          <div class="ti-play" style="color:#666;"><i class="fas fa-lock"></i></div>
+          <div class="ti-info">
+            <div class="ti-title" style="color:#666;">This album is coming soon</div>
+            <div class="ti-artist" style="color:#555;">Available 25 Sep 2026</div>
+          </div>
+          <div class="ti-dur" style="color:#444;">🔒</div>
+        </div>
+      `;
+      // Also show the tracks but grayed out
+      if (album && album.tracks) {
+        tracklist.innerHTML = album.tracks.map((t, i) => {
+          const title = t.mix ? `${t.title} (${t.mix})` : t.title;
+          return `
+            <div class="track-item" style="opacity:.4;cursor:default;pointer-events:none;padding:8px 14px;border-bottom:1px solid #1a1a1a;">
+              <div class="ti-play" style="color:#444;"><i class="fas fa-lock"></i></div>
+              <div class="ti-info">
+                <div class="ti-title" style="color:#666;">${title}</div>
+                <div class="ti-artist" style="color:#555;">${t.artist}</div>
+              </div>
+              <div class="ti-dur" style="color:#444;">🔒</div>
+            </div>
+          `;
+        }).join('');
+        // Add a "Coming Soon" message at the top
+        tracklist.innerHTML = `
+          <div class="track-item" style="opacity:.6;cursor:default;pointer-events:none;padding:8px 14px;background:#1a1a1a;border-bottom:1px solid #2a2a2a;">
+            <div class="ti-info" style="text-align:center;">
+              <div class="ti-title" style="color:#e5de69;font-size:.9rem;"><i class="fas fa-clock"></i> Coming 25 Sep 2026</div>
+              <div class="ti-artist" style="color:#888;">${album.tracks.length} tracks · Preview only</div>
+            </div>
+          </div>
+        ` + tracklist.innerHTML;
+      }
       return;
     }
     tlTitle.textContent = album.title;
@@ -122,25 +156,25 @@
     clearInterval(timer);
     updatePlayBtn();
 
-    if (album.isCS && !unlocked) {
-      curAlbum = null; curTrack = null;
+    // HTC5 - Coming Soon (locked or unlocked)
+    if (album.isCS) {
+      curAlbum = null;
+      curTrack = null;
       artImg.src = getImage(album);
       csOverlay.style.display = 'flex';
       csTitle.textContent = album.title;
       csSub.textContent = `${album.artist} · ${album.year} · ${album.trackCount} tracks`;
       csDate.textContent = new Date(album.releaseDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
-      renderTracks(null, true);
+      
+      // Show tracklist with locked tracks
+      renderTracks(album, true);
       renderAlbums();
       updatePlayBtn();
       return;
     }
 
-    if (album.isCS && unlocked) {
-      curAlbum = { id: 'htc5', title: album.title, artist: album.artist, year: album.year, cover: album.cover, folder: 'HTC5', tracks: album.tracks };
-    } else {
-      curAlbum = album;
-    }
-
+    // Regular album (HTC1-4)
+    curAlbum = album;
     csOverlay.style.display = 'none';
     artImg.src = getImage(curAlbum);
     curTrack = null; curIdx = 0;
@@ -154,7 +188,7 @@
     updatePlayBtn();
   }
 
-  // Play Track
+  // Play Track (only for unlocked albums)
   function playTrack(idx) {
     if (!curAlbum) return;
     const track = curAlbum.tracks[idx];
@@ -229,7 +263,30 @@
   function closeFull() { pf.classList.remove('active'); }
 
   // Back button
-  backBtn.onclick = showAlbumList;
+  backBtn.onclick = function() {
+    showAlbumList();
+    // Reset to HTC5 cover
+    const defaultAlbum = allAlbums[4];
+    artImg.src = getImage(defaultAlbum);
+    csOverlay.style.display = 'flex';
+    csTitle.textContent = defaultAlbum.title;
+    csSub.textContent = `${defaultAlbum.artist} · ${defaultAlbum.year} · ${defaultAlbum.trackCount} tracks`;
+    csDate.textContent = new Date(defaultAlbum.releaseDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+    pmArt.src = getImage(defaultAlbum);
+    // Reset now playing
+    npPcTrack.textContent = 'Select a track';
+    npPcArtist.textContent = '—';
+    npPcFill.style.width = '0%';
+    npPcCur.textContent = '0:00';
+    npPcTot.textContent = '0:00';
+    pmTitle.textContent = 'Select a track';
+    pmArtist.textContent = '—';
+    // Stop audio
+    audio.pause();
+    audio.src = '';
+    isPlaying = false;
+    updatePlayBtn();
+  };
 
   // Events
   pcPlay.onclick = togglePlay; pcPrev.onclick = prevTrack; pcNext.onclick = nextTrack;
@@ -238,10 +295,10 @@
   audio.onended = nextTrack;
 
   // ============================================================
-  // INIT - Show album list, don't auto-load any album
+  // INIT - Album List ONLY, no tracklist visible
   // ============================================================
   renderAlbums();
-  showAlbumList();
+  showAlbumList(); // This hides tracklist and shows album list
 
   // Set default artwork to HTC5 (coming soon)
   const defaultAlbum = allAlbums[4]; // HTC5
@@ -256,4 +313,4 @@
   const main = document.getElementById('main');
   const resize = () => main.style.flexDirection = window.innerWidth <= 860 ? 'column' : 'row';
   resize(); window.onresize = resize;
-})(); 
+})();
