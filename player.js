@@ -24,7 +24,7 @@
   const pfPlay = $('pfPlay'), pfPrev = $('pfPrev'), pfNext = $('pfNext'), pfClose = $('pfClose');
   const backBtn = $('backBtn'), headerBadge = $('headerBadge');
 
-  // Media Session API (for notification bar artwork on Android/iOS)
+  // Media Session API
   function updateMediaSession(album, track) {
     if ('mediaSession' in navigator) {
       const title = track.mix ? `${track.title} (${track.mix})` : track.title;
@@ -61,7 +61,6 @@
 
   // Render Album List (HTC5 first)
   function renderAlbums() {
-    // Reverse the array to show HTC5 first
     const sortedAlbums = [...allAlbums].reverse();
     albumList.innerHTML = sortedAlbums.map((a, i) => {
       const originalIdx = allAlbums.length - 1 - i;
@@ -169,7 +168,6 @@
     pfTitle.textContent = title; pfArtist.textContent = track.artist;
     pfArt.src = getImage(curAlbum);
     pmArt.src = getImage(curAlbum);
-    // Update Media Session
     updateMediaSession(curAlbum, track);
     renderTracks(curAlbum);
     audio.play().then(() => { isPlaying = true; updatePlayBtn(); startProgress(); }).catch(() => { isPlaying = false; updatePlayBtn(); });
@@ -239,13 +237,22 @@
   pfPlay.onclick = togglePlay; pfPrev.onclick = prevTrack; pfNext.onclick = nextTrack; pfClose.onclick = closeFull;
   audio.onended = nextTrack;
 
-  // Init
+  // ============================================================
+  // INIT - Show album list, don't auto-load any album
+  // ============================================================
   renderAlbums();
   showAlbumList();
-  loadAlbum(4); // Start with HTC5 (coming soon)
+
+  // Set default artwork to HTC5 (coming soon)
+  artImg.src = getImage(allAlbums[4]);
+  csOverlay.style.display = 'flex';
+  csTitle.textContent = allAlbums[4].title;
+  csSub.textContent = `${allAlbums[4].artist} · ${allAlbums[4].year} · ${allAlbums[4].trackCount} tracks`;
+  csDate.textContent = new Date(allAlbums[4].releaseDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+  pmArt.src = getImage(allAlbums[4]);
 
   // Responsive
   const main = document.getElementById('main');
   const resize = () => main.style.flexDirection = window.innerWidth <= 860 ? 'column' : 'row';
   resize(); window.onresize = resize;
-})(); 
+})();
