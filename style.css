@@ -1,32 +1,24 @@
-/* ============================================================
-   RESET & BASE
-   ============================================================ */
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,Inter,sans-serif}
 body{background:#0b0b0b;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px}
-#app{max-width:1360px;width:100%;background:#0f0f0f;border-radius:36px;padding:24px 28px 20px;border:1px solid #2a2a2a;box-shadow:0 20px 40px rgba(0,0,0,.8),0 0 0 1px rgba(229,222,105,.15);min-height:600px;display:flex;flex-direction:column;position:relative}
+#app{max-width:1360px;width:100%;background:#0f0f0f;border-radius:36px;padding:24px 28px 20px;border:1px solid #2a2a2a;box-shadow:0 20px 40px rgba(0,0,0,.8);min-height:600px;display:flex;flex-direction:column}
 
-/* ============================================================
-   HEADER
-   ============================================================ */
+/* HEADER */
 header{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #e5de69;padding-bottom:14px;margin-bottom:20px;flex-shrink:0}
 header h1{color:#e5de69;font-size:1.5rem;font-weight:600}
 header h1 i{margin-right:10px}
-header #backBtn{background:none;border:none;color:#e5de69;font-size:.9rem;font-weight:600;cursor:pointer;padding:6px 14px;border-radius:20px;transition:.2s}
-header #backBtn:hover{background:#1e1d12}
-header #backBtn i{margin-right:6px}
-header span{color:#fff;font-size:.85rem;background:#1a1a1a;padding:6px 16px;border-radius:30px;border:1px solid #2a2a2a}
+#backBtn{background:none;border:none;color:#e5de69;font-size:.9rem;font-weight:600;cursor:pointer;padding:6px 14px;border-radius:20px;display:none}
+#backBtn:hover{background:#1e1d12}
+#backBtn i{margin-right:6px}
+#headerBadge{color:#fff;font-size:.85rem;background:#1a1a1a;padding:6px 16px;border-radius:30px;border:1px solid #2a2a2a}
 
-/* ============================================================
-   MAIN LAYOUT
-   ============================================================ */
+/* MAIN */
 main{display:flex;gap:28px;flex:1;min-height:0}
 
-/* LEFT: ART SECTION */
+/* LEFT: ART */
 .art-section{flex:0 0 42%;display:flex;flex-direction:column;gap:16px;min-width:0}
 .art-wrap{position:relative;width:100%;aspect-ratio:1;border-radius:20px;overflow:hidden;background:#141414;border:1px solid #2a2a2a}
 .art-wrap img{width:100%;height:100%;object-fit:cover}
 
-/* Coming Soon Overlay */
 .cs-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.75);display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:20px;backdrop-filter:blur(4px)}
 .cs-overlay div:first-child{color:#e5de69;font-size:3rem;margin-bottom:10px}
 .cs-badge{color:#e5de69;font-size:1.2rem;font-weight:700;background:#1e1d12;padding:8px 24px;border-radius:40px;border:2px solid #e5de69;margin-bottom:12px}
@@ -35,7 +27,7 @@ main{display:flex;gap:28px;flex:1;min-height:0}
 .cs-overlay small{color:#fff;font-size:.9rem}
 .cs-overlay small i{color:#e5de69}
 
-/* PC Now Playing */
+/* PC NOW PLAYING */
 .np-pc{background:#141414;border-radius:16px;padding:14px 18px;border:1px solid #2a2a2a;flex-shrink:0}
 .np-pc-track{color:#fff;font-size:1rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .np-pc-artist{color:#aaa;font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -47,16 +39,13 @@ main{display:flex;gap:28px;flex:1;min-height:0}
 .np-pc-btns i{font-size:1.4rem;cursor:pointer}
 .np-pc-btns i:nth-child(2){font-size:2.2rem}
 
-/* ============================================================
-   RIGHT: LIST SECTION
-   ============================================================ */
+/* RIGHT: LIST */
 .list-section{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
 
 /* Album List */
-.album-list{display:flex;flex-direction:column;gap:8px;flex:1;overflow-y:auto;padding-right:4px}
+#albumList{display:flex;flex-direction:column;gap:8px;flex:1;overflow-y:auto;padding-right:4px}
 .album-item{display:flex;align-items:center;gap:14px;padding:10px 14px;background:#141414;border-radius:12px;border:1px solid #262626;cursor:pointer;transition:.2s}
 .album-item:hover{background:#1d1d1d;border-color:#e5de6960}
-.album-item.active{background:#1a1910;border-color:#e5de69}
 .album-item .ai-art{width:44px;height:44px;border-radius:8px;overflow:hidden;flex-shrink:0;border:1px solid #333}
 .album-item .ai-art img{width:100%;height:100%;object-fit:cover}
 .album-item .ai-info{flex:1;min-width:0}
@@ -65,14 +54,13 @@ main{display:flex;gap:28px;flex:1;min-height:0}
 .album-item .ai-badge{color:#e5de69;font-size:.7rem;font-weight:600;background:#1e1d12;padding:2px 10px;border-radius:12px;border:1px solid #e5de6940;flex-shrink:0}
 .album-item .ai-play{color:#e5de69;font-size:1.2rem;opacity:0;transition:.2s}
 .album-item:hover .ai-play{opacity:.5}
-.album-item.active .ai-play{opacity:1}
 
 /* Tracklist */
-.tracklist-wrap{display:flex;flex-direction:column;flex:1;min-height:0;background:#141414;border-radius:12px;border:1px solid #262626;overflow:hidden}
-.tracklist-header{padding:10px 16px;background:#1a1a1a;border-bottom:1px solid #262626;flex-shrink:0}
-.tracklist-header .tl-title{color:#fff;font-weight:600;font-size:.95rem}
-.tracklist-header .tl-artist{color:#aaa;font-size:.8rem}
-.tracklist{flex:1;overflow-y:auto;padding:4px 0}
+#tracklistWrap{display:none;flex-direction:column;flex:1;min-height:0;background:#141414;border-radius:12px;border:1px solid #262626;overflow:hidden}
+#tracklistHeader{padding:10px 16px;background:#1a1a1a;border-bottom:1px solid #262626;flex-shrink:0}
+#tlTitle{color:#fff;font-weight:600;font-size:.95rem}
+#tlArtist{color:#aaa;font-size:.8rem}
+#tracklist{flex:1;overflow-y:auto;padding:4px 0}
 .track-item{display:flex;align-items:center;gap:12px;padding:8px 14px;cursor:pointer;transition:.15s;border-bottom:1px solid #1a1a1a}
 .track-item:hover{background:#1d1d1d}
 .track-item.active{background:#1a1910;border-left:3px solid #e5de69}
@@ -82,35 +70,35 @@ main{display:flex;gap:28px;flex:1;min-height:0}
 .track-item .ti-info .ti-artist{color:#aaa;font-size:.75rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .track-item.active .ti-info .ti-title{color:#e5de69}
 .track-item .ti-dur{color:#666;font-size:.7rem;flex-shrink:0}
+.track-item.locked{opacity:.5;cursor:default;pointer-events:none}
+.track-item.locked .ti-play{color:#444}
+.track-item.locked .ti-info .ti-title{color:#666}
+.track-item.locked .ti-info .ti-artist{color:#555}
+.track-item.locked .ti-dur{color:#444}
 
-/* ============================================================
-   MOBILE BOTTOM PLAYER (sticky)
-   ============================================================ */
-.player-mobile{display:none;position:fixed;bottom:0;left:0;right:0;background:#1a1a1a;padding:10px 14px;border-top:1px solid #2a2a2a;align-items:center;justify-content:space-between;border-radius:0;z-index:100;min-height:64px;gap:10px}
+/* MOBILE */
+#playerMobile{display:none;position:fixed;bottom:0;left:0;right:0;background:#1a1a1a;padding:10px 14px;border-top:1px solid #2a2a2a;align-items:center;justify-content:space-between;z-index:100;min-height:64px;gap:10px}
 .pm-left{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
 .pm-left img{width:44px;height:44px;border-radius:8px;object-fit:cover;border:1px solid #333;flex-shrink:0}
 .pm-info{flex:1;min-width:0;height:44px;display:flex;flex-direction:column;justify-content:center;overflow:hidden}
-.pm-title{color:#fff;font-weight:600;font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;animation:scroll-title 8s linear infinite;width:fit-content;max-width:100%}
-.pm-artist{color:#aaa;font-size:.7rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;animation:scroll-title 8s linear infinite;width:fit-content;max-width:100%}
+#pmTitle{color:#fff;font-weight:600;font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;animation:scroll-title 8s linear infinite;width:fit-content;max-width:100%}
+#pmArtist{color:#aaa;font-size:.7rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;animation:scroll-title 8s linear infinite;width:fit-content;max-width:100%}
 @keyframes scroll-title{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 .pm-controls{display:flex;align-items:center;gap:14px;color:#e5de69;flex-shrink:0}
 .pm-controls i{font-size:1.6rem;cursor:pointer}
 .pm-expand{color:#666;padding:0 4px;cursor:pointer;flex-shrink:0}
 
-/* ============================================================
-   MOBILE FULL PLAYER (overlay)
-   ============================================================ */
-.player-full{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:#0f0f0f;flex-direction:column;padding:20px 24px 30px;z-index:1000}
-.player-full.active{display:flex}
+#playerFull{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:#0f0f0f;flex-direction:column;padding:20px 24px 30px;z-index:1000}
+#playerFull.active{display:flex}
 .pf-header{display:flex;justify-content:space-between;align-items:center;padding-bottom:16px;color:#fff;flex-shrink:0}
 .pf-header i{font-size:1.4rem;cursor:pointer;color:#888}
 .pf-header span{font-weight:500;color:#fff}
-.player-full img{width:100%;max-width:360px;aspect-ratio:1;margin:0 auto 20px;border-radius:20px;object-fit:cover;border:1px solid #2a2a2a;box-shadow:0 20px 60px rgba(0,0,0,.8)}
+#playerFull img{width:100%;max-width:360px;aspect-ratio:1;margin:0 auto 20px;border-radius:20px;object-fit:cover;border:1px solid #2a2a2a;box-shadow:0 20px 60px rgba(0,0,0,.8)}
 .pf-info{text-align:center;margin-bottom:14px;flex-shrink:0}
-.pf-title{color:#fff;font-size:1.1rem;font-weight:600}
-.pf-artist{color:#aaa;font-size:.85rem}
+#pfTitle{color:#fff;font-size:1.1rem;font-weight:600}
+#pfArtist{color:#aaa;font-size:.85rem}
 .pf-bar{display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-shrink:0}
-.pf-time{color:#888;font-size:.7rem;min-width:36px}
+.pf-bar span{color:#888;font-size:.7rem;min-width:36px}
 .pf-progress{flex:1;height:4px;background:#2a2a2a;border-radius:2px;overflow:hidden;cursor:pointer;position:relative}
 .pf-fill{height:100%;background:#e5de69;border-radius:2px;width:0%;transition:width .1s;pointer-events:none}
 .pf-btns{display:flex;justify-content:center;align-items:center;gap:32px;color:#e5de69;flex-shrink:0}
@@ -118,23 +106,18 @@ main{display:flex;gap:28px;flex:1;min-height:0}
 .pf-btns i:first-child,.pf-btns i:last-child{font-size:1.4rem;opacity:.7}
 .pf-btns i:nth-child(2){font-size:3.2rem}
 
-/* ============================================================
-   SCROLLBARS
-   ============================================================ */
-.album-list::-webkit-scrollbar,.tracklist::-webkit-scrollbar{width:3px}
-.album-list::-webkit-scrollbar-track,.tracklist::-webkit-scrollbar-track{background:#1a1a1a}
-.album-list::-webkit-scrollbar-thumb,.tracklist::-webkit-scrollbar-thumb{background:#e5de69;border-radius:10px}
+/* SCROLLBARS */
+#albumList::-webkit-scrollbar,#tracklist::-webkit-scrollbar{width:3px}
+#albumList::-webkit-scrollbar-track,#tracklist::-webkit-scrollbar-track{background:#1a1a1a}
+#albumList::-webkit-scrollbar-thumb,#tracklist::-webkit-scrollbar-thumb{background:#e5de69;border-radius:10px}
 
-/* ============================================================
-   RESPONSIVE - MOBILE
-   ============================================================ */
+/* RESPONSIVE */
 @media(max-width:860px){
   body{padding:0}
-  #app{border-radius:0;padding:16px 16px 80px;box-shadow:none;border:none;min-height:100vh;height:100vh;max-height:100vh;overflow:hidden;position:relative}
+  #app{border-radius:0;padding:16px 16px 80px;box-shadow:none;border:none;min-height:100vh;height:100vh;max-height:100vh;overflow:hidden}
   header{padding-bottom:10px;margin-bottom:12px}
   header h1{font-size:1.1rem}
-  header span{font-size:.7rem;padding:4px 12px}
-  
+  #headerBadge{font-size:.7rem;padding:4px 12px}
   main{flex-direction:column;flex:1;min-height:0;gap:12px}
   .art-section{flex:0 0 auto;width:100%;max-width:300px;margin:0 auto}
   .art-wrap{border-radius:16px}
@@ -143,25 +126,22 @@ main{display:flex;gap:28px;flex:1;min-height:0}
   .cs-overlay p{font-size:.85rem}
   .cs-overlay small{font-size:.8rem}
   .np-pc{display:none}
-  
   .list-section{flex:1;min-height:0}
-  .album-list{flex:1;gap:6px;padding-bottom:4px}
+  #albumList{flex:1;gap:6px;padding-bottom:4px}
   .album-item{padding:8px 12px}
   .album-item .ai-art{width:36px;height:36px}
   .album-item .ai-info .ai-title{font-size:.8rem}
   .album-item .ai-info .ai-artist{font-size:.7rem}
-  
-  .tracklist-wrap{flex:1;min-height:0}
-  .tracklist-header{padding:8px 12px}
-  .tracklist-header .tl-title{font-size:.85rem}
-  .tracklist-header .tl-artist{font-size:.7rem}
+  #tracklistWrap{flex:1;min-height:0}
+  #tracklistHeader{padding:8px 12px}
+  #tlTitle{font-size:.85rem}
+  #tlArtist{font-size:.7rem}
   .track-item{padding:6px 12px}
   .track-item .ti-info .ti-title{font-size:.8rem}
   .track-item .ti-info .ti-artist{font-size:.7rem}
-  
-  .player-mobile{display:flex}
-  .pm-title{font-size:.8rem}
-  .pm-artist{font-size:.65rem}
+  #playerMobile{display:flex}
+  #pmTitle{font-size:.8rem}
+  #pmArtist{font-size:.65rem}
   .pm-controls i{font-size:1.4rem}
 }
 
@@ -172,6 +152,6 @@ main{display:flex;gap:28px;flex:1;min-height:0}
   .album-item .ai-info .ai-title{font-size:.75rem}
   .track-item .ti-info .ti-title{font-size:.75rem}
   .pm-left img{width:36px;height:36px}
-  .pm-title{font-size:.75rem}
+  #pmTitle{font-size:.75rem}
   .pm-controls i{font-size:1.2rem}
-} 
+             }
