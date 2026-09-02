@@ -66,7 +66,26 @@
   const allAlbums = [...albums, { ...comingSoonAlbum, isCS: true }];
 
   // ============================================================
-  // UPDATE NOW PLAYING UI (shows PLAYING track, not viewed)
+  // UPDATE ARTWORK (separate from now playing)
+  // ============================================================
+  function updateArtwork() {
+    // If playing, show playing album artwork
+    // Otherwise show HTC5 (Coming Soon)
+    if (playingAlbum) {
+      artImg.src = getImage(playingAlbum);
+      csOverlay.style.display = 'none';
+    } else {
+      const defaultAlbum = allAlbums[4];
+      artImg.src = getImage(defaultAlbum);
+      csOverlay.style.display = 'flex';
+      csTitle.textContent = defaultAlbum.title;
+      csSub.textContent = `${defaultAlbum.artist} · ${defaultAlbum.year} · ${defaultAlbum.trackCount} tracks`;
+      csDate.textContent = new Date(defaultAlbum.releaseDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+  }
+
+  // ============================================================
+  // UPDATE NOW PLAYING UI
   // ============================================================
   function updateNowPlaying() {
     if (!playingTrack || !playingAlbum) {
@@ -90,6 +109,8 @@
     const art = getImage(playingAlbum);
     pmArt.src = art;
     pfArt.src = art;
+    // Also update the main artwork
+    updateArtwork();
   }
 
   // ============================================================
@@ -152,13 +173,14 @@
     albumList.innerHTML = sorted.map((a) => {
       const idx = allAlbums.indexOf(a);
       const isCS = a.isCS || false;
-      // Check if this album has a saved state
+      // Check if this album is currently playing
+      const isPlayingAlbum = playingAlbum && playingAlbum.id === a.id;
       const hasState = albumStates[a.id] !== undefined;
       return `
         <div class="album-item" data-idx="${idx}">
           <div class="ai-art"><img src="${getImage(a)}" alt="${a.title}" /></div>
           <div class="ai-info">
-            <div class="ai-title">${a.title} ${hasState ? '▶' : ''}</div>
+            <div class="ai-title">${a.title} ${isPlayingAlbum ? '▶' : ''} ${hasState && !isPlayingAlbum ? '●' : ''}</div>
             <div class="ai-artist">${a.artist} · ${a.year}</div>
           </div>
           ${isCS ? `<div class="ai-badge">🔜</div>` : ''}
@@ -241,18 +263,7 @@
     // Update the viewed album
     viewedAlbum = album;
 
-    // Update artwork to show the selected album
-    artImg.src = getImage(album);
-    if (isLocked) {
-      csOverlay.style.display = 'flex';
-      csTitle.textContent = album.title;
-      csSub.textContent = `${album.artist} · ${album.year} · ${album.trackCount || album.tracks.length} tracks`;
-      csDate.textContent = new Date(album.releaseDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
-    } else {
-      csOverlay.style.display = 'none';
-    }
-
-    // DON'T change the playing album or track
+    // DON'T change the artwork - it should stay with playing song
     // DON'T change the now playing UI
 
     renderTracklist(album, isLocked);
@@ -273,7 +284,7 @@
     playingTrack = track;
     playingIdx = idx;
 
-    // Save state for this album (FULL ALBUM STATE)
+    // Save state for this album
     albumStates[album.id] = { 
       playingIdx: idx,
       albumTitle: album.title,
@@ -319,7 +330,7 @@
   }
 
   // ============================================================
-  // CONTROLS - ALWAYS work on the PLAYING track
+  // CONTROLS - ALWAYS work on the PLAYING album
   // ============================================================
   function togglePlay() {
     if (!playingTrack) {
@@ -386,19 +397,21 @@
 
   function nextTrack() {
     if (!playingAlbum) return;
-    const album = playingAlbum;
-    const nextIdx = (playingIdx + 1) % album.tracks.length;
-    // Save the new state
-    albumStates[album.id] = { playingIdx: nextIdx };
+    // Always skip on the PLAYING album
+    const nextIdx = (playingIdx + 1) % playingAlbum.tracks.length;
+    // Update the state for the playing album
+    albumStates[playingAlbum.id] = { playingIdx: nextIdx };
+    // Play the next track on the playing album
     playTrack(nextIdx);
   }
 
   function prevTrack() {
     if (!playingAlbum) return;
-    const album = playingAlbum;
-    const prevIdx = (playingIdx - 1 + album.tracks.length) % album.tracks.length;
-    // Save the new state
-    albumStates[album.id] = { playingIdx: prevIdx };
+    // Always go previous on the PLAYING album
+    const prevIdx = (playingIdx - 1 + playingAlbum.tracks.length) % playingAlbum.tracks.length;
+    // Update the state for the playing album
+    albumStates[playingAlbum.id] = { playingIdx: prevIdx };
+    // Play the previous track on the playing album
     playTrack(prevIdx);
   }
 
@@ -407,15 +420,8 @@
   // ============================================================
   function goBack() {
     showAlbumList();
-    const defaultAlbum = allAlbums[4];
-    artImg.src = getImage(defaultAlbum);
-    csOverlay.style.display = 'flex';
-    csTitle.textContent = defaultAlbum.title;
-    csSub.textContent = `${defaultAlbum.artist} · ${defaultAlbum.year} · ${defaultAlbum.trackCount} tracks`;
-    csDate.textContent = new Date(defaultAlbum.releaseDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
-    
-    // DON'T change the playing album or now playing
-    // Artwork stays with the playing song
+    // Artwork stays with playing song, or shows HTC5 if nothing playing
+    updateArtwork();
   }
 
   function openFull() { pf.classList.add('active'); }
@@ -446,13 +452,8 @@
   showAlbumList();
 
   // Default artwork: HTC5 (Coming Soon)
-  const defaultAlbum = allAlbums[4];
-  artImg.src = getImage(defaultAlbum);
-  csOverlay.style.display = 'flex';
-  csTitle.textContent = defaultAlbum.title;
-  csSub.textContent = `${defaultAlbum.artist} · ${defaultAlbum.year} · ${defaultAlbum.trackCount} tracks`;
-  csDate.textContent = new Date(defaultAlbum.releaseDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
-  pmArt.src = getImage(defaultAlbum);
+  updateArtwork();
+  pmArt.src = getImage(allAlbums[4]);
 
   // Responsive
   const main = document.getElementById('main');
