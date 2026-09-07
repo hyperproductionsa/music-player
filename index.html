@@ -16,15 +16,18 @@
 
   <!-- HEADER -->
   <header>
-    <h1><i class="fas fa-headphones"></i> HTs Collections</h1>
+    <div class="header-left">
+      <img src="http://hyperproduction.co.za/logo/HPSA-gold.png" alt="Hyper Production" id="logo" />
+      <span id="brandName">HTs Collections</span>
+    </div>
     <button id="backBtn"><i class="fas fa-arrow-left"></i> Back</button>
     <span id="headerBadge">5 albums</span>
   </header>
 
-  <!-- MAIN CONTENT -->
+  <!-- MAIN CONTENT (Static art + Scrollable playlist) -->
   <main id="main">
 
-    <!-- LEFT: COVER ART + BUY BUTTON -->
+    <!-- LEFT: COVER ART (STATIC - NEVER SCROLLS) -->
     <section class="art-section" id="artSection">
       <div class="art-wrap" id="artWrap">
         <img id="artImg" src="https://cdn.htcoll.shop/images/HTC5.jpg" alt="cover" />
@@ -54,7 +57,7 @@
           <small><i class="fas fa-calendar"></i> <span id="csDate">25 Sep 2026</span></small>
         </div>
       </div>
-      <!-- Buy Now Button BELOW the artwork -->
+      <!-- Buy Now Button BELOW artwork -->
       <div class="art-buy-container" id="artBuyContainer" style="display:none;">
         <button class="buy-btn" id="artBuyBtn">
           <i class="fas fa-shopping-cart"></i> Buy Now
@@ -63,11 +66,11 @@
       </div>
     </section>
 
-    <!-- RIGHT: ALBUM LIST & TRACKLIST -->
+    <!-- RIGHT: ALBUM LIST & TRACKLIST (SCROLLABLE) -->
     <section class="list-section" id="listSection">
-      <!-- Album List (visible by default) -->
+      <!-- Album List -->
       <div id="albumList"></div>
-      <!-- Tracklist (hidden by default) -->
+      <!-- Tracklist -->
       <div id="tracklistWrap" style="display:none;">
         <div id="tracklistHeader">
           <span id="tlTitle">HTs Collections</span>
@@ -82,7 +85,7 @@
 
   </main>
 
-  <!-- PC NOW PLAYING FOOTER -->
+  <!-- PC NOW PLAYING FOOTER (STICKY) -->
   <footer id="pcFooter">
     <div class="footer-left">
       <img id="footerArt" src="https://cdn.htcoll.shop/images/HTC5.jpg" alt="cover" />
@@ -104,7 +107,8 @@
       </div>
     </div>
     <div class="footer-right">
-      <i class="fas fa-volume-up"></i>
+      <i class="fas fa-volume-up" id="volumeIcon"></i>
+      <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.8" />
     </div>
   </footer>
 
