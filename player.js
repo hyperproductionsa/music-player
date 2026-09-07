@@ -73,14 +73,16 @@
   // VOLUME CONTROL
   // ============================================================
   audio.volume = 0.8;
-  volumeSlider.value = 0.8;
-
-  volumeSlider.addEventListener('input', function() {
-    audio.volume = parseFloat(this.value);
-    updateVolumeIcon();
-  });
+  if (volumeSlider) {
+    volumeSlider.value = 0.8;
+    volumeSlider.addEventListener('input', function() {
+      audio.volume = parseFloat(this.value);
+      updateVolumeIcon();
+    });
+  }
 
   function updateVolumeIcon() {
+    if (!volumeIcon) return;
     const vol = audio.volume;
     if (vol === 0) {
       volumeIcon.className = 'fas fa-volume-mute';
@@ -91,26 +93,28 @@
     }
   }
 
-  volumeIcon.addEventListener('click', function() {
-    if (audio.volume > 0) {
-      audio.volume = 0;
-      volumeSlider.value = 0;
-    } else {
-      audio.volume = 0.8;
-      volumeSlider.value = 0.8;
-    }
-    updateVolumeIcon();
-  });
+  if (volumeIcon) {
+    volumeIcon.addEventListener('click', function() {
+      if (audio.volume > 0) {
+        audio.volume = 0;
+        if (volumeSlider) volumeSlider.value = 0;
+      } else {
+        audio.volume = 0.8;
+        if (volumeSlider) volumeSlider.value = 0.8;
+      }
+      updateVolumeIcon();
+    });
+  }
 
   // ============================================================
-  // BUY ALBUM FUNCTION - FIXED WORKER CALL
+  // BUY ALBUM FUNCTION - WITH DEBUGGING
   // ============================================================
   window.buyAlbum = async function(albumId) {
-    // REPLACE THIS WITH YOUR ACTUAL WORKER URL
+    // YOUR WORKER URL - UPDATE THIS
     const workerUrl = 'https://yoco-checkout.hyperproductionsa.workers.dev';
     
-    console.log('Buying album:', albumId);
-    console.log('Calling worker:', workerUrl);
+    console.log('🔵 Buy Album clicked:', albumId);
+    console.log('🔵 Calling worker:', workerUrl);
     
     try {
       const response = await fetch(workerUrl, {
@@ -120,22 +124,24 @@
         },
         body: JSON.stringify({ 
           productId: albumId,
-          price: 15000
+          price: 15000 // R150 in cents
         })
       });
       
-      console.log('Response status:', response.status);
+      console.log('🔵 Response status:', response.status);
       const data = await response.json();
-      console.log('Response data:', data);
+      console.log('🔵 Response data:', data);
       
-      if (data.checkoutUrl) {
+      if (response.ok && data.checkoutUrl) {
+        console.log('✅ Redirecting to:', data.checkoutUrl);
         window.location.href = data.checkoutUrl;
       } else {
-        alert('Payment error: ' + (data.error || 'Please try again.'));
+        alert('Payment error: ' + (data.error || data.message || 'Please try again.'));
+        console.error('❌ Payment error:', data);
       }
     } catch (error) {
-      console.error('Payment error:', error);
-      alert('Payment error. Please try again. Check console for details.');
+      console.error('❌ Fetch error:', error);
+      alert('Payment error: ' + error.message);
     }
   };
 
@@ -143,6 +149,7 @@
   // COUNTDOWN TIMER
   // ============================================================
   function updateCountdown() {
+    if (!countdownOverlay) return;
     const now = new Date();
     const diff = releaseDate - now;
     
@@ -161,12 +168,11 @@
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((diff % (1000 * 60)) / 1000);
     
-    cdDays.textContent = String(days).padStart(2, '0');
-    cdHours.textContent = String(hours).padStart(2, '0');
-    cdMinutes.textContent = String(minutes).padStart(2, '0');
-    cdSeconds.textContent = String(seconds).padStart(2, '0');
-    
-    csDate.textContent = releaseDate.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+    if (cdDays) cdDays.textContent = String(days).padStart(2, '0');
+    if (cdHours) cdHours.textContent = String(hours).padStart(2, '0');
+    if (cdMinutes) cdMinutes.textContent = String(minutes).padStart(2, '0');
+    if (cdSeconds) cdSeconds.textContent = String(seconds).padStart(2, '0');
+    if (csDate) csDate.textContent = releaseDate.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
   }
 
   // ============================================================
@@ -195,6 +201,7 @@
   // UPDATE ARTWORK
   // ============================================================
   function updateArtwork(album) {
+    if (!artImg || !countdownOverlay) return;
     if (album) {
       artImg.src = getImage(album);
       countdownOverlay.style.display = 'none';
@@ -211,16 +218,19 @@
   // ============================================================
   function updateBuyButton(album) {
     if (!album || album.isCS) {
-      artBuyContainer.style.display = 'none';
-      tlBuyBtn.style.display = 'none';
+      if (artBuyContainer) artBuyContainer.style.display = 'none';
+      if (tlBuyBtn) tlBuyBtn.style.display = 'none';
       return;
     }
-    artBuyContainer.style.display = 'flex';
-    artBuyBtn.onclick = () => buyAlbum(album.id);
-    artBuyPrice.textContent = 'R150';
-    
-    tlBuyBtn.style.display = 'flex';
-    tlBuyBtn.onclick = () => buyAlbum(album.id);
+    if (artBuyContainer) {
+      artBuyContainer.style.display = 'flex';
+      if (artBuyBtn) artBuyBtn.onclick = () => buyAlbum(album.id);
+      if (artBuyPrice) artBuyPrice.textContent = 'R150';
+    }
+    if (tlBuyBtn) {
+      tlBuyBtn.style.display = 'flex';
+      tlBuyBtn.onclick = () => buyAlbum(album.id);
+    }
   }
 
   // ============================================================
@@ -228,24 +238,24 @@
   // ============================================================
   function updateNowPlaying() {
     if (!playingTrack || !playingAlbum) {
-      footerTitle.textContent = 'Select a track';
-      footerArtist.textContent = '—';
-      pfTitle.textContent = 'Select a track';
-      pfArtist.textContent = '—';
+      if (footerTitle) footerTitle.textContent = 'Select a track';
+      if (footerArtist) footerArtist.textContent = '—';
+      if (pfTitle) pfTitle.textContent = 'Select a track';
+      if (pfArtist) pfArtist.textContent = '—';
       updateMobileText('Select a track', '—');
       return;
     }
     const title = playingTrack.mix ? `${playingTrack.title} (${playingTrack.mix})` : playingTrack.title;
-    footerTitle.textContent = title;
-    footerArtist.textContent = playingTrack.artist;
-    pfTitle.textContent = title;
-    pfArtist.textContent = playingTrack.artist;
+    if (footerTitle) footerTitle.textContent = title;
+    if (footerArtist) footerArtist.textContent = playingTrack.artist;
+    if (pfTitle) pfTitle.textContent = title;
+    if (pfArtist) pfArtist.textContent = playingTrack.artist;
     updateMobileText(title, playingTrack.artist);
     
     const art = getImage(playingAlbum);
-    footerArt.src = art;
-    pmArt.src = art;
-    pfArt.src = art;
+    if (footerArt) footerArt.src = art;
+    if (pmArt) pmArt.src = art;
+    if (pfArt) pfArt.src = art;
   }
 
   // ============================================================
@@ -286,25 +296,28 @@
   // VIEW FUNCTIONS
   // ============================================================
   function showAlbumList() {
-    albumList.style.display = 'flex';
-    tracklistWrap.style.display = 'none';
-    backBtn.style.display = 'none';
-    headerBadge.style.display = 'inline';
-    headerBadge.textContent = '5 albums';
-    tlBuyBtn.style.display = 'none';
+    if (albumList) albumList.style.display = 'flex';
+    if (tracklistWrap) tracklistWrap.style.display = 'none';
+    if (backBtn) backBtn.style.display = 'none';
+    if (headerBadge) {
+      headerBadge.style.display = 'inline';
+      headerBadge.textContent = '5 albums';
+    }
+    if (tlBuyBtn) tlBuyBtn.style.display = 'none';
   }
 
   function showTracklist() {
-    albumList.style.display = 'none';
-    tracklistWrap.style.display = 'flex';
-    backBtn.style.display = 'inline';
-    headerBadge.style.display = 'none';
+    if (albumList) albumList.style.display = 'none';
+    if (tracklistWrap) tracklistWrap.style.display = 'flex';
+    if (backBtn) backBtn.style.display = 'inline';
+    if (headerBadge) headerBadge.style.display = 'none';
   }
 
   // ============================================================
   // RENDER FUNCTIONS
   // ============================================================
   function renderAlbums() {
+    if (!albumList) return;
     const sorted = [...allAlbums].reverse();
     albumList.innerHTML = sorted.map((a) => {
       const idx = allAlbums.indexOf(a);
@@ -330,9 +343,10 @@
   }
 
   function renderTracklist(album, isLocked = false) {
+    if (!tracklistWrap || !tracklist) return;
     showTracklist();
-    tlTitle.textContent = album.title;
-    tlArtist.textContent = `${album.artist} · ${album.year}`;
+    if (tlTitle) tlTitle.textContent = album.title;
+    if (tlArtist) tlArtist.textContent = `${album.artist} · ${album.year}`;
     viewedAlbum = album;
     
     updateBuyButton(album);
@@ -480,9 +494,9 @@
 
   function updatePlayBtn() {
     const icon = isPlaying ? 'fa-pause-circle' : 'fa-play-circle';
-    footerPlay.className = `fas ${icon}`;
-    pmPlay.className = `fas ${icon}`;
-    pfPlay.className = `fas ${icon}`;
+    if (footerPlay) footerPlay.className = `fas ${icon}`;
+    if (pmPlay) pmPlay.className = `fas ${icon}`;
+    if (pfPlay) pfPlay.className = `fas ${icon}`;
   }
 
   function startProgress() {
@@ -490,16 +504,16 @@
     timer = setInterval(() => {
       if (audio.duration && !isNaN(audio.duration)) {
         const p = (audio.currentTime / audio.duration) * 100;
-        footerFill.style.width = p + '%';
-        pfFill.style.width = p + '%';
+        if (footerFill) footerFill.style.width = p + '%';
+        if (pfFill) pfFill.style.width = p + '%';
         const cm = Math.floor(audio.currentTime / 60);
         const cs = Math.floor(audio.currentTime % 60);
         const tm = Math.floor(audio.duration / 60);
         const ts = Math.floor(audio.duration % 60);
-        footerCur.textContent = `${cm}:${String(cs).padStart(2, '0')}`;
-        pfCur.textContent = footerCur.textContent;
-        footerTot.textContent = `${tm}:${String(ts).padStart(2, '0')}`;
-        pfTot.textContent = footerTot.textContent;
+        if (footerCur) footerCur.textContent = `${cm}:${String(cs).padStart(2, '0')}`;
+        if (pfCur) pfCur.textContent = footerCur ? footerCur.textContent : '0:00';
+        if (footerTot) footerTot.textContent = `${tm}:${String(ts).padStart(2, '0')}`;
+        if (pfTot) pfTot.textContent = footerTot ? footerTot.textContent : '0:00';
       }
     }, 200);
   }
@@ -541,30 +555,34 @@
     showAlbumList();
     const defaultAlbum = allAlbums[4];
     updateArtwork(defaultAlbum);
-    artBuyContainer.style.display = 'none';
-    tlBuyBtn.style.display = 'none';
+    if (artBuyContainer) artBuyContainer.style.display = 'none';
+    if (tlBuyBtn) tlBuyBtn.style.display = 'none';
   }
 
-  function openFull() { pf.classList.add('active'); }
-  function closeFull() { pf.classList.remove('active'); }
+  function openFull() { if (pf) pf.classList.add('active'); }
+  function closeFull() { if (pf) pf.classList.remove('active'); }
 
   // ============================================================
   // EVENT LISTENERS
   // ============================================================
-  footerPlay.onclick = togglePlay;
-  footerPrev.onclick = prevTrack;
-  footerNext.onclick = nextTrack;
-  pmPlay.onclick = togglePlay;
-  pmNext.onclick = nextTrack;
-  pmExpand.onclick = openFull;
-  pfPlay.onclick = togglePlay;
-  pfPrev.onclick = prevTrack;
-  pfNext.onclick = nextTrack;
-  pfClose.onclick = closeFull;
-  backBtn.onclick = goBack;
+  if (footerPlay) footerPlay.onclick = togglePlay;
+  if (footerPrev) footerPrev.onclick = prevTrack;
+  if (footerNext) footerNext.onclick = nextTrack;
+  if (pmPlay) pmPlay.onclick = togglePlay;
+  if (pmNext) pmNext.onclick = nextTrack;
+  if (pmExpand) pmExpand.onclick = openFull;
+  if (pfPlay) pfPlay.onclick = togglePlay;
+  if (pfPrev) pfPrev.onclick = prevTrack;
+  if (pfNext) pfNext.onclick = nextTrack;
+  if (pfClose) pfClose.onclick = closeFull;
+  if (backBtn) backBtn.onclick = goBack;
   audio.onended = nextTrack;
-  footerProgress.addEventListener('click', (e) => seekTo(e, footerProgress, footerFill, footerCur, footerTot));
-  pfProgress.addEventListener('click', (e) => seekTo(e, pfProgress, pfFill, pfCur, pfTot));
+  if (footerProgress) {
+    footerProgress.addEventListener('click', (e) => seekTo(e, footerProgress, footerFill, footerCur, footerTot));
+  }
+  if (pfProgress) {
+    pfProgress.addEventListener('click', (e) => seekTo(e, pfProgress, pfFill, pfCur, pfTot));
+  }
 
   // ============================================================
   // INIT
@@ -575,11 +593,11 @@
   const defaultAlbum = allAlbums[4];
   updateArtwork(defaultAlbum);
   updateMobileText('Select a track', '—');
-  footerArt.src = getImage(defaultAlbum);
-  pmArt.src = getImage(defaultAlbum);
+  if (footerArt) footerArt.src = getImage(defaultAlbum);
+  if (pmArt) pmArt.src = getImage(defaultAlbum);
   
-  artBuyContainer.style.display = 'none';
-  tlBuyBtn.style.display = 'none';
+  if (artBuyContainer) artBuyContainer.style.display = 'none';
+  if (tlBuyBtn) tlBuyBtn.style.display = 'none';
   
   updateCountdown();
   setInterval(updateCountdown, 1000);
@@ -588,8 +606,9 @@
 
   const main = document.getElementById('main');
   const resize = () => {
-    main.style.flexDirection = window.innerWidth <= 860 ? 'column' : 'row';
-    document.getElementById('pcFooter').style.display = window.innerWidth <= 860 ? 'none' : 'flex';
+    if (main) main.style.flexDirection = window.innerWidth <= 860 ? 'column' : 'row';
+    const footer = document.getElementById('pcFooter');
+    if (footer) footer.style.display = window.innerWidth <= 860 ? 'none' : 'flex';
   };
   resize();
   window.onresize = resize;
