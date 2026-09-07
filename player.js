@@ -3,7 +3,8 @@
   const DATA = await res.json();
   const { baseUrl, comingSoon, albums, comingSoonAlbum } = DATA;
 
-  const isUnlocked = () => new Date() >= new Date(comingSoon);
+  const releaseDate = new Date(comingSoon);
+  const isUnlocked = () => new Date() >= releaseDate;
   const audio = new Audio();
   const getAudio = (a, t) => `${baseUrl}/m4a/${a.folder}/${t.file}`;
   const getImage = (a) => `${baseUrl}/images/${a.cover}`;
@@ -23,22 +24,29 @@
   const tracklist = $('tracklist');
   const tlTitle = $('tlTitle');
   const tlArtist = $('tlArtist');
+  const tlBuyBtn = $('tlBuyBtn');
   const backBtn = $('backBtn');
   const headerBadge = $('headerBadge');
   const artImg = $('artImg');
-  const csOverlay = $('csOverlay');
-  const csTitle = $('csTitle');
-  const csSub = $('csSub');
+  const countdownOverlay = $('countdownOverlay');
+  const artBuyContainer = $('artBuyContainer');
+  const artBuyBtn = $('artBuyBtn');
+  const artBuyPrice = $('artBuyPrice');
+  const cdDays = $('cdDays');
+  const cdHours = $('cdHours');
+  const cdMinutes = $('cdMinutes');
+  const cdSeconds = $('cdSeconds');
   const csDate = $('csDate');
-  const npPcTrack = $('npPcTrack');
-  const npPcArtist = $('npPcArtist');
-  const npPcFill = $('npPcFill');
-  const npPcCur = $('npPcCur');
-  const npPcTot = $('npPcTot');
-  const npPcProgress = $('npPcProgress');
-  const pcPlay = $('pcPlay');
-  const pcPrev = $('pcPrev');
-  const pcNext = $('pcNext');
+  const footerArt = $('footerArt');
+  const footerTitle = $('footerTitle');
+  const footerArtist = $('footerArtist');
+  const footerFill = $('footerFill');
+  const footerCur = $('footerCur');
+  const footerTot = $('footerTot');
+  const footerProgress = $('footerProgress');
+  const footerPlay = $('footerPlay');
+  const footerPrev = $('footerPrev');
+  const footerNext = $('footerNext');
   const pmArt = $('pmArt');
   const pmTitle = $('pmTitle');
   const pmArtist = $('pmArtist');
@@ -61,7 +69,66 @@
   const allAlbums = [...albums, { ...comingSoonAlbum, isCS: true }];
 
   // ============================================================
-  // SMART CAROUSEL - Only scroll if text overflows
+  // BUY ALBUM FUNCTION
+  // ============================================================
+  window.buyAlbum = async function(albumId) {
+    // TODO: Replace with your Cloudflare Worker URL
+    const workerUrl = 'https://your-worker.workers.dev/checkout';
+    
+    try {
+      const response = await fetch(workerUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          productId: albumId,
+          price: 15000 // R150 in cents
+        })
+      });
+      
+      const data = await response.json();
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      } else {
+        alert('Payment error. Please try again.');
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+      alert('Payment error. Please try again.');
+    }
+  };
+
+  // ============================================================
+  // COUNTDOWN TIMER
+  // ============================================================
+  function updateCountdown() {
+    const now = new Date();
+    const diff = releaseDate - now;
+    
+    if (diff <= 0) {
+      countdownOverlay.innerHTML = `
+        <div style="color:#e5de69;font-size:2.5rem;margin-bottom:10px;"><i class="fas fa-check-circle"></i></div>
+        <div style="color:#e5de69;font-size:1.2rem;font-weight:700;background:#1e1d12;padding:8px 24px;border-radius:40px;border:2px solid #e5de69;margin-bottom:12px;">NOW AVAILABLE</div>
+        <h2 style="color:#fff;font-size:2rem;">HTs Collections V</h2>
+        <p style="color:#aaa;font-size:1rem;margin:6px 0;">HyperSOUL-X · 2026 · 14 tracks</p>
+      `;
+      return;
+    }
+    
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    
+    cdDays.textContent = String(days).padStart(2, '0');
+    cdHours.textContent = String(hours).padStart(2, '0');
+    cdMinutes.textContent = String(minutes).padStart(2, '0');
+    cdSeconds.textContent = String(seconds).padStart(2, '0');
+    
+    csDate.textContent = releaseDate.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  // ============================================================
+  // SMART CAROUSEL
   // ============================================================
   function updateMobileText(title, artist) {
     if (!pmTitle || !pmArtist) return;
@@ -69,14 +136,12 @@
     pmTitle.textContent = title || 'Select a track';
     pmArtist.textContent = artist || '—';
     
-    // Check title overflow
     pmTitle.classList.remove('scroll');
     void pmTitle.offsetWidth;
     if (pmTitle.scrollWidth > pmTitle.clientWidth) {
       pmTitle.classList.add('scroll');
     }
     
-    // Check artist overflow
     pmArtist.classList.remove('scroll');
     void pmArtist.offsetWidth;
     if (pmArtist.scrollWidth > pmArtist.clientWidth) {
@@ -87,18 +152,33 @@
   // ============================================================
   // UPDATE ARTWORK
   // ============================================================
-  function updateArtwork() {
-    if (playingAlbum) {
-      artImg.src = getImage(playingAlbum);
-      csOverlay.style.display = 'none';
+  function updateArtwork(album) {
+    if (album) {
+      artImg.src = getImage(album);
+      countdownOverlay.style.display = 'none';
     } else {
       const defaultAlbum = allAlbums[4];
       artImg.src = getImage(defaultAlbum);
-      csOverlay.style.display = 'flex';
-      csTitle.textContent = defaultAlbum.title;
-      csSub.textContent = `${defaultAlbum.artist} · ${defaultAlbum.year} · ${defaultAlbum.trackCount} tracks`;
-      csDate.textContent = new Date(defaultAlbum.releaseDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+      countdownOverlay.style.display = 'flex';
+      updateCountdown();
     }
+  }
+
+  // ============================================================
+  // UPDATE BUY BUTTON
+  // ============================================================
+  function updateBuyButton(album) {
+    if (!album || album.isCS) {
+      artBuyContainer.style.display = 'none';
+      tlBuyBtn.style.display = 'none';
+      return;
+    }
+    artBuyContainer.style.display = 'flex';
+    artBuyBtn.onclick = () => buyAlbum(album.id);
+    artBuyPrice.textContent = 'R150';
+    
+    tlBuyBtn.style.display = 'flex';
+    tlBuyBtn.onclick = () => buyAlbum(album.id);
   }
 
   // ============================================================
@@ -106,24 +186,24 @@
   // ============================================================
   function updateNowPlaying() {
     if (!playingTrack || !playingAlbum) {
-      npPcTrack.textContent = 'Select a track';
-      npPcArtist.textContent = '—';
+      footerTitle.textContent = 'Select a track';
+      footerArtist.textContent = '—';
       pfTitle.textContent = 'Select a track';
       pfArtist.textContent = '—';
       updateMobileText('Select a track', '—');
       return;
     }
     const title = playingTrack.mix ? `${playingTrack.title} (${playingTrack.mix})` : playingTrack.title;
-    npPcTrack.textContent = title;
-    npPcArtist.textContent = playingTrack.artist;
+    footerTitle.textContent = title;
+    footerArtist.textContent = playingTrack.artist;
     pfTitle.textContent = title;
     pfArtist.textContent = playingTrack.artist;
     updateMobileText(title, playingTrack.artist);
     
     const art = getImage(playingAlbum);
+    footerArt.src = art;
     pmArt.src = art;
     pfArt.src = art;
-    updateArtwork();
   }
 
   // ============================================================
@@ -169,6 +249,8 @@
     backBtn.style.display = 'none';
     headerBadge.style.display = 'inline';
     headerBadge.textContent = '5 albums';
+    // Hide tracklist buy button when in album list view
+    tlBuyBtn.style.display = 'none';
   }
 
   function showTracklist() {
@@ -196,6 +278,7 @@
             <div class="ai-artist">${a.artist} · ${a.year}</div>
           </div>
           ${isCS ? `<div class="ai-badge">🔜</div>` : ''}
+          <div class="ai-cart" onclick="event.stopPropagation(); buyAlbum('${a.id}')" title="Buy album"><i class="fas fa-shopping-cart"></i></div>
           <div class="ai-play"><i class="fas fa-play-circle"></i></div>
         </div>
       `;
@@ -210,6 +293,9 @@
     tlTitle.textContent = album.title;
     tlArtist.textContent = `${album.artist} · ${album.year}`;
     viewedAlbum = album;
+    
+    // Update buy button in tracklist header
+    updateBuyButton(album);
 
     if (isLocked || album.isCS) {
       tracklist.innerHTML = `
@@ -271,6 +357,11 @@
     const album = allAlbums[idx];
     const isLocked = album.isCS || false;
     viewedAlbum = album;
+    
+    // Update artwork and buy button
+    updateArtwork(album);
+    updateBuyButton(album);
+    
     renderTracklist(album, isLocked);
   }
 
@@ -350,7 +441,7 @@
 
   function updatePlayBtn() {
     const icon = isPlaying ? 'fa-pause-circle' : 'fa-play-circle';
-    pcPlay.className = `fas ${icon}`;
+    footerPlay.className = `fas ${icon}`;
     pmPlay.className = `fas ${icon}`;
     pfPlay.className = `fas ${icon}`;
   }
@@ -360,16 +451,16 @@
     timer = setInterval(() => {
       if (audio.duration && !isNaN(audio.duration)) {
         const p = (audio.currentTime / audio.duration) * 100;
-        npPcFill.style.width = p + '%';
+        footerFill.style.width = p + '%';
         pfFill.style.width = p + '%';
         const cm = Math.floor(audio.currentTime / 60);
         const cs = Math.floor(audio.currentTime % 60);
         const tm = Math.floor(audio.duration / 60);
         const ts = Math.floor(audio.duration % 60);
-        npPcCur.textContent = `${cm}:${String(cs).padStart(2, '0')}`;
-        pfCur.textContent = npPcCur.textContent;
-        npPcTot.textContent = `${tm}:${String(ts).padStart(2, '0')}`;
-        pfTot.textContent = npPcTot.textContent;
+        footerCur.textContent = `${cm}:${String(cs).padStart(2, '0')}`;
+        pfCur.textContent = footerCur.textContent;
+        footerTot.textContent = `${tm}:${String(ts).padStart(2, '0')}`;
+        pfTot.textContent = footerTot.textContent;
       }
     }, 200);
   }
@@ -409,7 +500,12 @@
   // ============================================================
   function goBack() {
     showAlbumList();
-    updateArtwork();
+    // Reset to HTC5 artwork
+    const defaultAlbum = allAlbums[4];
+    updateArtwork(defaultAlbum);
+    // Hide buy button
+    artBuyContainer.style.display = 'none';
+    tlBuyBtn.style.display = 'none';
   }
 
   function openFull() { pf.classList.add('active'); }
@@ -418,9 +514,9 @@
   // ============================================================
   // EVENT LISTENERS
   // ============================================================
-  pcPlay.onclick = togglePlay;
-  pcPrev.onclick = prevTrack;
-  pcNext.onclick = nextTrack;
+  footerPlay.onclick = togglePlay;
+  footerPrev.onclick = prevTrack;
+  footerNext.onclick = nextTrack;
   pmPlay.onclick = togglePlay;
   pmNext.onclick = nextTrack;
   pmExpand.onclick = openFull;
@@ -430,7 +526,7 @@
   pfClose.onclick = closeFull;
   backBtn.onclick = goBack;
   audio.onended = nextTrack;
-  npPcProgress.addEventListener('click', (e) => seekTo(e, npPcProgress, npPcFill, npPcCur, npPcTot));
+  footerProgress.addEventListener('click', (e) => seekTo(e, footerProgress, footerFill, footerCur, footerTot));
   pfProgress.addEventListener('click', (e) => seekTo(e, pfProgress, pfFill, pfCur, pfTot));
 
   // ============================================================
@@ -438,12 +534,27 @@
   // ============================================================
   renderAlbums();
   showAlbumList();
-  updateArtwork();
+  
+  // Start with HTC5 (Coming Soon)
+  const defaultAlbum = allAlbums[4];
+  updateArtwork(defaultAlbum);
   updateMobileText('Select a track', '—');
-  pmArt.src = getImage(allAlbums[4]);
+  footerArt.src = getImage(defaultAlbum);
+  pmArt.src = getImage(defaultAlbum);
+  
+  // Hide buy button initially
+  artBuyContainer.style.display = 'none';
+  tlBuyBtn.style.display = 'none';
+  
+  // Update countdown every second
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
 
   const main = document.getElementById('main');
-  const resize = () => main.style.flexDirection = window.innerWidth <= 860 ? 'column' : 'row';
+  const resize = () => {
+    main.style.flexDirection = window.innerWidth <= 860 ? 'column' : 'row';
+    document.getElementById('pcFooter').style.display = window.innerWidth <= 860 ? 'none' : 'flex';
+  };
   resize();
   window.onresize = resize;
 })();
