@@ -1,43 +1,55 @@
-*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,Inter,sans-serif}
+/* ============================================================
+   ROBOTO FONT & RESET
+   ============================================================ */
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Roboto',-apple-system,sans-serif}
 body{background:#0b0b0b;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px}
-#app{max-width:1360px;width:100%;background:#0f0f0f;border-radius:36px;padding:24px 28px 20px;border:1px solid #2a2a2a;box-shadow:0 20px 40px rgba(0,0,0,.8);min-height:600px;display:flex;flex-direction:column}
+#app{max-width:1360px;width:100%;background:#0f0f0f;border-radius:36px;padding:24px 28px 20px;border:1px solid #2a2a2a;box-shadow:0 20px 40px rgba(0,0,0,.8);min-height:600px;display:flex;flex-direction:column;position:relative}
 
 /* HEADER */
 header{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #e5de69;padding-bottom:14px;margin-bottom:20px;flex-shrink:0}
-header h1{color:#e5de69;font-size:1.5rem;font-weight:600}
+header h1{color:#e5de69;font-size:1.5rem;font-weight:700;letter-spacing:-0.5px}
 header h1 i{margin-right:10px}
-#backBtn{background:none;border:none;color:#e5de69;font-size:.9rem;font-weight:600;cursor:pointer;padding:6px 14px;border-radius:20px;display:none}
+#backBtn{background:none;border:none;color:#e5de69;font-size:.9rem;font-weight:600;cursor:pointer;padding:6px 14px;border-radius:20px;display:none;font-family:'Roboto',sans-serif}
 #backBtn:hover{background:#1e1d12}
 #backBtn i{margin-right:6px}
-#headerBadge{color:#fff;font-size:.85rem;background:#1a1a1a;padding:6px 16px;border-radius:30px;border:1px solid #2a2a2a}
+#headerBadge{color:#fff;font-size:.85rem;background:#1a1a1a;padding:6px 16px;border-radius:30px;border:1px solid #2a2a2a;font-weight:300}
 
 /* MAIN */
-main{display:flex;gap:28px;flex:1;min-height:0}
+main{display:flex;gap:28px;flex:1;min-height:0;padding-bottom:20px}
 
 /* LEFT: ART */
 .art-section{flex:0 0 42%;display:flex;flex-direction:column;gap:16px;min-width:0}
 .art-wrap{position:relative;width:100%;aspect-ratio:1;border-radius:20px;overflow:hidden;background:#141414;border:1px solid #2a2a2a}
 .art-wrap img{width:100%;height:100%;object-fit:cover}
 
-.cs-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.75);display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:20px;backdrop-filter:blur(4px)}
-.cs-overlay div:first-child{color:#e5de69;font-size:3rem;margin-bottom:10px}
-.cs-badge{color:#e5de69;font-size:1.2rem;font-weight:700;background:#1e1d12;padding:8px 24px;border-radius:40px;border:2px solid #e5de69;margin-bottom:12px}
-.cs-overlay h2{color:#fff;font-size:2rem}
-.cs-overlay p{color:#fff;font-size:1rem;margin:6px 0}
-.cs-overlay small{color:#fff;font-size:.9rem}
-.cs-overlay small i{color:#e5de69}
+/* COUNTDOWN OVERLAY */
+.countdown-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.8);display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:20px;backdrop-filter:blur(4px)}
+.countdown-icon{color:#e5de69;font-size:2.5rem;margin-bottom:10px}
+.countdown-badge{color:#e5de69;font-size:.9rem;font-weight:700;letter-spacing:2px;background:#1e1d12;padding:4px 20px;border-radius:40px;border:1px solid #e5de69;margin-bottom:12px;font-family:'Roboto',sans-serif}
+.countdown-timer{display:flex;gap:16px;margin:10px 0}
+.countdown-block{display:flex;flex-direction:column;align-items:center;min-width:60px}
+.countdown-number{color:#fff;font-size:2.5rem;font-weight:700;font-family:'Roboto',sans-serif;line-height:1;letter-spacing:-1px}
+.countdown-label{color:#999;font-size:.6rem;text-transform:uppercase;letter-spacing:1px;margin-top:4px;font-weight:300}
+.countdown-sub{color:#aaa;font-size:.9rem;margin-top:4px}
+.countdown-overlay small{color:#888;font-size:.8rem;margin-top:4px}
+.countdown-overlay small i{color:#e5de69}
 
-/* PC NOW PLAYING */
-.np-pc{background:#141414;border-radius:16px;padding:14px 18px;border:1px solid #2a2a2a;flex-shrink:0}
-.np-pc-track{color:#fff;font-size:1rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.np-pc-artist{color:#aaa;font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.np-pc-bar{display:flex;align-items:center;gap:12px;margin:8px 0 10px}
-.np-pc-time{color:#888;font-size:.7rem;min-width:36px}
-.np-pc-progress{flex:1;height:4px;background:#2a2a2a;border-radius:2px;overflow:hidden;cursor:pointer;position:relative}
-.np-pc-fill{height:100%;background:#e5de69;border-radius:2px;width:0%;transition:width .1s;pointer-events:none}
-.np-pc-btns{display:flex;justify-content:center;align-items:center;gap:28px;color:#e5de69}
-.np-pc-btns i{font-size:1.4rem;cursor:pointer}
-.np-pc-btns i:nth-child(2){font-size:2.2rem}
+/* BUY BUTTON BELOW ARTWORK */
+.art-buy-container{display:flex;align-items:center;justify-content:center;gap:14px;padding:12px 0;background:transparent;flex-shrink:0}
+.buy-btn{background:#e5de69;color:#0f0f0f;border:none;padding:12px 28px;border-radius:40px;font-size:1rem;font-weight:700;cursor:pointer;transition:.2s;font-family:'Roboto',sans-serif;display:flex;align-items:center;gap:10px}
+.buy-btn:hover{background:#f5ee79;transform:scale(1.02)}
+.buy-btn i{font-size:1.1rem}
+.buy-price{color:#e5de69;font-size:1.1rem;font-weight:700;font-family:'Roboto',sans-serif;letter-spacing:0.5px}
+
+/* BUY BUTTON IN TRACKLIST HEADER */
+.buy-btn-small{background:#e5de69;color:#0f0f0f;border:none;padding:6px 16px;border-radius:30px;font-size:.75rem;font-weight:700;cursor:pointer;transition:.2s;font-family:'Roboto',sans-serif;display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0}
+.buy-btn-small:hover{background:#f5ee79;transform:scale(1.02)}
+.buy-btn-small i{font-size:.8rem}
+
+/* CART ICON IN ALBUM LIST */
+.album-item .ai-cart{color:#e5de69;font-size:1rem;opacity:0;transition:.2s;cursor:pointer;flex-shrink:0;margin-left:4px}
+.album-item:hover .ai-cart{opacity:.6}
+.album-item .ai-cart:hover{opacity:1!important;transform:scale(1.1)}
 
 /* RIGHT: LIST */
 .list-section{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
@@ -49,25 +61,25 @@ main{display:flex;gap:28px;flex:1;min-height:0}
 .album-item .ai-art{width:44px;height:44px;border-radius:8px;overflow:hidden;flex-shrink:0;border:1px solid #333}
 .album-item .ai-art img{width:100%;height:100%;object-fit:cover}
 .album-item .ai-info{flex:1;min-width:0}
-.album-item .ai-info .ai-title{color:#fff;font-weight:600;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.album-item .ai-info .ai-artist{color:#aaa;font-size:.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.album-item .ai-badge{color:#e5de69;font-size:.7rem;font-weight:600;background:#1e1d12;padding:2px 10px;border-radius:12px;border:1px solid #e5de6940;flex-shrink:0}
+.album-item .ai-info .ai-title{color:#fff;font-weight:500;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.album-item .ai-info .ai-artist{color:#aaa;font-size:.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:300}
+.album-item .ai-badge{color:#e5de69;font-size:.7rem;font-weight:700;background:#1e1d12;padding:2px 10px;border-radius:12px;border:1px solid #e5de6940;flex-shrink:0}
 .album-item .ai-play{color:#e5de69;font-size:1.2rem;opacity:0;transition:.2s}
 .album-item:hover .ai-play{opacity:.5}
 
 /* Tracklist */
 #tracklistWrap{display:none;flex-direction:column;flex:1;min-height:0;background:#141414;border-radius:12px;border:1px solid #262626;overflow:hidden}
-#tracklistHeader{padding:10px 16px;background:#1a1a1a;border-bottom:1px solid #262626;flex-shrink:0}
-#tlTitle{color:#fff;font-weight:600;font-size:.95rem}
-#tlArtist{color:#aaa;font-size:.8rem}
+#tracklistHeader{display:flex;align-items:center;gap:12px;padding:10px 16px;background:#1a1a1a;border-bottom:1px solid #262626;flex-shrink:0;flex-wrap:wrap}
+#tlTitle{color:#fff;font-weight:500;font-size:.95rem}
+#tlArtist{color:#aaa;font-size:.8rem;font-weight:300}
 #tracklist{flex:1;overflow-y:auto;padding:4px 0}
 .track-item{display:flex;align-items:center;gap:12px;padding:8px 14px;cursor:pointer;transition:.15s;border-bottom:1px solid #1a1a1a}
 .track-item:hover{background:#1d1d1d}
 .track-item.active{background:#1a1910;border-left:3px solid #e5de69}
 .track-item .ti-play{color:#e5de69;font-size:1rem;width:20px;text-align:center;flex-shrink:0}
 .track-item .ti-info{flex:1;min-width:0}
-.track-item .ti-info .ti-title{color:#fff;font-weight:600;font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.track-item .ti-info .ti-artist{color:#aaa;font-size:.75rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.track-item .ti-info .ti-title{color:#fff;font-weight:500;font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.track-item .ti-info .ti-artist{color:#aaa;font-size:.75rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:300}
 .track-item.active .ti-info .ti-title{color:#e5de69}
 .track-item .ti-dur{color:#666;font-size:.7rem;flex-shrink:0}
 .track-item.locked{opacity:.5;cursor:default;pointer-events:none}
@@ -76,21 +88,48 @@ main{display:flex;gap:28px;flex:1;min-height:0}
 .track-item.locked .ti-info .ti-artist{color:#555}
 .track-item.locked .ti-dur{color:#444}
 
-/* MOBILE BOTTOM PLAYER */
+/* ============================================================
+   PC FOOTER
+   ============================================================ */
+#pcFooter{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:#1a1a1a;border-top:1px solid #2a2a2a;border-radius:12px;margin-top:auto;flex-shrink:0;gap:16px}
+.footer-left{display:flex;align-items:center;gap:14px;min-width:180px;flex:0 0 30%}
+#footerArt{width:48px;height:48px;border-radius:8px;object-fit:cover;border:1px solid #333}
+.footer-info{display:flex;flex-direction:column;min-width:0}
+#footerTitle{color:#fff;font-size:.85rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#footerArtist{color:#aaa;font-size:.75rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:300}
+
+.footer-center{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;padding:0 20px}
+.footer-controls{display:flex;align-items:center;gap:24px;color:#e5de69}
+.footer-controls i{font-size:1.2rem;cursor:pointer;transition:.15s}
+.footer-controls i:hover{transform:scale(1.1)}
+.footer-controls i:nth-child(2){font-size:2rem}
+.footer-progress{display:flex;align-items:center;gap:12px;width:100%;max-width:500px}
+#footerCur,#footerTot{color:#888;font-size:.65rem;min-width:32px}
+.footer-progress-bar{flex:1;height:3px;background:#2a2a2a;border-radius:2px;overflow:hidden;cursor:pointer;position:relative}
+.footer-progress-fill{height:100%;background:#e5de69;border-radius:2px;width:0%;transition:width .1s;pointer-events:none}
+
+.footer-right{flex:0 0 30%;display:flex;justify-content:flex-end;color:#888;min-width:50px}
+.footer-right i{font-size:1.1rem;cursor:pointer}
+
+/* ============================================================
+   MOBILE BOTTOM PLAYER
+   ============================================================ */
 #playerMobile{display:none;position:fixed;bottom:0;left:0;right:0;background:#1a1a1a;padding:10px 14px;border-top:1px solid #2a2a2a;align-items:center;justify-content:space-between;z-index:100;min-height:64px;gap:10px}
 .pm-left{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
 .pm-left img{width:44px;height:44px;border-radius:8px;object-fit:cover;border:1px solid #333;flex-shrink:0}
 .pm-info{flex:1;min-width:0;height:44px;display:flex;flex-direction:column;justify-content:center;overflow:hidden;position:relative}
-.pm-title{color:#fff;font-weight:600;font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
-.pm-title.scroll{animation:scroll-title 12s linear infinite;width:fit-content;max-width:none;padding-right:30px}
-.pm-artist{color:#aaa;font-size:.7rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
-.pm-artist.scroll{animation:scroll-title 12s linear infinite;width:fit-content;max-width:none;padding-right:30px}
+#pmTitle{color:#fff !important;font-weight:500;font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
+#pmTitle.scroll{animation:scroll-title 12s linear infinite;width:fit-content;max-width:none;padding-right:30px}
+#pmArtist{color:#aaa !important;font-size:.7rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;font-weight:300}
+#pmArtist.scroll{animation:scroll-title 12s linear infinite;width:fit-content;max-width:none;padding-right:30px}
 @keyframes scroll-title{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 .pm-controls{display:flex;align-items:center;gap:14px;color:#e5de69;flex-shrink:0}
 .pm-controls i{font-size:1.6rem;cursor:pointer}
 .pm-expand{color:#666;padding:0 4px;cursor:pointer;flex-shrink:0}
 
-/* MOBILE FULL PLAYER */
+/* ============================================================
+   MOBILE FULL PLAYER
+   ============================================================ */
 #playerFull{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:#0f0f0f;flex-direction:column;padding:20px 24px 30px;z-index:1000}
 #playerFull.active{display:flex}
 .pf-header{display:flex;justify-content:space-between;align-items:center;padding-bottom:16px;color:#fff;flex-shrink:0}
@@ -98,8 +137,8 @@ main{display:flex;gap:28px;flex:1;min-height:0}
 .pf-header span{font-weight:500;color:#fff}
 #playerFull img{width:100%;max-width:360px;aspect-ratio:1;margin:0 auto 20px;border-radius:20px;object-fit:cover;border:1px solid #2a2a2a;box-shadow:0 20px 60px rgba(0,0,0,.8)}
 .pf-info{text-align:center;margin-bottom:14px;flex-shrink:0}
-#pfTitle{color:#fff;font-size:1.1rem;font-weight:600}
-#pfArtist{color:#aaa;font-size:.85rem}
+#pfTitle{color:#fff;font-size:1.1rem;font-weight:500}
+#pfArtist{color:#aaa;font-size:.85rem;font-weight:300}
 .pf-bar{display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-shrink:0}
 .pf-bar span{color:#888;font-size:.7rem;min-width:36px}
 .pf-progress{flex:1;height:4px;background:#2a2a2a;border-radius:2px;overflow:hidden;cursor:pointer;position:relative}
@@ -124,11 +163,14 @@ main{display:flex;gap:28px;flex:1;min-height:0}
   main{flex-direction:column;flex:1;min-height:0;gap:12px}
   .art-section{flex:0 0 auto;width:100%;max-width:300px;margin:0 auto}
   .art-wrap{border-radius:16px}
-  .cs-badge{font-size:1rem;padding:6px 16px}
-  .cs-overlay h2{font-size:1.4rem}
-  .cs-overlay p{font-size:.85rem}
-  .cs-overlay small{font-size:.8rem}
-  .np-pc{display:none}
+  .countdown-number{font-size:1.8rem;min-width:40px}
+  .countdown-block{min-width:44px}
+  .countdown-timer{gap:8px}
+  .countdown-badge{font-size:.7rem}
+  .art-buy-container{padding:8px 0}
+  .buy-btn{padding:10px 20px;font-size:.9rem}
+  .buy-price{font-size:.95rem}
+  #pcFooter{display:none}
   .list-section{flex:1;min-height:0}
   #albumList{flex:1;gap:6px;padding-bottom:4px}
   .album-item{padding:8px 12px}
@@ -143,18 +185,24 @@ main{display:flex;gap:28px;flex:1;min-height:0}
   .track-item .ti-info .ti-title{font-size:.8rem}
   .track-item .ti-info .ti-artist{font-size:.7rem}
   #playerMobile{display:flex}
-  #pmTitle{font-size:.8rem}
-  #pmArtist{font-size:.65rem}
+  #pmTitle{font-size:.8rem;color:#fff !important}
+  #pmArtist{font-size:.65rem;color:#aaa !important}
   .pm-controls i{font-size:1.4rem}
 }
 
 @media(max-width:480px){
   #app{padding:12px 12px 75px}
   .art-section{max-width:240px}
+  .countdown-number{font-size:1.4rem;min-width:32px}
+  .countdown-block{min-width:34px}
+  .countdown-timer{gap:4px}
+  .countdown-badge{font-size:.6rem;padding:2px 12px}
+  .buy-btn{padding:8px 16px;font-size:.8rem}
+  .buy-price{font-size:.85rem}
   .album-item .ai-art{width:32px;height:32px}
   .album-item .ai-info .ai-title{font-size:.75rem}
   .track-item .ti-info .ti-title{font-size:.75rem}
   .pm-left img{width:36px;height:36px}
-  #pmTitle{font-size:.75rem}
+  #pmTitle{font-size:.75rem;color:#fff !important}
   .pm-controls i{font-size:1.2rem}
 }
