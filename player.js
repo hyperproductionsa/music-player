@@ -4,7 +4,6 @@
   const { baseUrl, comingSoon, albums, comingSoonAlbum } = DATA;
 
   const releaseDate = new Date(comingSoon);
-  const isUnlocked = () => new Date() >= releaseDate;
   const audio = new Audio();
   const getAudio = (a, t) => `${baseUrl}/m4a/${a.folder}/${t.file}`;
   const getImage = (a) => `${baseUrl}/images/${a.cover}`;
@@ -47,6 +46,8 @@
   const footerPlay = $('footerPlay');
   const footerPrev = $('footerPrev');
   const footerNext = $('footerNext');
+  const volumeSlider = $('volumeSlider');
+  const volumeIcon = $('volumeIcon');
   const pmArt = $('pmArt');
   const pmTitle = $('pmTitle');
   const pmArtist = $('pmArtist');
@@ -69,11 +70,43 @@
   const allAlbums = [...albums, { ...comingSoonAlbum, isCS: true }];
 
   // ============================================================
+  // VOLUME CONTROL
+  // ============================================================
+  audio.volume = 0.8;
+  volumeSlider.value = 0.8;
+
+  volumeSlider.addEventListener('input', function() {
+    audio.volume = parseFloat(this.value);
+    updateVolumeIcon();
+  });
+
+  function updateVolumeIcon() {
+    const vol = audio.volume;
+    if (vol === 0) {
+      volumeIcon.className = 'fas fa-volume-mute';
+    } else if (vol < 0.5) {
+      volumeIcon.className = 'fas fa-volume-down';
+    } else {
+      volumeIcon.className = 'fas fa-volume-up';
+    }
+  }
+
+  volumeIcon.addEventListener('click', function() {
+    if (audio.volume > 0) {
+      audio.volume = 0;
+      volumeSlider.value = 0;
+    } else {
+      audio.volume = 0.8;
+      volumeSlider.value = 0.8;
+    }
+    updateVolumeIcon();
+  });
+
+  // ============================================================
   // BUY ALBUM FUNCTION
   // ============================================================
   window.buyAlbum = async function(albumId) {
-    // TODO: Replace with your Cloudflare Worker URL
-    const workerUrl = 'https://your-worker.workers.dev/checkout';
+    const workerUrl = 'https://yoco-checkout.your-subdomain.workers.dev';
     
     try {
       const response = await fetch(workerUrl, {
@@ -81,7 +114,7 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           productId: albumId,
-          price: 15000 // R150 in cents
+          price: 15000
         })
       });
       
@@ -106,10 +139,10 @@
     
     if (diff <= 0) {
       countdownOverlay.innerHTML = `
-        <div style="color:#e5de69;font-size:2.5rem;margin-bottom:10px;"><i class="fas fa-check-circle"></i></div>
-        <div style="color:#e5de69;font-size:1.2rem;font-weight:700;background:#1e1d12;padding:8px 24px;border-radius:40px;border:2px solid #e5de69;margin-bottom:12px;">NOW AVAILABLE</div>
-        <h2 style="color:#fff;font-size:2rem;">HTs Collections V</h2>
-        <p style="color:#aaa;font-size:1rem;margin:6px 0;">HyperSOUL-X · 2026 · 14 tracks</p>
+        <div style="color:#e5de69;font-size:2rem;margin-bottom:8px;"><i class="fas fa-check-circle"></i></div>
+        <div style="color:#e5de69;font-size:1rem;font-weight:700;background:#1e1d12;padding:6px 20px;border-radius:40px;border:2px solid #e5de69;margin-bottom:10px;">NOW AVAILABLE</div>
+        <h2 style="color:#fff;font-size:1.6rem;">HTs Collections V</h2>
+        <p style="color:#aaa;font-size:.85rem;margin:4px 0;">HyperSOUL-X · 2026 · 14 tracks</p>
       `;
       return;
     }
@@ -249,7 +282,6 @@
     backBtn.style.display = 'none';
     headerBadge.style.display = 'inline';
     headerBadge.textContent = '5 albums';
-    // Hide tracklist buy button when in album list view
     tlBuyBtn.style.display = 'none';
   }
 
@@ -294,14 +326,13 @@
     tlArtist.textContent = `${album.artist} · ${album.year}`;
     viewedAlbum = album;
     
-    // Update buy button in tracklist header
     updateBuyButton(album);
 
     if (isLocked || album.isCS) {
       tracklist.innerHTML = `
-        <div class="track-item locked" style="background:#1a1a1a;border-bottom:1px solid #2a2a2a;padding:12px 14px;cursor:default;">
+        <div class="track-item locked" style="background:#1a1a1a;border-bottom:1px solid #2a2a2a;padding:10px 14px;cursor:default;">
           <div class="ti-info" style="text-align:center;">
-            <div class="ti-title" style="color:#e5de69;font-size:.9rem;"><i class="fas fa-clock"></i> Coming ${new Date(album.releaseDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+            <div class="ti-title" style="color:#e5de69;font-size:.85rem;"><i class="fas fa-clock"></i> Coming ${new Date(album.releaseDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
             <div class="ti-artist" style="color:#888;">${album.trackCount || album.tracks.length} tracks</div>
           </div>
         </div>
@@ -358,7 +389,6 @@
     const isLocked = album.isCS || false;
     viewedAlbum = album;
     
-    // Update artwork and buy button
     updateArtwork(album);
     updateBuyButton(album);
     
@@ -500,10 +530,8 @@
   // ============================================================
   function goBack() {
     showAlbumList();
-    // Reset to HTC5 artwork
     const defaultAlbum = allAlbums[4];
     updateArtwork(defaultAlbum);
-    // Hide buy button
     artBuyContainer.style.display = 'none';
     tlBuyBtn.style.display = 'none';
   }
@@ -535,20 +563,20 @@
   renderAlbums();
   showAlbumList();
   
-  // Start with HTC5 (Coming Soon)
   const defaultAlbum = allAlbums[4];
   updateArtwork(defaultAlbum);
   updateMobileText('Select a track', '—');
   footerArt.src = getImage(defaultAlbum);
   pmArt.src = getImage(defaultAlbum);
   
-  // Hide buy button initially
   artBuyContainer.style.display = 'none';
   tlBuyBtn.style.display = 'none';
   
-  // Update countdown every second
   updateCountdown();
   setInterval(updateCountdown, 1000);
+
+  // Volume icon initial state
+  updateVolumeIcon();
 
   const main = document.getElementById('main');
   const resize = () => {
