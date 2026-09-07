@@ -107,7 +107,7 @@
   }
 
   // ============================================================
-  // BUY ALBUM FUNCTION
+  // BUY ALBUM FUNCTION - WITH localStorage CHECKOUT ID
   // ============================================================
   window.buyAlbum = async function(albumId) {
     const workerUrl = 'https://yoco-checkout.hyperproductionsa.workers.dev';
@@ -123,13 +123,19 @@
         },
         body: JSON.stringify({ 
           productId: albumId,
-          price: 15000
+          price: 15000 // R150 in cents
         })
       });
       
       console.log('🔵 Response status:', response.status);
       const data = await response.json();
       console.log('🔵 Response data:', data);
+      
+      // Store checkoutId in localStorage (survives page redirect)
+      if (data.sessionId) {
+        localStorage.setItem('checkoutId', data.sessionId);
+        console.log('✅ Stored checkoutId in localStorage:', data.sessionId);
+      }
       
       const redirectUrl = data.redirectUrl || data.checkoutUrl;
       
