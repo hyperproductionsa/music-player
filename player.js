@@ -107,10 +107,9 @@
   }
 
   // ============================================================
-  // BUY ALBUM FUNCTION - WITH DEBUGGING
+  // BUY ALBUM FUNCTION
   // ============================================================
   window.buyAlbum = async function(albumId) {
-    // YOUR WORKER URL - UPDATE THIS
     const workerUrl = 'https://yoco-checkout.hyperproductionsa.workers.dev';
     
     console.log('🔵 Buy Album clicked:', albumId);
@@ -124,7 +123,7 @@
         },
         body: JSON.stringify({ 
           productId: albumId,
-          price: 15000 // R150 in cents
+          price: 15000
         })
       });
       
@@ -132,9 +131,11 @@
       const data = await response.json();
       console.log('🔵 Response data:', data);
       
-      if (response.ok && data.checkoutUrl) {
-        console.log('✅ Redirecting to:', data.checkoutUrl);
-        window.location.href = data.checkoutUrl;
+      const redirectUrl = data.redirectUrl || data.checkoutUrl;
+      
+      if (response.ok && redirectUrl) {
+        console.log('✅ Redirecting to:', redirectUrl);
+        window.location.href = redirectUrl;
       } else {
         alert('Payment error: ' + (data.error || data.message || 'Please try again.'));
         console.error('❌ Payment error:', data);
@@ -585,20 +586,26 @@
   }
 
   // ============================================================
-  // INIT
+  // INIT - COUNTDOWN VISIBLE ON HTC5
   // ============================================================
   renderAlbums();
   showAlbumList();
-  
+
+  // Start with HTC5 - COUNTDOWN VISIBLE
   const defaultAlbum = allAlbums[4];
-  updateArtwork(defaultAlbum);
+  artImg.src = getImage(defaultAlbum);
+  countdownOverlay.style.display = 'flex';
+  csTitle.textContent = defaultAlbum.title;
+  csSub.textContent = `${defaultAlbum.artist} · ${defaultAlbum.year} · ${defaultAlbum.trackCount} tracks`;
+  csDate.textContent = new Date(defaultAlbum.releaseDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+
   updateMobileText('Select a track', '—');
   if (footerArt) footerArt.src = getImage(defaultAlbum);
   if (pmArt) pmArt.src = getImage(defaultAlbum);
-  
+
   if (artBuyContainer) artBuyContainer.style.display = 'none';
   if (tlBuyBtn) tlBuyBtn.style.display = 'none';
-  
+
   updateCountdown();
   setInterval(updateCountdown, 1000);
 
