@@ -107,7 +107,7 @@
   }
 
   // ============================================================
-  // BUY ALBUM FUNCTION - WITH localStorage CHECKOUT ID
+  // BUY ALBUM FUNCTION - CORRECTED
   // ============================================================
   window.buyAlbum = async function(albumId) {
     const workerUrl = 'https://yoco-checkout.hyperproductionsa.workers.dev';
@@ -131,10 +131,10 @@
       const data = await response.json();
       console.log('🔵 Response data:', data);
       
-      // Store checkoutId in localStorage (survives page redirect)
-      if (data.sessionId) {
-        localStorage.setItem('checkoutId', data.sessionId);
-        console.log('✅ Stored checkoutId in localStorage:', data.sessionId);
+      // ✅ CORRECT: Use checkoutId (not sessionId)
+      if (data.checkoutId) {
+        localStorage.setItem('checkoutId', data.checkoutId);
+        console.log('✅ Stored checkoutId in localStorage:', data.checkoutId);
       }
       
       const redirectUrl = data.redirectUrl || data.checkoutUrl;
