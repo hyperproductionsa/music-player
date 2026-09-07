@@ -103,30 +103,39 @@
   });
 
   // ============================================================
-  // BUY ALBUM FUNCTION
+  // BUY ALBUM FUNCTION - FIXED WORKER CALL
   // ============================================================
   window.buyAlbum = async function(albumId) {
-    const workerUrl = 'https://yoco-checkout.hyperproductionsa.workers.dev/';
+    // REPLACE THIS WITH YOUR ACTUAL WORKER URL
+    const workerUrl = 'https://yoco-checkout.hyperproductionsa.workers.dev';
+    
+    console.log('Buying album:', albumId);
+    console.log('Calling worker:', workerUrl);
     
     try {
       const response = await fetch(workerUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json' 
+        },
         body: JSON.stringify({ 
           productId: albumId,
           price: 15000
         })
       });
       
+      console.log('Response status:', response.status);
       const data = await response.json();
+      console.log('Response data:', data);
+      
       if (data.checkoutUrl) {
         window.location.href = data.checkoutUrl;
       } else {
-        alert('Payment error. Please try again.');
+        alert('Payment error: ' + (data.error || 'Please try again.'));
       }
     } catch (error) {
       console.error('Payment error:', error);
-      alert('Payment error. Please try again.');
+      alert('Payment error. Please try again. Check console for details.');
     }
   };
 
@@ -575,7 +584,6 @@
   updateCountdown();
   setInterval(updateCountdown, 1000);
 
-  // Volume icon initial state
   updateVolumeIcon();
 
   const main = document.getElementById('main');
