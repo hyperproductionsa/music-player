@@ -106,7 +106,7 @@
   // BUY ALBUM FUNCTION
   // ============================================================
   window.buyAlbum = async function(albumId) {
-    const workerUrl = 'https://yoco-checkout.your-subdomain.workers.dev';
+    const workerUrl = 'https://yoco-checkout.hyperproductionsa.workers.dev/';
     
     try {
       const response = await fetch(workerUrl, {
