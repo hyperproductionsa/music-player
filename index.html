@@ -24,14 +24,14 @@
     <span id="headerBadge">5 albums</span>
   </header>
 
-  <!-- MAIN CONTENT (Static art + Scrollable playlist) -->
+  <!-- MAIN CONTENT -->
   <main id="main">
 
-    <!-- LEFT: COVER ART (STATIC - NEVER SCROLLS) -->
+    <!-- LEFT: COVER ART (STATIC) -->
     <section class="art-section" id="artSection">
       <div class="art-wrap" id="artWrap">
         <img id="artImg" src="https://cdn.htcoll.shop/images/HTC5.jpg" alt="cover" />
-        <!-- Countdown Overlay for HTC5 -->
+        <!-- COUNTDOWN OVERLAY for HTC5 -->
         <div class="countdown-overlay" id="countdownOverlay">
           <div class="countdown-icon"><i class="fas fa-clock"></i></div>
           <div class="countdown-badge">RELEASING IN</div>
@@ -66,11 +66,9 @@
       </div>
     </section>
 
-    <!-- RIGHT: ALBUM LIST & TRACKLIST (SCROLLABLE) -->
+    <!-- RIGHT: SCROLLABLE PLAYLIST -->
     <section class="list-section" id="listSection">
-      <!-- Album List -->
       <div id="albumList"></div>
-      <!-- Tracklist -->
       <div id="tracklistWrap" style="display:none;">
         <div id="tracklistHeader">
           <span id="tlTitle">HTs Collections</span>
@@ -85,7 +83,7 @@
 
   </main>
 
-  <!-- PC NOW PLAYING FOOTER (STICKY) -->
+  <!-- PC FOOTER (STICKY) -->
   <footer id="pcFooter">
     <div class="footer-left">
       <img id="footerArt" src="https://cdn.htcoll.shop/images/HTC5.jpg" alt="cover" />
