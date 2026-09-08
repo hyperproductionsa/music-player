@@ -186,9 +186,10 @@
   }
 
   // ============================================================
-  // BUY BUTTON
+  // BUY BUTTON - HTC5 COMPLETELY HIDDEN
   // ============================================================
   function updateBuyButton(album) {
+    // HTC5 (isCS) → COMPLETELY HIDE everything
     if (!album || album.isCS) {
       if (artBuyContainer) {
         artBuyContainer.style.display = 'none';
@@ -200,6 +201,8 @@
       }
       return;
     }
+    
+    // HTC1-4 → show buy button
     if (artBuyContainer) {
       artBuyContainer.style.display = 'flex';
       artBuyContainer.classList.remove('hidden');
