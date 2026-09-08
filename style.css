@@ -4,7 +4,7 @@ body{display:flex;flex-direction:column;padding:0}
 header{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #e5de69;padding:14px 24px;flex-shrink:0;min-height:64px;background:#0f0f0f;z-index:10;position:sticky;top:0}
 .header-left{display:flex;align-items:center;gap:12px}
 #logo{height:32px;width:auto;object-fit:contain}
-#brandName{color:#e5de69;font-size:1.2rem;font-weight:700;letter-spacing:-0.5px}
+#brandName{color:#e5de69;font-size:1.2rem;font-weight:700}
 #backBtn{background:none;border:none;color:#e5de69;font-size:.9rem;font-weight:600;cursor:pointer;padding:6px 14px;border-radius:20px;display:none}
 #backBtn:hover{background:#1e1d12}
 #backBtn i{margin-right:6px}
@@ -18,13 +18,12 @@ main{display:flex;gap:24px;flex:1;min-height:0;padding:20px 24px;overflow:hidden
 .countdown-badge{color:#e5de69;font-size:.8rem;font-weight:700;letter-spacing:2px;background:#1e1d12;padding:4px 20px;border-radius:40px;border:1px solid #e5de69;margin-bottom:10px}
 .countdown-timer{display:flex;gap:12px;margin:8px 0}
 .countdown-block{display:flex;flex-direction:column;align-items:center;min-width:50px}
-.countdown-number{color:#fff;font-size:2rem;font-weight:700;line-height:1;letter-spacing:-1px}
+.countdown-number{color:#fff;font-size:2rem;font-weight:700;line-height:1}
 .countdown-label{color:#999;font-size:.55rem;text-transform:uppercase;letter-spacing:1px;margin-top:2px;font-weight:300}
 .countdown-sub{color:#aaa;font-size:.85rem}
 .countdown-overlay small{color:#888;font-size:.75rem}
-.countdown-overlay small i{color:#e5de69}
 .art-buy-container{display:flex;align-items:center;justify-content:center;gap:14px;padding:8px 0;flex-shrink:0}
-.buy-btn{background:#e5de69;color:#0f0f0f;border:none;padding:10px 24px;border-radius:40px;font-size:.95rem;font-weight:700;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:10px}
+.buy-btn{background:#e5de69;color:#0f0f0f;border:none;padding:10px 24px;border-radius:40px;font-size:.95rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:10px}
 .buy-btn:hover{background:#f5ee79;transform:scale(1.02)}
 .buy-price{color:#e5de69;font-size:1rem;font-weight:700}
 .list-section{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;height:100%}
@@ -46,7 +45,7 @@ main{display:flex;gap:24px;flex:1;min-height:0;padding:20px 24px;overflow:hidden
 #tracklistHeader{display:flex;align-items:center;gap:12px;padding:10px 16px;background:#1a1a1a;border-bottom:1px solid #262626;flex-shrink:0;flex-wrap:wrap}
 #tlTitle{color:#fff;font-weight:500;font-size:.95rem}
 #tlArtist{color:#aaa;font-size:.8rem;font-weight:300}
-.buy-btn-small{background:#e5de69;color:#0f0f0f;border:none;padding:4px 14px;border-radius:30px;font-size:.7rem;font-weight:700;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0}
+.buy-btn-small{background:#e5de69;color:#0f0f0f;border:none;padding:4px 14px;border-radius:30px;font-size:.7rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0}
 .buy-btn-small:hover{background:#f5ee79;transform:scale(1.02)}
 #tracklist{flex:1;overflow-y:auto;padding:4px 0}
 .track-item{display:flex;align-items:center;gap:12px;padding:8px 14px;cursor:pointer;transition:.15s;border-bottom:1px solid #1a1a1a;flex-shrink:0}
@@ -59,10 +58,6 @@ main{display:flex;gap:24px;flex:1;min-height:0;padding:20px 24px;overflow:hidden
 .track-item.active .ti-info .ti-title{color:#e5de69}
 .track-item .ti-dur{color:#666;font-size:.7rem;flex-shrink:0}
 .track-item.locked{opacity:.5;cursor:default;pointer-events:none}
-.track-item.locked .ti-play{color:#444}
-.track-item.locked .ti-info .ti-title{color:#666}
-.track-item.locked .ti-info .ti-artist{color:#555}
-.track-item.locked .ti-dur{color:#444}
 #pcFooter{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;background:#1a1a1a;border-top:1px solid #2a2a2a;flex-shrink:0;gap:16px;min-height:72px;position:sticky;bottom:0;z-index:10;width:100%}
 .footer-left{display:flex;align-items:center;gap:14px;min-width:160px;flex:0 0 28%}
 #footerArt{width:44px;height:44px;border-radius:8px;object-fit:cover;border:1px solid #333}
@@ -75,7 +70,7 @@ main{display:flex;gap:24px;flex:1;min-height:0;padding:20px 24px;overflow:hidden
 .footer-controls i:nth-child(2){font-size:1.8rem}
 .footer-progress{display:flex;align-items:center;gap:10px;width:100%;max-width:450px}
 #footerCur,#footerTot{color:#888;font-size:.6rem;min-width:28px}
-.footer-progress-bar{flex:1;height:3px;background:#2a2a2a;border-radius:2px;overflow:hidden;cursor:pointer;position:relative}
+.footer-progress-bar{flex:1;height:3px;background:#2a2a2a;border-radius:2px;overflow:hidden;cursor:pointer}
 .footer-progress-fill{height:100%;background:#e5de69;border-radius:2px;width:0%}
 .footer-right{flex:0 0 28%;display:flex;align-items:center;justify-content:flex-end;gap:10px;min-width:100px}
 #volumeIcon{color:#888;font-size:1rem;cursor:pointer}
@@ -98,13 +93,13 @@ main{display:flex;gap:24px;flex:1;min-height:0;padding:20px 24px;overflow:hidden
 .pf-header{display:flex;justify-content:space-between;align-items:center;padding-bottom:16px;color:#fff;flex-shrink:0}
 .pf-header i{font-size:1.4rem;cursor:pointer;color:#888}
 .pf-header span{font-weight:500;color:#fff}
-#playerFull img{width:100%;max-width:320px;aspect-ratio:1;margin:0 auto 16px;border-radius:20px;object-fit:cover;border:1px solid #2a2a2a;box-shadow:0 20px 60px rgba(0,0,0,.8)}
+#playerFull img{width:100%;max-width:320px;aspect-ratio:1;margin:0 auto 16px;border-radius:20px;object-fit:cover;border:1px solid #2a2a2a}
 .pf-info{text-align:center;margin-bottom:12px;flex-shrink:0}
 #pfTitle{color:#fff;font-size:1rem;font-weight:500}
 #pfArtist{color:#aaa;font-size:.8rem;font-weight:300}
 .pf-bar{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-shrink:0}
 .pf-bar span{color:#888;font-size:.65rem;min-width:32px}
-.pf-progress{flex:1;height:4px;background:#2a2a2a;border-radius:2px;overflow:hidden;cursor:pointer;position:relative}
+.pf-progress{flex:1;height:4px;background:#2a2a2a;border-radius:2px;overflow:hidden;cursor:pointer}
 .pf-fill{height:100%;background:#e5de69;border-radius:2px;width:0%}
 .pf-btns{display:flex;justify-content:center;align-items:center;gap:28px;color:#e5de69;flex-shrink:0}
 .pf-btns i{font-size:1.8rem;cursor:pointer}
