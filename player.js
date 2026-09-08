@@ -16,7 +16,6 @@
   let viewedAlbum = null;
   const albumStates = {};
   let countdownVisible = true;
-  let popupCheckInterval = null;
 
   const $ = id => document.getElementById(id);
   const albumList = $('albumList');
@@ -102,7 +101,7 @@
   }
 
   // ============================================================
-  // BUY ALBUM - POPUP METHOD
+  // BUY ALBUM - SIMPLE REDIRECT
   // ============================================================
   window.buyAlbum = async function(albumId) {
     const workerUrl = 'https://yoco-checkout.hyperproductionsa.workers.dev';
@@ -118,27 +117,7 @@
       console.log('🔵 Response:', data);
 
       if (response.ok && data.redirectUrl) {
-        localStorage.setItem('lastPurchasedAlbum', albumId);
-
-        // Try popup first
-        const popup = window.open(data.redirectUrl, 'yocoCheckout', 'width=500,height=700,scrollbars=yes,resizable=yes');
-
-        if (!popup || popup.closed || typeof popup.closed === 'undefined') {
-          // Popup blocked — open in new tab
-          window.open(data.redirectUrl, '_blank');
-          alert('Please complete payment in the new tab, then refresh this page.');
-        } else {
-          // Popup opened successfully — check when it closes
-          if (popupCheckInterval) clearInterval(popupCheckInterval);
-          popupCheckInterval = setInterval(() => {
-            if (popup.closed) {
-              clearInterval(popupCheckInterval);
-              popupCheckInterval = null;
-              // Check if payment was successful
-              checkPaymentStatus();
-            }
-          }, 500);
-        }
+        window.location.href = data.redirectUrl;
       } else {
         alert('Payment error: ' + (data.error || 'Please try again.'));
       }
@@ -147,158 +126,6 @@
       alert('Payment error. Please try again.');
     }
   };
-
-  // ============================================================
-  // CHECK PAYMENT STATUS
-  // ============================================================
-  function checkPaymentStatus() {
-    // Check URL params
-    const url = new URL(window.location.href);
-    let checkoutId = url.searchParams.get('checkoutId');
-
-    if (checkoutId) {
-      showSuccessModal(checkoutId);
-      window.history.replaceState({}, document.title, window.location.pathname);
-      return;
-    }
-
-    // Check localStorage
-    checkoutId = localStorage.getItem('yocoCheckoutId');
-    if (checkoutId) {
-      showSuccessModal(checkoutId);
-      localStorage.removeItem('yocoCheckoutId');
-      return;
-    }
-
-    // If no checkoutId found, check with the success worker
-    const productId = localStorage.getItem('lastPurchasedAlbum');
-    if (productId) {
-      // Try to get checkoutId from session
-      fetch('https://yoco-success.hyperproductionsa.workers.dev/last-checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ productId })
-      })
-      .then(r => r.json())
-      .then(data => {
-        if (data.checkoutId) {
-          showSuccessModal(data.checkoutId);
-        }
-      })
-      .catch(() => {});
-    }
-  }
-
-  // ============================================================
-  // SUCCESS MODAL
-  // ============================================================
-  function showSuccessModal(checkoutId) {
-    const productId = localStorage.getItem('lastPurchasedAlbum') || 'htc1';
-    const album = allAlbums.find(a => a.id === productId);
-    const productName = album ? album.title : 'HTs Collections';
-
-    // Close any existing modal
-    closeModal();
-
-    const overlay = document.createElement('div');
-    overlay.id = 'successModal';
-    overlay.style.cssText = `
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center;
-      z-index: 9999; backdrop-filter: blur(8px);
-    `;
-
-    overlay.innerHTML = `
-      <div style="background:#0f0f0f;border-radius:24px;padding:40px;max-width:500px;width:90%;border:1px solid #2a2a2a;text-align:center;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.9);">
-        <div style="font-size:64px;color:#e5de69;margin-bottom:16px;">✓</div>
-        <h2 style="color:#e5de69;font-size:1.8rem;font-weight:700;margin-bottom:8px;">Payment Successful!</h2>
-        <p style="color:#aaa;margin-bottom:12px;">Thank you for your purchase.</p>
-        <div style="color:#fff;font-weight:500;font-size:1.1rem;padding:12px;background:#1a1a1a;border-radius:12px;border:1px solid #2a2a2a;margin:16px 0;">${productName}</div>
-        <div style="display:flex;flex-direction:column;gap:12px;margin:20px 0;">
-          <button onclick="fetchDownloadLink('${checkoutId}','${productId}')" style="background:#e5de69;color:#0f0f0f;padding:14px 24px;border-radius:40px;border:none;cursor:pointer;font-size:1rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;width:100%;">
-            <i class="fas fa-download"></i> Download Now
-          </button>
-          <button onclick="sendEmailModal('${checkoutId}','${productName}')" style="background:transparent;color:#e5de69;padding:14px 24px;border-radius:40px;border:2px solid #e5de69;cursor:pointer;font-size:1rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;width:100%;">
-            <i class="fas fa-envelope"></i> Send Via Email
-          </button>
-        </div>
-        <p style="color:#666;font-size:.85rem;">🔒 Download link expires in 24 hours.</p>
-        <button onclick="closeModal()" style="margin-top:20px;background:none;border:none;color:#666;cursor:pointer;font-size:.85rem;">Close</button>
-      </div>
-    `;
-    document.body.appendChild(overlay);
-  }
-
-  window.fetchDownloadLink = async function(checkoutId, productId) {
-    try {
-      const response = await fetch('https://yoco-success.hyperproductionsa.workers.dev/generate-download', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ checkoutId, productId })
-      });
-      const data = await response.json();
-      if (data.success && data.downloadUrl) {
-        window.open(data.downloadUrl, '_blank');
-        alert('✅ Download started!');
-      } else {
-        alert('❌ ' + (data.error || 'Could not generate download link.'));
-      }
-    } catch (error) {
-      console.error('Download error:', error);
-      alert('❌ Error generating download link.');
-    }
-  };
-
-  window.closeModal = function() {
-    const modal = document.getElementById('successModal');
-    if (modal) modal.remove();
-  };
-
-  window.sendEmailModal = function(checkoutId, productName) {
-    const email = prompt('Enter your email address:');
-    if (!email || !email.includes('@')) {
-      if (email) alert('Please enter a valid email address.');
-      return;
-    }
-    fetch('https://yoco-success.hyperproductionsa.workers.dev/send-email', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ checkoutId, email, productName })
-    })
-    .then(r => r.json())
-    .then(data => {
-      if (data.success) {
-        alert('✅ Link sent to ' + email + '!');
-      } else {
-        alert('❌ Failed to send: ' + (data.error || ''));
-      }
-    })
-    .catch(() => alert('❌ Error sending email.'));
-  };
-
-  // ============================================================
-  // CHECK PAYMENT ON PAGE LOAD
-  // ============================================================
-  (function initPaymentCheck() {
-    // Check URL params
-    const url = new URL(window.location.href);
-    const checkoutId = url.searchParams.get('checkoutId');
-    if (checkoutId) {
-      console.log('✅ Payment detected on load!');
-      setTimeout(() => showSuccessModal(checkoutId), 500);
-      window.history.replaceState({}, document.title, window.location.pathname);
-      return;
-    }
-
-    // Check localStorage
-    const storedId = localStorage.getItem('yocoCheckoutId');
-    if (storedId) {
-      console.log('✅ Payment detected from localStorage!');
-      setTimeout(() => showSuccessModal(storedId), 500);
-      localStorage.removeItem('yocoCheckoutId');
-      return;
-    }
-  })();
 
   // ============================================================
   // COUNTDOWN - FIXED
@@ -344,6 +171,7 @@
   function updateArtwork(album) {
     if (!artImg || !countdownOverlay) return;
 
+    // If there's a playing album → show its artwork, hide countdown
     if (album && !album.isCS) {
       artImg.src = getImage(album);
       countdownOverlay.style.display = 'none';
@@ -351,6 +179,7 @@
       return;
     }
 
+    // No album playing → show HTC5 + countdown
     const defaultAlbum = allAlbums[4];
     artImg.src = getImage(defaultAlbum);
     countdownVisible = true;
