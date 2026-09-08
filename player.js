@@ -107,20 +107,12 @@
   }
 
   // ============================================================
-  // BUY ALBUM FUNCTION - WITH EMAIL PROMPT (ZeptoMail via Worker)
+  // BUY ALBUM FUNCTION - NO EMAIL PROMPT
   // ============================================================
   window.buyAlbum = async function(albumId) {
     const workerUrl = 'https://yoco-checkout.hyperproductionsa.workers.dev';
     
-    // Prompt for email
-    const customerEmail = prompt('Enter your email address to receive your download link:');
-    if (!customerEmail || !customerEmail.includes('@')) {
-      alert('Please enter a valid email address.');
-      return;
-    }
-    
     console.log('🔵 Buy Album clicked:', albumId);
-    console.log('📧 Customer email:', customerEmail);
     
     try {
       const response = await fetch(workerUrl, {
@@ -130,8 +122,7 @@
         },
         body: JSON.stringify({ 
           productId: albumId,
-          price: 15000,
-          customerEmail: customerEmail
+          price: 15000
         })
       });
       
@@ -141,8 +132,7 @@
       
       if (data.checkoutId) {
         localStorage.setItem('checkoutId', data.checkoutId);
-        localStorage.setItem('customerEmail', customerEmail);
-        console.log('✅ Stored checkoutId and email in localStorage');
+        console.log('✅ Stored checkoutId in localStorage');
       }
       
       const redirectUrl = data.redirectUrl || data.checkoutUrl;
@@ -584,7 +574,6 @@
   // ============================================================
   function goBack() {
     showAlbumList();
-    // Show HTC5 with countdown on desktop if nothing playing, or mobile always shows countdown
     updateArtwork(playingAlbum);
     if (artBuyContainer) artBuyContainer.style.display = 'none';
     if (tlBuyBtn) tlBuyBtn.style.display = 'none';
@@ -621,7 +610,6 @@
   renderAlbums();
   showAlbumList();
 
-  // Set initial artwork (desktop: HTC5 with countdown, mobile: HTC5 with countdown)
   updateArtwork(null);
 
   updateMobileText('Select a track', '—');
@@ -641,7 +629,6 @@
     if (main) main.style.flexDirection = window.innerWidth <= 860 ? 'column' : 'row';
     const footer = document.getElementById('pcFooter');
     if (footer) footer.style.display = window.innerWidth <= 860 ? 'none' : 'flex';
-    // Update artwork on resize (desktop/mobile switch)
     updateArtwork(playingAlbum);
   };
   resize();
