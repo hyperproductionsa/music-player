@@ -186,10 +186,9 @@
   }
 
   // ============================================================
-  // UPDATE BUY BUTTON - HTC5 COMPLETELY HIDDEN
+  // BUY BUTTON - HTC5 COMPLETELY HIDDEN
   // ============================================================
   function updateBuyButton(album) {
-    // HTC5 (isCS) → COMPLETELY HIDE everything
     if (!album || album.isCS) {
       if (artBuyContainer) {
         artBuyContainer.style.display = 'none';
@@ -202,7 +201,6 @@
       return;
     }
     
-    // HTC1-4 → show buy button
     if (artBuyContainer) {
       artBuyContainer.style.display = 'flex';
       artBuyContainer.classList.remove('hidden');
@@ -388,7 +386,7 @@
   }
 
   // ============================================================
-  // PLAY TRACK - FIXED
+  // PLAY TRACK
   // ============================================================
   function playTrack(idx, album) {
     if (!album) album = viewedAlbum;
@@ -403,7 +401,6 @@
     
     const url = getAudio(album, track);
     
-    // If same track, toggle play/pause
     if (audio.src === url) {
       if (isPlaying) {
         audio.pause();
@@ -425,7 +422,6 @@
       }
     }
     
-    // New track
     audio.src = url;
     audio.load();
     updateNowPlaying();
@@ -446,7 +442,7 @@
   }
 
   // ============================================================
-  // TOGGLE PLAY - FIXED
+  // TOGGLE PLAY
   // ============================================================
   function togglePlay() {
     if (!playingTrack) {
@@ -475,7 +471,7 @@
   }
 
   // ============================================================
-  // UPDATE PLAY BUTTON - FIXED
+  // UPDATE PLAY BUTTON
   // ============================================================
   function updatePlayBtn() {
     const icon = isPlaying ? 'fa-pause-circle' : 'fa-play-circle';
@@ -597,11 +593,26 @@
   updateVolumeIcon();
 
   const main = document.getElementById('main');
+  const footer = document.getElementById('pcFooter');
+  const mobileFooter = document.getElementById('playerMobile');
+
   const resize = () => {
-    if (main) main.style.flexDirection = window.innerWidth <= 860 ? 'column' : 'row';
-    const footer = document.getElementById('pcFooter');
-    if (footer) footer.style.display = window.innerWidth <= 860 ? 'none' : 'flex';
+    const isMobile = window.innerWidth <= 860;
+    if (main) {
+      main.style.flexDirection = isMobile ? 'column' : 'row';
+    }
+    // Show/hide PC footer
+    if (footer) {
+      footer.style.display = isMobile ? 'none' : 'flex';
+    }
+    // Show/hide mobile footer
+    if (mobileFooter) {
+      mobileFooter.style.display = isMobile ? 'flex' : 'none';
+    }
+    // Update artwork on resize
+    updateArtwork(playingAlbum);
   };
+
   resize();
   window.onresize = resize;
 
