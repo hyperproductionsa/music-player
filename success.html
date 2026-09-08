@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Payment Successful</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Roboto', -apple-system, sans-serif; }
+    body { background: #0b0b0b; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+    .container { max-width: 500px; width: 100%; background: #0f0f0f; border-radius: 24px; padding: 40px; border: 1px solid #2a2a2a; text-align: center; }
+    .checkmark { font-size: 64px; color: #e5de69; margin-bottom: 16px; }
+    h1 { color: #e5de69; font-size: 1.8rem; font-weight: 700; margin-bottom: 8px; }
+    p { color: #aaa; margin-bottom: 12px; }
+    .product { color: #fff; font-weight: 500; font-size: 1.1rem; padding: 12px; background: #1a1a1a; border-radius: 12px; border: 1px solid #2a2a2a; margin: 16px 0; }
+    .btn { display: block; width: 100%; padding: 14px; border-radius: 40px; border: none; cursor: pointer; font-size: 1rem; font-weight: 700; text-decoration: none; text-align: center; margin-top: 10px; }
+    .btn-primary { background: #e5de69; color: #0f0f0f; }
+    .btn-primary:hover { background: #f5ee79; transform: scale(1.02); }
+    .btn-secondary { background: transparent; color: #e5de69; border: 2px solid #e5de69; }
+    .btn-secondary:hover { background: #1e1d12; transform: scale(1.02); }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .status { margin-top: 15px; font-size: 14px; padding: 10px; border-radius: 8px; }
+    .status.success { color: #4caf50; background: rgba(76, 175, 80, 0.1); }
+    .status.error { color: #ff6b6b; background: rgba(255, 107, 107, 0.1); }
+    .status.loading { color: #e5de69; background: rgba(229, 222, 105, 0.1); }
+    .expiry { color: #e5de69; font-weight: 600; }
+    .transaction { margin-top: 20px; padding-top: 20px; border-top: 1px solid #2a2a2a; color: #666; font-size: 13px; word-break: break-all; }
+    .back { display: inline-block; margin-top: 16px; color: #666; text-decoration: none; font-size: 0.9rem; }
+    .back:hover { color: #e5de69; }
+    .hidden { display: none; }
+    .spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid #2a2a2a; border-top: 2px solid #e5de69; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 10px; vertical-align: middle; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .email-input { width: 100%; padding: 12px 16px; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; color: #fff; font-size: 1rem; margin-top: 10px; }
+    .email-input:focus { outline: none; border-color: #e5de69; }
+  </style>
+</head>
+<body>
+
+<div class="container" id="app">
+  <div class="checkmark">✓</div>
+  <h1>Payment Successful!</h1>
+  <p>Thank you for your purchase.</p>
+  <div class="product" id="productName">Loading...</div>
+
+  <!-- Download Section -->
+  <div id="downloadSection">
+    <a href="#" id="downloadBtn" class="btn btn-primary" style="display:none;">
+      <i class="fas fa-download"></i> Download Now
+    </a>
+  </div>
+
+  <!-- Or Enter Email -->
+  <div id="emailSection" style="margin-top: 16px;">
+    <p style="color: #888; font-size: 0.9rem; margin-bottom: 8px;">Or receive your download via email:</p>
+    <div style="display: flex; gap: 10px;">
+      <input type="email" id="emailInput" class="email-input" placeholder="Enter your email address" />
+      <button id="emailBtn" class="btn btn-secondary" style="width: auto; padding: 12px 20px; margin-top: 0; white-space: nowrap;">
+        <i class="fas fa-envelope"></i> Send
+      </button>
+    </div>
+  </div>
+
+  <div id="statusMessage" class="status hidden"></div>
+
+  <div class="transaction" id="transactionInfo">Transaction: Loading...</div>
+  <a href="https://htcoll.shop" class="back">← Back to Player</a>
+</div>
+
+<script>
+  // ============================================================
+  // SUCCESS PAGE - RETRIEVES DATA FROM KV
+  // ============================================================
+
+  (async function() {
+    const url = new URL(window.location.href);
+    const orderToken = url.searchParams.get('order');
+    const checkoutId = url.searchParams.get('checkoutId') || url.searchParams.get('id');
+
+    const productNameEl = document.getElementById('productName');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const emailInput = document.getElementById('emailInput');
+    const emailBtn = document.getElementById('emailBtn');
+    const statusEl = document.getElementById('statusMessage');
+    const transactionEl = document.getElementById('transactionInfo');
+
+    let productId = localStorage.getItem('lastPurchasedAlbum') || 'htc1';
+    let downloadUrl = null;
+    let productName = 'HTs Collections';
+
+    console.log('🔍 URL:', window.location.href);
+    console.log('🔍 Order Token:', orderToken);
+    console.log('🔍 Checkout ID:', checkoutId);
+
+    if (!orderToken && !checkoutId) {
+      statusEl.textContent = '❌ No payment session found. Please contact support.';
+      statusEl.className = 'status error';
+      statusEl.classList.remove('hidden');
+      productNameEl.textContent = 'Unknown';
+      transactionEl.textContent = 'Transaction: Unknown';
+      return;
+    }
+
+    transactionEl.textContent = `Order: ${orderToken || checkoutId}`;
+
+    // Show loading
+    statusEl.innerHTML = '<span class="spinner"></span> Verifying your payment...';
+    statusEl.className = 'status loading';
+    statusEl.classList.remove('hidden');
+
+    try {
+      // Call Worker to generate download link (pass orderToken if available)
+      const response = await fetch('https://yoco-success.hyperproductionsa.workers.dev/generate-download', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderToken: orderToken,
+          checkoutId: checkoutId
+        })
+      });
+
+      const data = await response.json();
+      console.log('🔵 Download response:', data);
+
+      if (data.success && data.downloadUrl) {
+        downloadUrl = data.downloadUrl;
+        productName = data.productName || 'HTs Collections';
+        productNameEl.textContent = productName;
+
+        // Show download button
+        downloadBtn.href = downloadUrl;
+        downloadBtn.style.display = 'block';
+        downloadBtn.textContent = '⬇ Download Now';
+
+        statusEl.textContent = '✅ Payment verified! Your download is ready.';
+        statusEl.className = 'status success';
+        statusEl.classList.remove('hidden');
+
+        // Auto-download after 1 second
+        setTimeout(() => {
+          window.location.href = downloadUrl;
+        }, 1500);
+
+      } else {
+        statusEl.innerHTML = '⚠️ ' + (data.error || 'Could not generate download link. Please enter your email below.');
+        statusEl.className = 'status error';
+        statusEl.classList.remove('hidden');
+
+        // Show email section prominently
+        emailInput.focus();
+      }
+
+    } catch (error) {
+      console.error('❌ Error:', error);
+      statusEl.innerHTML = '❌ Error verifying payment. Please enter your email below to receive the download link.';
+      statusEl.className = 'status error';
+      statusEl.classList.remove('hidden');
+    }
+
+    // ============================================================
+    // EMAIL SEND
+    // ============================================================
+    emailBtn.addEventListener('click', async function() {
+      const email = emailInput.value.trim();
+      if (!email || !email.includes('@') || !email.includes('.')) {
+        alert('Please enter a valid email address.');
+        return;
+      }
+
+      emailBtn.disabled = true;
+      emailBtn.innerHTML = '<span class="spinner"></span> Sending...';
+      statusEl.innerHTML = '⏳ Sending download link to ' + email + '...';
+      statusEl.className = 'status loading';
+      statusEl.classList.remove('hidden');
+
+      try {
+        const response = await fetch('https://yoco-success.hyperproductionsa.workers.dev/send-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            orderToken: orderToken,
+            email: email,
+            productName: productName,
+            downloadUrl: downloadUrl || null
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          statusEl.innerHTML = '✅ Download link sent to ' + email + '! Check your inbox (and spam folder).';
+          statusEl.className = 'status success';
+          emailBtn.innerHTML = '<i class="fas fa-check"></i> Sent!';
+          emailInput.disabled = true;
+        } else {
+          statusEl.innerHTML = '❌ ' + (data.error || 'Failed to send email. Please try again.');
+          statusEl.className = 'status error';
+          emailBtn.disabled = false;
+          emailBtn.innerHTML = '<i class="fas fa-envelope"></i> Send';
+        }
+      } catch (error) {
+        console.error('❌ Email error:', error);
+        statusEl.innerHTML = '❌ Error sending email. Please try again.';
+        statusEl.className = 'status error';
+        emailBtn.disabled = false;
+        emailBtn.innerHTML = '<i class="fas fa-envelope"></i> Send';
+      }
+    });
+
+    // Enter key triggers email send
+    emailInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        emailBtn.click();
+      }
+    });
+
+  })();
+</script>
+</body>
+</html>
