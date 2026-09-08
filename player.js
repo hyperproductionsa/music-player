@@ -101,7 +101,7 @@
   }
 
   // ============================================================
-  // BUY ALBUM - SIMPLE REDIRECT
+  // BUY ALBUM
   // ============================================================
   window.buyAlbum = async function(albumId) {
     const workerUrl = 'https://yoco-checkout.hyperproductionsa.workers.dev';
@@ -128,7 +128,7 @@
   };
 
   // ============================================================
-  // COUNTDOWN - FIXED
+  // COUNTDOWN
   // ============================================================
   function updateCountdown() {
     if (!countdownOverlay) return;
@@ -166,12 +166,11 @@
   }
 
   // ============================================================
-  // ARTWORK - FIXED
+  // ARTWORK
   // ============================================================
   function updateArtwork(album) {
     if (!artImg || !countdownOverlay) return;
 
-    // If there's a playing album → show its artwork, hide countdown
     if (album && !album.isCS) {
       artImg.src = getImage(album);
       countdownOverlay.style.display = 'none';
@@ -179,7 +178,6 @@
       return;
     }
 
-    // No album playing → show HTC5 + countdown
     const defaultAlbum = allAlbums[4];
     artImg.src = getImage(defaultAlbum);
     countdownVisible = true;
@@ -188,25 +186,36 @@
   }
 
   // ============================================================
-  // REST OF PLAYER LOGIC
+  // BUY BUTTON
   // ============================================================
   function updateBuyButton(album) {
     if (!album || album.isCS) {
-      if (artBuyContainer) artBuyContainer.style.display = 'none';
-      if (tlBuyBtn) tlBuyBtn.style.display = 'none';
+      if (artBuyContainer) {
+        artBuyContainer.style.display = 'none';
+        artBuyContainer.classList.add('hidden');
+      }
+      if (tlBuyBtn) {
+        tlBuyBtn.style.display = 'none';
+        tlBuyBtn.classList.add('hidden');
+      }
       return;
     }
     if (artBuyContainer) {
       artBuyContainer.style.display = 'flex';
+      artBuyContainer.classList.remove('hidden');
       if (artBuyBtn) artBuyBtn.onclick = () => buyAlbum(album.id);
       if (artBuyPrice) artBuyPrice.textContent = 'R150';
     }
     if (tlBuyBtn) {
       tlBuyBtn.style.display = 'flex';
+      tlBuyBtn.classList.remove('hidden');
       tlBuyBtn.onclick = () => buyAlbum(album.id);
     }
   }
 
+  // ============================================================
+  // UPDATE NOW PLAYING
+  // ============================================================
   function updateNowPlaying() {
     if (!playingTrack || !playingAlbum) {
       if (footerTitle) footerTitle.textContent = 'Select a track';
@@ -228,6 +237,9 @@
     if (pfArt) pfArt.src = art;
   }
 
+  // ============================================================
+  // MOBILE TEXT
+  // ============================================================
   function updateMobileText(title, artist) {
     if (!pmTitle || !pmArtist) return;
     pmTitle.textContent = title || 'Select a track';
@@ -240,6 +252,9 @@
     if (pmArtist.scrollWidth > pmArtist.clientWidth) pmArtist.classList.add('scroll');
   }
 
+  // ============================================================
+  // MEDIA SESSION
+  // ============================================================
   function setupMediaSession() {
     if (!('mediaSession' in navigator) || !playingTrack || !playingAlbum) return;
     const title = playingTrack.mix ? `${playingTrack.title} (${playingTrack.mix})` : playingTrack.title;
@@ -255,6 +270,9 @@
     navigator.mediaSession.setActionHandler('nexttrack', () => { if (playingAlbum) nextTrack(); });
   }
 
+  // ============================================================
+  // VIEW FUNCTIONS
+  // ============================================================
   function showAlbumList() {
     if (albumList) albumList.style.display = 'flex';
     if (tracklistWrap) tracklistWrap.style.display = 'none';
@@ -270,6 +288,9 @@
     if (headerBadge) headerBadge.style.display = 'none';
   }
 
+  // ============================================================
+  // RENDER
+  // ============================================================
   function renderAlbums() {
     if (!albumList) return;
     const sorted = [...allAlbums].reverse();
@@ -363,22 +384,45 @@
     renderTracklist(album, isLocked);
   }
 
+  // ============================================================
+  // PLAY TRACK - FIXED
+  // ============================================================
   function playTrack(idx, album) {
     if (!album) album = viewedAlbum;
     if (!album || album.isCS) return;
     const track = album.tracks[idx];
     if (!track) return;
+    
     playingAlbum = album;
     playingTrack = track;
     playingIdx = idx;
     albumStates[album.id] = { playingIdx: idx };
+    
     const url = getAudio(album, track);
+    
+    // If same track, toggle play/pause
     if (audio.src === url) {
-      if (isPlaying) { audio.pause(); isPlaying = false; clearInterval(timer); }
-      else { audio.play().then(() => { isPlaying = true; startProgress(); }).catch(err => console.warn('Playback blocked:', err)); }
-      updatePlayBtn();
-      return;
+      if (isPlaying) {
+        audio.pause();
+        isPlaying = false;
+        clearInterval(timer);
+        updatePlayBtn();
+        return;
+      } else {
+        audio.play().then(() => {
+          isPlaying = true;
+          updatePlayBtn();
+          startProgress();
+        }).catch(err => {
+          console.warn('Playback blocked:', err);
+          isPlaying = false;
+          updatePlayBtn();
+        });
+        return;
+      }
     }
+    
+    // New track
     audio.src = url;
     audio.load();
     updateNowPlaying();
@@ -386,23 +430,66 @@
     renderTracklist(album, false);
     renderAlbums();
     updateArtwork(album);
-    audio.play().then(() => { isPlaying = true; updatePlayBtn(); startProgress(); }).catch(err => { isPlaying = false; updatePlayBtn(); });
+    
+    audio.play().then(() => {
+      isPlaying = true;
+      updatePlayBtn();
+      startProgress();
+    }).catch(err => {
+      console.warn('Playback blocked:', err);
+      isPlaying = false;
+      updatePlayBtn();
+    });
   }
 
+  // ============================================================
+  // TOGGLE PLAY - FIXED
+  // ============================================================
   function togglePlay() {
-    if (!playingTrack) { if (viewedAlbum && !viewedAlbum.isCS) playTrack(0, viewedAlbum); return; }
-    if (isPlaying) { audio.pause(); isPlaying = false; clearInterval(timer); }
-    else { audio.play().then(() => { isPlaying = true; startProgress(); }).catch(err => console.warn('Playback blocked:', err)); }
-    updatePlayBtn();
+    if (!playingTrack) {
+      if (viewedAlbum && !viewedAlbum.isCS) {
+        playTrack(0, viewedAlbum);
+      }
+      return;
+    }
+    
+    if (isPlaying) {
+      audio.pause();
+      isPlaying = false;
+      clearInterval(timer);
+      updatePlayBtn();
+    } else {
+      audio.play().then(() => {
+        isPlaying = true;
+        updatePlayBtn();
+        startProgress();
+      }).catch(err => {
+        console.warn('Playback blocked:', err);
+        isPlaying = false;
+        updatePlayBtn();
+      });
+    }
   }
 
+  // ============================================================
+  // UPDATE PLAY BUTTON - FIXED
+  // ============================================================
   function updatePlayBtn() {
     const icon = isPlaying ? 'fa-pause-circle' : 'fa-play-circle';
-    if (footerPlay) footerPlay.className = `fas ${icon}`;
-    if (pmPlay) pmPlay.className = `fas ${icon}`;
-    if (pfPlay) pfPlay.className = `fas ${icon}`;
+    if (footerPlay) {
+      footerPlay.className = `fas ${icon}`;
+    }
+    if (pmPlay) {
+      pmPlay.className = `fas ${icon}`;
+    }
+    if (pfPlay) {
+      pfPlay.className = `fas ${icon}`;
+    }
   }
 
+  // ============================================================
+  // PROGRESS
+  // ============================================================
   function startProgress() {
     clearInterval(timer);
     timer = setInterval(() => {
@@ -437,10 +524,33 @@
     }
   }
 
-  function nextTrack() { if (!playingAlbum) return; const nextIdx = (playingIdx + 1) % playingAlbum.tracks.length; albumStates[playingAlbum.id] = { playingIdx: nextIdx }; playTrack(nextIdx, playingAlbum); }
-  function prevTrack() { if (!playingAlbum) return; const prevIdx = (playingIdx - 1 + playingAlbum.tracks.length) % playingAlbum.tracks.length; albumStates[playingAlbum.id] = { playingIdx: prevIdx }; playTrack(prevIdx, playingAlbum); }
+  function nextTrack() {
+    if (!playingAlbum) return;
+    const nextIdx = (playingIdx + 1) % playingAlbum.tracks.length;
+    albumStates[playingAlbum.id] = { playingIdx: nextIdx };
+    playTrack(nextIdx, playingAlbum);
+  }
 
-  function goBack() { showAlbumList(); updateArtwork(playingAlbum); if (artBuyContainer) artBuyContainer.style.display = 'none'; if (tlBuyBtn) tlBuyBtn.style.display = 'none'; }
+  function prevTrack() {
+    if (!playingAlbum) return;
+    const prevIdx = (playingIdx - 1 + playingAlbum.tracks.length) % playingAlbum.tracks.length;
+    albumStates[playingAlbum.id] = { playingIdx: prevIdx };
+    playTrack(prevIdx, playingAlbum);
+  }
+
+  function goBack() {
+    showAlbumList();
+    updateArtwork(playingAlbum);
+    if (artBuyContainer) {
+      artBuyContainer.style.display = 'none';
+      artBuyContainer.classList.add('hidden');
+    }
+    if (tlBuyBtn) {
+      tlBuyBtn.style.display = 'none';
+      tlBuyBtn.classList.add('hidden');
+    }
+  }
+
   function openFull() { if (pf) pf.classList.add('active'); }
   function closeFull() { if (pf) pf.classList.remove('active'); }
 
@@ -471,8 +581,14 @@
   updateMobileText('Select a track', '—');
   if (footerArt) footerArt.src = getImage(allAlbums[4]);
   if (pmArt) pmArt.src = getImage(allAlbums[4]);
-  if (artBuyContainer) artBuyContainer.style.display = 'none';
-  if (tlBuyBtn) tlBuyBtn.style.display = 'none';
+  if (artBuyContainer) {
+    artBuyContainer.style.display = 'none';
+    artBuyContainer.classList.add('hidden');
+  }
+  if (tlBuyBtn) {
+    tlBuyBtn.style.display = 'none';
+    tlBuyBtn.classList.add('hidden');
+  }
   updateCountdown();
   setInterval(updateCountdown, 1000);
   updateVolumeIcon();
@@ -485,4 +601,5 @@
   };
   resize();
   window.onresize = resize;
+
 })();
