@@ -15,6 +15,8 @@
   let timer = null;
   let viewedAlbum = null;
   const albumStates = {};
+  let countdownVisible = true;
+  let popupCheckInterval = null;
 
   const $ = id => document.getElementById(id);
   const albumList = $('albumList');
@@ -100,7 +102,7 @@
   }
 
   // ============================================================
-  // BUY ALBUM
+  // BUY ALBUM - POPUP METHOD
   // ============================================================
   window.buyAlbum = async function(albumId) {
     const workerUrl = 'https://yoco-checkout.hyperproductionsa.workers.dev';
@@ -113,9 +115,30 @@
         body: JSON.stringify({ productId: albumId })
       });
       const data = await response.json();
+      console.log('🔵 Response:', data);
+
       if (response.ok && data.redirectUrl) {
         localStorage.setItem('lastPurchasedAlbum', albumId);
-        window.location.href = data.redirectUrl;
+
+        // Try popup first
+        const popup = window.open(data.redirectUrl, 'yocoCheckout', 'width=500,height=700,scrollbars=yes,resizable=yes');
+
+        if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+          // Popup blocked — open in new tab
+          window.open(data.redirectUrl, '_blank');
+          alert('Please complete payment in the new tab, then refresh this page.');
+        } else {
+          // Popup opened successfully — check when it closes
+          if (popupCheckInterval) clearInterval(popupCheckInterval);
+          popupCheckInterval = setInterval(() => {
+            if (popup.closed) {
+              clearInterval(popupCheckInterval);
+              popupCheckInterval = null;
+              // Check if payment was successful
+              checkPaymentStatus();
+            }
+          }, 500);
+        }
       } else {
         alert('Payment error: ' + (data.error || 'Please try again.'));
       }
@@ -126,23 +149,56 @@
   };
 
   // ============================================================
-  // MODAL
+  // CHECK PAYMENT STATUS
   // ============================================================
-  (function checkPaymentSuccess() {
+  function checkPaymentStatus() {
+    // Check URL params
     const url = new URL(window.location.href);
-    const checkoutId = url.searchParams.get('checkoutId');
-    console.log('🔍 URL:', url.href, 'Checkout ID:', checkoutId);
-    if (checkoutId) {
-      console.log('✅ Payment success!');
-      setTimeout(() => showSuccessModal(checkoutId), 500);
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
-  })();
+    let checkoutId = url.searchParams.get('checkoutId');
 
+    if (checkoutId) {
+      showSuccessModal(checkoutId);
+      window.history.replaceState({}, document.title, window.location.pathname);
+      return;
+    }
+
+    // Check localStorage
+    checkoutId = localStorage.getItem('yocoCheckoutId');
+    if (checkoutId) {
+      showSuccessModal(checkoutId);
+      localStorage.removeItem('yocoCheckoutId');
+      return;
+    }
+
+    // If no checkoutId found, check with the success worker
+    const productId = localStorage.getItem('lastPurchasedAlbum');
+    if (productId) {
+      // Try to get checkoutId from session
+      fetch('https://yoco-success.hyperproductionsa.workers.dev/last-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId })
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.checkoutId) {
+          showSuccessModal(data.checkoutId);
+        }
+      })
+      .catch(() => {});
+    }
+  }
+
+  // ============================================================
+  // SUCCESS MODAL
+  // ============================================================
   function showSuccessModal(checkoutId) {
     const productId = localStorage.getItem('lastPurchasedAlbum') || 'htc1';
     const album = allAlbums.find(a => a.id === productId);
     const productName = album ? album.title : 'HTs Collections';
+
+    // Close any existing modal
+    closeModal();
 
     const overlay = document.createElement('div');
     overlay.id = 'successModal';
@@ -153,20 +209,20 @@
     `;
 
     overlay.innerHTML = `
-      <div style="background:#0f0f0f;border-radius:24px;padding:40px;max-width:500px;width:90%;border:1px solid #2a2a2a;text-align:center;">
+      <div style="background:#0f0f0f;border-radius:24px;padding:40px;max-width:500px;width:90%;border:1px solid #2a2a2a;text-align:center;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.9);">
         <div style="font-size:64px;color:#e5de69;margin-bottom:16px;">✓</div>
         <h2 style="color:#e5de69;font-size:1.8rem;font-weight:700;margin-bottom:8px;">Payment Successful!</h2>
         <p style="color:#aaa;margin-bottom:12px;">Thank you for your purchase.</p>
         <div style="color:#fff;font-weight:500;font-size:1.1rem;padding:12px;background:#1a1a1a;border-radius:12px;border:1px solid #2a2a2a;margin:16px 0;">${productName}</div>
         <div style="display:flex;flex-direction:column;gap:12px;margin:20px 0;">
-          <button onclick="fetchDownloadLink('${checkoutId}','${productId}')" style="background:#e5de69;color:#0f0f0f;padding:14px 24px;border-radius:40px;border:none;cursor:pointer;font-size:1rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;">
+          <button onclick="fetchDownloadLink('${checkoutId}','${productId}')" style="background:#e5de69;color:#0f0f0f;padding:14px 24px;border-radius:40px;border:none;cursor:pointer;font-size:1rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;width:100%;">
             <i class="fas fa-download"></i> Download Now
           </button>
-          <button onclick="sendEmailModal('${checkoutId}','${productName}')" style="background:transparent;color:#e5de69;padding:14px 24px;border-radius:40px;border:2px solid #e5de69;cursor:pointer;font-size:1rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;">
+          <button onclick="sendEmailModal('${checkoutId}','${productName}')" style="background:transparent;color:#e5de69;padding:14px 24px;border-radius:40px;border:2px solid #e5de69;cursor:pointer;font-size:1rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;width:100%;">
             <i class="fas fa-envelope"></i> Send Via Email
           </button>
         </div>
-        <p style="color:#666;font-size:.85rem;">🔒 You will receive a download link shortly.</p>
+        <p style="color:#666;font-size:.85rem;">🔒 Download link expires in 24 hours.</p>
         <button onclick="closeModal()" style="margin-top:20px;background:none;border:none;color:#666;cursor:pointer;font-size:.85rem;">Close</button>
       </div>
     `;
@@ -210,17 +266,56 @@
       body: JSON.stringify({ checkoutId, email, productName })
     })
     .then(r => r.json())
-    .then(data => data.success ? alert('✅ Link sent to ' + email + '!') : alert('❌ Failed to send.'))
-    .catch(() => alert('❌ Error sending.'));
+    .then(data => {
+      if (data.success) {
+        alert('✅ Link sent to ' + email + '!');
+      } else {
+        alert('❌ Failed to send: ' + (data.error || ''));
+      }
+    })
+    .catch(() => alert('❌ Error sending email.'));
   };
 
   // ============================================================
-  // COUNTDOWN
+  // CHECK PAYMENT ON PAGE LOAD
+  // ============================================================
+  (function initPaymentCheck() {
+    // Check URL params
+    const url = new URL(window.location.href);
+    const checkoutId = url.searchParams.get('checkoutId');
+    if (checkoutId) {
+      console.log('✅ Payment detected on load!');
+      setTimeout(() => showSuccessModal(checkoutId), 500);
+      window.history.replaceState({}, document.title, window.location.pathname);
+      return;
+    }
+
+    // Check localStorage
+    const storedId = localStorage.getItem('yocoCheckoutId');
+    if (storedId) {
+      console.log('✅ Payment detected from localStorage!');
+      setTimeout(() => showSuccessModal(storedId), 500);
+      localStorage.removeItem('yocoCheckoutId');
+      return;
+    }
+  })();
+
+  // ============================================================
+  // COUNTDOWN - FIXED
   // ============================================================
   function updateCountdown() {
     if (!countdownOverlay) return;
+
+    if (!countdownVisible) {
+      countdownOverlay.style.display = 'none';
+      return;
+    }
+
+    countdownOverlay.style.display = 'flex';
+
     const now = new Date();
     const diff = releaseDate - now;
+
     if (diff <= 0) {
       countdownOverlay.innerHTML = `
         <div style="color:#e5de69;font-size:2rem;margin-bottom:8px;"><i class="fas fa-check-circle"></i></div>
@@ -230,32 +325,37 @@
       `;
       return;
     }
+
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
     if (cdDays) cdDays.textContent = String(days).padStart(2, '0');
     if (cdHours) cdHours.textContent = String(hours).padStart(2, '0');
     if (cdMinutes) cdMinutes.textContent = String(minutes).padStart(2, '0');
     if (cdSeconds) cdSeconds.textContent = String(seconds).padStart(2, '0');
     if (csDate) csDate.textContent = releaseDate.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
-    countdownOverlay.style.display = 'flex';
   }
 
   // ============================================================
-  // ARTWORK - SIMPLE LOGIC
+  // ARTWORK - FIXED
   // ============================================================
   function updateArtwork(album) {
     if (!artImg || !countdownOverlay) return;
+
     if (album && !album.isCS) {
       artImg.src = getImage(album);
       countdownOverlay.style.display = 'none';
-    } else {
-      const defaultAlbum = allAlbums[4];
-      artImg.src = getImage(defaultAlbum);
-      countdownOverlay.style.display = 'flex';
-      updateCountdown();
+      countdownVisible = false;
+      return;
     }
+
+    const defaultAlbum = allAlbums[4];
+    artImg.src = getImage(defaultAlbum);
+    countdownVisible = true;
+    countdownOverlay.style.display = 'flex';
+    updateCountdown();
   }
 
   // ============================================================
