@@ -1,15 +1,10 @@
 (async function() {
-  // ------------------------------------------------------------
-  // LOAD DATA
-  // ------------------------------------------------------------
   const res = await fetch('data.json');
   const DATA = await res.json();
   const { baseUrl, comingSoon, albums, comingSoonAlbum } = DATA;
 
   const releaseDate = new Date(comingSoon);
   const audio = new Audio();
-
-  // --- Helper functions ---
   const getAudio = (a, t) => `${baseUrl}/m4a/${a.folder}/${t.file}`;
   const getImage = (a) => `${baseUrl}/images/${a.cover}`;
 
@@ -21,9 +16,7 @@
   let viewedAlbum = null;
   const albumStates = {};
 
-  // ------------------------------------------------------------
-  // DOM ELEMENTS
-  // ------------------------------------------------------------
+  // DOM
   const $ = id => document.getElementById(id);
   const albumList = $('albumList');
   const tracklistWrap = $('tracklistWrap');
@@ -76,9 +69,9 @@
 
   const allAlbums = [...albums, { ...comingSoonAlbum, isCS: true }];
 
-  // ------------------------------------------------------------
+  // ============================================================
   // VOLUME CONTROL
-  // ------------------------------------------------------------
+  // ============================================================
   audio.volume = 0.8;
   if (volumeSlider) {
     volumeSlider.value = 0.8;
@@ -91,7 +84,13 @@
   function updateVolumeIcon() {
     if (!volumeIcon) return;
     const vol = audio.volume;
-    volumeIcon.className = vol === 0 ? 'fas fa-volume-mute' : vol < 0.5 ? 'fas fa-volume-down' : 'fas fa-volume-up';
+    if (vol === 0) {
+      volumeIcon.className = 'fas fa-volume-mute';
+    } else if (vol < 0.5) {
+      volumeIcon.className = 'fas fa-volume-down';
+    } else {
+      volumeIcon.className = 'fas fa-volume-up';
+    }
   }
 
   if (volumeIcon) {
@@ -107,9 +106,9 @@
     });
   }
 
-  // ------------------------------------------------------------
+  // ============================================================
   // BUY ALBUM FUNCTION
-  // ------------------------------------------------------------
+  // ============================================================
   window.buyAlbum = async function(albumId) {
     const workerUrl = 'https://yoco-checkout.hyperproductionsa.workers.dev';
     console.log('🔵 Buy Album clicked:', albumId);
@@ -122,7 +121,6 @@
       });
       const data = await response.json();
       if (response.ok && data.redirectUrl) {
-        // Store product name for modal later
         localStorage.setItem('lastPurchasedAlbum', albumId);
         window.location.href = data.redirectUrl;
       } else {
@@ -134,31 +132,26 @@
     }
   };
 
-  // ------------------------------------------------------------
+  // ============================================================
   // CHECK PAYMENT SUCCESS ON PAGE LOAD (MODAL)
-  // ------------------------------------------------------------
+  // ============================================================
   (function checkPaymentSuccess() {
     const url = new URL(window.location.href);
     const checkoutId = url.searchParams.get('checkoutId');
     if (checkoutId) {
       console.log('✅ Payment success! Checkout ID:', checkoutId);
-      // Show modal after a short delay
       setTimeout(() => showSuccessModal(checkoutId), 500);
-      // Clean URL
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   })();
 
-  // ------------------------------------------------------------
+  // ============================================================
   // SUCCESS MODAL
-  // ------------------------------------------------------------
+  // ============================================================
   function showSuccessModal(checkoutId) {
     const productId = localStorage.getItem('lastPurchasedAlbum') || 'htc1';
-    // Find product name from data
     const album = allAlbums.find(a => a.id === productId);
     const productName = album ? album.title : 'HTs Collections';
-    // TEMPORARY: Since download URL is generated server-side, we'll show a message
-    // In production, you'd fetch the download URL from your success worker
 
     const overlay = document.createElement('div');
     overlay.id = 'successModal';
@@ -184,14 +177,14 @@
         ">${productName}</div>
 
         <div style="display: flex; flex-direction: column; gap: 12px; margin: 20px 0;">
-          <a href="#" onclick="alert('Download link will be available here. Check your email.'); return false;" style="
+          <button onclick="fetchDownloadLink('${checkoutId}', '${productId}')" style="
             background: #e5de69; color: #0f0f0f; padding: 14px 24px;
             border-radius: 40px; text-decoration: none; font-weight: 700;
             display: flex; align-items: center; justify-content: center; gap: 10px;
             border: none; cursor: pointer; font-size: 1rem;
           ">
             <i class="fas fa-download"></i> Download Now
-          </a>
+          </button>
           <button onclick="sendEmailModal('${checkoutId}', '${productName}')" style="
             background: transparent; color: #e5de69; padding: 14px 24px;
             border-radius: 40px; text-decoration: none; font-weight: 700;
@@ -203,16 +196,32 @@
         </div>
 
         <p style="color: #666; font-size: .85rem;">🔒 You will receive a download link shortly.</p>
-
-        <button onclick="closeModal()" style="
-          margin-top: 20px; background: none; border: none; color: #666;
-          cursor: pointer; font-size: .85rem;
-        ">Close</button>
+        <button onclick="closeModal()" style="margin-top: 20px; background: none; border: none; color: #666; cursor: pointer; font-size: .85rem;">Close</button>
       </div>
     `;
 
     document.body.appendChild(overlay);
   }
+
+  window.fetchDownloadLink = async function(checkoutId, productId) {
+    try {
+      const response = await fetch('https://yoco-success.hyperproductionsa.workers.dev/generate-download', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ checkoutId, productId })
+      });
+      const data = await response.json();
+      if (data.success && data.downloadUrl) {
+        window.open(data.downloadUrl, '_blank');
+        alert('✅ Download started!');
+      } else {
+        alert('❌ ' + (data.error || 'Could not generate download link.'));
+      }
+    } catch (error) {
+      console.error('Download error:', error);
+      alert('❌ Error generating download link.');
+    }
+  };
 
   window.closeModal = function() {
     const modal = document.getElementById('successModal');
@@ -226,7 +235,6 @@
       return;
     }
 
-    // Call your success worker's email endpoint
     fetch('https://yoco-success.hyperproductionsa.workers.dev/send-email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -247,9 +255,9 @@
     .catch(() => alert('❌ Error sending email.'));
   };
 
-  // ------------------------------------------------------------
+  // ============================================================
   // COUNTDOWN TIMER
-  // ------------------------------------------------------------
+  // ============================================================
   function updateCountdown() {
     if (!countdownOverlay) return;
     const now = new Date();
@@ -278,28 +286,18 @@
     countdownOverlay.style.display = 'flex';
   }
 
-  // ------------------------------------------------------------
-  // UPDATE ARTWORK - Desktop vs Mobile Logic
-  // ------------------------------------------------------------
+  // ============================================================
+  // UPDATE ARTWORK - SIMPLIFIED (No Mobile/PC difference)
+  // ============================================================
   function updateArtwork(album) {
     if (!artImg || !countdownOverlay) return;
 
-    const isMobile = window.innerWidth <= 860;
-
-    if (isMobile) {
-      // MOBILE: Always show HTC5 with countdown
-      const defaultAlbum = allAlbums[4];
-      artImg.src = getImage(defaultAlbum);
-      countdownOverlay.style.display = 'flex';
-      updateCountdown();
-      return;
-    }
-
-    // DESKTOP: Show playing album artwork, or HTC5 with countdown if nothing playing
+    // If there's a playing album (or an album passed in), show its artwork
     if (album && !album.isCS) {
       artImg.src = getImage(album);
       countdownOverlay.style.display = 'none';
     } else {
+      // Nothing playing → show HTC5 with countdown
       const defaultAlbum = allAlbums[4];
       artImg.src = getImage(defaultAlbum);
       countdownOverlay.style.display = 'flex';
@@ -307,9 +305,9 @@
     }
   }
 
-  // ------------------------------------------------------------
+  // ============================================================
   // BUY BUTTON
-  // ------------------------------------------------------------
+  // ============================================================
   function updateBuyButton(album) {
     if (!album || album.isCS) {
       if (artBuyContainer) artBuyContainer.style.display = 'none';
@@ -327,9 +325,9 @@
     }
   }
 
-  // ------------------------------------------------------------
+  // ============================================================
   // UPDATE NOW PLAYING UI
-  // ------------------------------------------------------------
+  // ============================================================
   function updateNowPlaying() {
     if (!playingTrack || !playingAlbum) {
       if (footerTitle) footerTitle.textContent = 'Select a track';
@@ -352,9 +350,9 @@
     if (pfArt) pfArt.src = art;
   }
 
-  // ------------------------------------------------------------
+  // ============================================================
   // MOBILE TEXT SCROLL
-  // ------------------------------------------------------------
+  // ============================================================
   function updateMobileText(title, artist) {
     if (!pmTitle || !pmArtist) return;
     pmTitle.textContent = title || 'Select a track';
@@ -369,9 +367,9 @@
     if (pmArtist.scrollWidth > pmArtist.clientWidth) pmArtist.classList.add('scroll');
   }
 
-  // ------------------------------------------------------------
+  // ============================================================
   // MEDIA SESSION API
-  // ------------------------------------------------------------
+  // ============================================================
   function setupMediaSession() {
     if (!('mediaSession' in navigator) || !playingTrack || !playingAlbum) return;
     const title = playingTrack.mix ? `${playingTrack.title} (${playingTrack.mix})` : playingTrack.title;
@@ -402,9 +400,9 @@
     });
   }
 
-  // ------------------------------------------------------------
+  // ============================================================
   // VIEW FUNCTIONS
-  // ------------------------------------------------------------
+  // ============================================================
   function showAlbumList() {
     if (albumList) albumList.style.display = 'flex';
     if (tracklistWrap) tracklistWrap.style.display = 'none';
@@ -423,9 +421,9 @@
     if (headerBadge) headerBadge.style.display = 'none';
   }
 
-  // ------------------------------------------------------------
+  // ============================================================
   // RENDER FUNCTIONS
-  // ------------------------------------------------------------
+  // ============================================================
   function renderAlbums() {
     if (!albumList) return;
     const sorted = [...allAlbums].reverse();
@@ -514,9 +512,9 @@
     });
   }
 
-  // ------------------------------------------------------------
+  // ============================================================
   // LOAD ALBUM
-  // ------------------------------------------------------------
+  // ============================================================
   function loadAlbum(idx) {
     const album = allAlbums[idx];
     const isLocked = album.isCS || false;
@@ -527,9 +525,9 @@
     renderTracklist(album, isLocked);
   }
 
-  // ------------------------------------------------------------
+  // ============================================================
   // PLAY TRACK
-  // ------------------------------------------------------------
+  // ============================================================
   function playTrack(idx, album) {
     if (!album) album = viewedAlbum;
     if (!album || album.isCS) return;
@@ -544,7 +542,6 @@
 
     const url = getAudio(album, track);
 
-    // If same track, toggle play/pause
     if (audio.src === url) {
       if (isPlaying) {
         audio.pause();
@@ -560,7 +557,6 @@
       return;
     }
 
-    // New track
     audio.src = url;
     audio.load();
 
@@ -569,7 +565,9 @@
     renderTracklist(album, false);
     renderAlbums();
 
-    // Try to play
+    // UPDATE ARTWORK TO SHOW PLAYING ALBUM
+    updateArtwork(album);
+
     audio.play().then(() => {
       isPlaying = true;
       updatePlayBtn();
@@ -581,9 +579,9 @@
     });
   }
 
-  // ------------------------------------------------------------
+  // ============================================================
   // CONTROLS
-  // ------------------------------------------------------------
+  // ============================================================
   function togglePlay() {
     if (!playingTrack) {
       if (viewedAlbum && !viewedAlbum.isCS) playTrack(0, viewedAlbum);
@@ -659,7 +657,7 @@
 
   function goBack() {
     showAlbumList();
-    updateArtwork(playingAlbum); // Show playing album art on desktop if any
+    updateArtwork(playingAlbum); // Show playing album art if any, else countdown
     if (artBuyContainer) artBuyContainer.style.display = 'none';
     if (tlBuyBtn) tlBuyBtn.style.display = 'none';
   }
@@ -667,9 +665,9 @@
   function openFull() { if (pf) pf.classList.add('active'); }
   function closeFull() { if (pf) pf.classList.remove('active'); }
 
-  // ------------------------------------------------------------
+  // ============================================================
   // EVENT LISTENERS
-  // ------------------------------------------------------------
+  // ============================================================
   if (footerPlay) footerPlay.onclick = togglePlay;
   if (footerPrev) footerPrev.onclick = prevTrack;
   if (footerNext) footerNext.onclick = nextTrack;
@@ -685,13 +683,13 @@
   if (footerProgress) footerProgress.addEventListener('click', (e) => seekTo(e, footerProgress, footerFill, footerCur, footerTot));
   if (pfProgress) pfProgress.addEventListener('click', (e) => seekTo(e, pfProgress, pfFill, pfCur, pfTot));
 
-  // ------------------------------------------------------------
+  // ============================================================
   // INIT
-  // ------------------------------------------------------------
+  // ============================================================
   renderAlbums();
   showAlbumList();
 
-  // Set initial artwork (desktop: HTC5 with countdown, mobile: HTC5 with countdown)
+  // Start with HTC5 + countdown (nothing playing)
   updateArtwork(null);
 
   updateMobileText('Select a track', '—');
@@ -711,7 +709,6 @@
     if (main) main.style.flexDirection = window.innerWidth <= 860 ? 'column' : 'row';
     const footer = document.getElementById('pcFooter');
     if (footer) footer.style.display = window.innerWidth <= 860 ? 'none' : 'flex';
-    updateArtwork(playingAlbum);
   };
   resize();
   window.onresize = resize;
