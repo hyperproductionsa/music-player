@@ -16,7 +16,6 @@
   let viewedAlbum = null;
   const albumStates = {};
 
-  // DOM
   const $ = id => document.getElementById(id);
   const albumList = $('albumList');
   const tracklistWrap = $('tracklistWrap');
@@ -70,7 +69,7 @@
   const allAlbums = [...albums, { ...comingSoonAlbum, isCS: true }];
 
   // ============================================================
-  // VOLUME CONTROL
+  // VOLUME
   // ============================================================
   audio.volume = 0.8;
   if (volumeSlider) {
@@ -84,13 +83,7 @@
   function updateVolumeIcon() {
     if (!volumeIcon) return;
     const vol = audio.volume;
-    if (vol === 0) {
-      volumeIcon.className = 'fas fa-volume-mute';
-    } else if (vol < 0.5) {
-      volumeIcon.className = 'fas fa-volume-down';
-    } else {
-      volumeIcon.className = 'fas fa-volume-up';
-    }
+    volumeIcon.className = vol === 0 ? 'fas fa-volume-mute' : vol < 0.5 ? 'fas fa-volume-down' : 'fas fa-volume-up';
   }
 
   if (volumeIcon) {
@@ -107,11 +100,11 @@
   }
 
   // ============================================================
-  // BUY ALBUM FUNCTION
+  // BUY ALBUM
   // ============================================================
   window.buyAlbum = async function(albumId) {
     const workerUrl = 'https://yoco-checkout.hyperproductionsa.workers.dev';
-    console.log('🔵 Buy Album clicked:', albumId);
+    console.log('🔵 Buy Album:', albumId);
 
     try {
       const response = await fetch(workerUrl, {
@@ -133,21 +126,19 @@
   };
 
   // ============================================================
-  // CHECK PAYMENT SUCCESS ON PAGE LOAD (MODAL)
+  // MODAL
   // ============================================================
   (function checkPaymentSuccess() {
     const url = new URL(window.location.href);
     const checkoutId = url.searchParams.get('checkoutId');
+    console.log('🔍 URL:', url.href, 'Checkout ID:', checkoutId);
     if (checkoutId) {
-      console.log('✅ Payment success! Checkout ID:', checkoutId);
+      console.log('✅ Payment success!');
       setTimeout(() => showSuccessModal(checkoutId), 500);
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   })();
 
-  // ============================================================
-  // SUCCESS MODAL
-  // ============================================================
   function showSuccessModal(checkoutId) {
     const productId = localStorage.getItem('lastPurchasedAlbum') || 'htc1';
     const album = allAlbums.find(a => a.id === productId);
@@ -162,44 +153,23 @@
     `;
 
     overlay.innerHTML = `
-      <div style="
-        background: #0f0f0f; border-radius: 24px; padding: 40px; max-width: 500px; width: 90%;
-        border: 1px solid #2a2a2a; text-align: center; position: relative;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.9);
-      ">
-        <div style="font-size: 64px; color: #e5de69; margin-bottom: 16px;">✓</div>
-        <h2 style="color: #e5de69; font-size: 1.8rem; font-weight: 700; margin-bottom: 8px;">Payment Successful!</h2>
-        <p style="color: #aaa; margin-bottom: 12px;">Thank you for your purchase.</p>
-        <div style="
-          color: #fff; font-weight: 500; font-size: 1.1rem; padding: 12px;
-          background: #1a1a1a; border-radius: 12px; border: 1px solid #2a2a2a;
-          margin: 16px 0;
-        ">${productName}</div>
-
-        <div style="display: flex; flex-direction: column; gap: 12px; margin: 20px 0;">
-          <button onclick="fetchDownloadLink('${checkoutId}', '${productId}')" style="
-            background: #e5de69; color: #0f0f0f; padding: 14px 24px;
-            border-radius: 40px; text-decoration: none; font-weight: 700;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            border: none; cursor: pointer; font-size: 1rem;
-          ">
+      <div style="background:#0f0f0f;border-radius:24px;padding:40px;max-width:500px;width:90%;border:1px solid #2a2a2a;text-align:center;">
+        <div style="font-size:64px;color:#e5de69;margin-bottom:16px;">✓</div>
+        <h2 style="color:#e5de69;font-size:1.8rem;font-weight:700;margin-bottom:8px;">Payment Successful!</h2>
+        <p style="color:#aaa;margin-bottom:12px;">Thank you for your purchase.</p>
+        <div style="color:#fff;font-weight:500;font-size:1.1rem;padding:12px;background:#1a1a1a;border-radius:12px;border:1px solid #2a2a2a;margin:16px 0;">${productName}</div>
+        <div style="display:flex;flex-direction:column;gap:12px;margin:20px 0;">
+          <button onclick="fetchDownloadLink('${checkoutId}','${productId}')" style="background:#e5de69;color:#0f0f0f;padding:14px 24px;border-radius:40px;border:none;cursor:pointer;font-size:1rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;">
             <i class="fas fa-download"></i> Download Now
           </button>
-          <button onclick="sendEmailModal('${checkoutId}', '${productName}')" style="
-            background: transparent; color: #e5de69; padding: 14px 24px;
-            border-radius: 40px; text-decoration: none; font-weight: 700;
-            border: 2px solid #e5de69; cursor: pointer; font-size: 1rem;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-          ">
+          <button onclick="sendEmailModal('${checkoutId}','${productName}')" style="background:transparent;color:#e5de69;padding:14px 24px;border-radius:40px;border:2px solid #e5de69;cursor:pointer;font-size:1rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;">
             <i class="fas fa-envelope"></i> Send Via Email
           </button>
         </div>
-
-        <p style="color: #666; font-size: .85rem;">🔒 You will receive a download link shortly.</p>
-        <button onclick="closeModal()" style="margin-top: 20px; background: none; border: none; color: #666; cursor: pointer; font-size: .85rem;">Close</button>
+        <p style="color:#666;font-size:.85rem;">🔒 You will receive a download link shortly.</p>
+        <button onclick="closeModal()" style="margin-top:20px;background:none;border:none;color:#666;cursor:pointer;font-size:.85rem;">Close</button>
       </div>
     `;
-
     document.body.appendChild(overlay);
   }
 
@@ -229,40 +199,28 @@
   };
 
   window.sendEmailModal = function(checkoutId, productName) {
-    const email = prompt('Enter your email address to receive the download link:');
+    const email = prompt('Enter your email address:');
     if (!email || !email.includes('@')) {
       if (email) alert('Please enter a valid email address.');
       return;
     }
-
     fetch('https://yoco-success.hyperproductionsa.workers.dev/send-email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        checkoutId: checkoutId,
-        email: email,
-        productName: productName
-      })
+      body: JSON.stringify({ checkoutId, email, productName })
     })
     .then(r => r.json())
-    .then(data => {
-      if (data.success) {
-        alert('✅ Download link sent to ' + email + '!');
-      } else {
-        alert('❌ Failed to send email. Please try again.');
-      }
-    })
-    .catch(() => alert('❌ Error sending email.'));
+    .then(data => data.success ? alert('✅ Link sent to ' + email + '!') : alert('❌ Failed to send.'))
+    .catch(() => alert('❌ Error sending.'));
   };
 
   // ============================================================
-  // COUNTDOWN TIMER
+  // COUNTDOWN
   // ============================================================
   function updateCountdown() {
     if (!countdownOverlay) return;
     const now = new Date();
     const diff = releaseDate - now;
-
     if (diff <= 0) {
       countdownOverlay.innerHTML = `
         <div style="color:#e5de69;font-size:2rem;margin-bottom:8px;"><i class="fas fa-check-circle"></i></div>
@@ -272,12 +230,10 @@
       `;
       return;
     }
-
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
     if (cdDays) cdDays.textContent = String(days).padStart(2, '0');
     if (cdHours) cdHours.textContent = String(hours).padStart(2, '0');
     if (cdMinutes) cdMinutes.textContent = String(minutes).padStart(2, '0');
@@ -287,17 +243,14 @@
   }
 
   // ============================================================
-  // UPDATE ARTWORK - SIMPLIFIED (No Mobile/PC difference)
+  // ARTWORK - SIMPLE LOGIC
   // ============================================================
   function updateArtwork(album) {
     if (!artImg || !countdownOverlay) return;
-
-    // If there's a playing album (or an album passed in), show its artwork
     if (album && !album.isCS) {
       artImg.src = getImage(album);
       countdownOverlay.style.display = 'none';
     } else {
-      // Nothing playing → show HTC5 with countdown
       const defaultAlbum = allAlbums[4];
       artImg.src = getImage(defaultAlbum);
       countdownOverlay.style.display = 'flex';
@@ -306,7 +259,7 @@
   }
 
   // ============================================================
-  // BUY BUTTON
+  // REST OF PLAYER LOGIC
   // ============================================================
   function updateBuyButton(album) {
     if (!album || album.isCS) {
@@ -325,9 +278,6 @@
     }
   }
 
-  // ============================================================
-  // UPDATE NOW PLAYING UI
-  // ============================================================
   function updateNowPlaying() {
     if (!playingTrack || !playingAlbum) {
       if (footerTitle) footerTitle.textContent = 'Select a track';
@@ -343,33 +293,24 @@
     if (pfTitle) pfTitle.textContent = title;
     if (pfArtist) pfArtist.textContent = playingTrack.artist;
     updateMobileText(title, playingTrack.artist);
-
     const art = getImage(playingAlbum);
     if (footerArt) footerArt.src = art;
     if (pmArt) pmArt.src = art;
     if (pfArt) pfArt.src = art;
   }
 
-  // ============================================================
-  // MOBILE TEXT SCROLL
-  // ============================================================
   function updateMobileText(title, artist) {
     if (!pmTitle || !pmArtist) return;
     pmTitle.textContent = title || 'Select a track';
     pmArtist.textContent = artist || '—';
-
     pmTitle.classList.remove('scroll');
     void pmTitle.offsetWidth;
     if (pmTitle.scrollWidth > pmTitle.clientWidth) pmTitle.classList.add('scroll');
-
     pmArtist.classList.remove('scroll');
     void pmArtist.offsetWidth;
     if (pmArtist.scrollWidth > pmArtist.clientWidth) pmArtist.classList.add('scroll');
   }
 
-  // ============================================================
-  // MEDIA SESSION API
-  // ============================================================
   function setupMediaSession() {
     if (!('mediaSession' in navigator) || !playingTrack || !playingAlbum) return;
     const title = playingTrack.mix ? `${playingTrack.title} (${playingTrack.mix})` : playingTrack.title;
@@ -379,38 +320,17 @@
       album: playingAlbum.title,
       artwork: [{ src: getImage(playingAlbum), sizes: '512x512', type: 'image/jpeg' }]
     });
-
-    navigator.mediaSession.setActionHandler('play', () => {
-      audio.play();
-      isPlaying = true;
-      updatePlayBtn();
-      startProgress();
-    });
-    navigator.mediaSession.setActionHandler('pause', () => {
-      audio.pause();
-      isPlaying = false;
-      updatePlayBtn();
-      clearInterval(timer);
-    });
-    navigator.mediaSession.setActionHandler('previoustrack', () => {
-      if (playingAlbum) prevTrack();
-    });
-    navigator.mediaSession.setActionHandler('nexttrack', () => {
-      if (playingAlbum) nextTrack();
-    });
+    navigator.mediaSession.setActionHandler('play', () => { audio.play(); isPlaying = true; updatePlayBtn(); startProgress(); });
+    navigator.mediaSession.setActionHandler('pause', () => { audio.pause(); isPlaying = false; updatePlayBtn(); clearInterval(timer); });
+    navigator.mediaSession.setActionHandler('previoustrack', () => { if (playingAlbum) prevTrack(); });
+    navigator.mediaSession.setActionHandler('nexttrack', () => { if (playingAlbum) nextTrack(); });
   }
 
-  // ============================================================
-  // VIEW FUNCTIONS
-  // ============================================================
   function showAlbumList() {
     if (albumList) albumList.style.display = 'flex';
     if (tracklistWrap) tracklistWrap.style.display = 'none';
     if (backBtn) backBtn.style.display = 'none';
-    if (headerBadge) {
-      headerBadge.style.display = 'inline';
-      headerBadge.textContent = '5 albums';
-    }
+    if (headerBadge) { headerBadge.style.display = 'inline'; headerBadge.textContent = '5 albums'; }
     if (tlBuyBtn) tlBuyBtn.style.display = 'none';
   }
 
@@ -421,9 +341,6 @@
     if (headerBadge) headerBadge.style.display = 'none';
   }
 
-  // ============================================================
-  // RENDER FUNCTIONS
-  // ============================================================
   function renderAlbums() {
     if (!albumList) return;
     const sorted = [...allAlbums].reverse();
@@ -456,9 +373,7 @@
     if (tlTitle) tlTitle.textContent = album.title;
     if (tlArtist) tlArtist.textContent = `${album.artist} · ${album.year}`;
     viewedAlbum = album;
-
     updateBuyButton(album);
-
     if (isLocked || album.isCS) {
       tracklist.innerHTML = `
         <div class="track-item locked" style="background:#1a1a1a;border-bottom:1px solid #2a2a2a;padding:10px 14px;cursor:default;">
@@ -483,10 +398,8 @@
       });
       return;
     }
-
     const state = albumStates[album.id];
     const savedIdx = state ? state.playingIdx : 0;
-
     tracklist.innerHTML = album.tracks.map((t, i) => {
       const isSavedTrack = (state && i === savedIdx);
       const isActive = (playingAlbum && playingAlbum.id === album.id && i === playingIdx);
@@ -512,91 +425,45 @@
     });
   }
 
-  // ============================================================
-  // LOAD ALBUM
-  // ============================================================
   function loadAlbum(idx) {
     const album = allAlbums[idx];
     const isLocked = album.isCS || false;
     viewedAlbum = album;
-
     updateArtwork(album);
     updateBuyButton(album);
     renderTracklist(album, isLocked);
   }
 
-  // ============================================================
-  // PLAY TRACK
-  // ============================================================
   function playTrack(idx, album) {
     if (!album) album = viewedAlbum;
     if (!album || album.isCS) return;
-
     const track = album.tracks[idx];
     if (!track) return;
-
     playingAlbum = album;
     playingTrack = track;
     playingIdx = idx;
     albumStates[album.id] = { playingIdx: idx };
-
     const url = getAudio(album, track);
-
     if (audio.src === url) {
-      if (isPlaying) {
-        audio.pause();
-        isPlaying = false;
-        clearInterval(timer);
-      } else {
-        audio.play().then(() => {
-          isPlaying = true;
-          startProgress();
-        }).catch(err => console.warn('Playback blocked:', err));
-      }
+      if (isPlaying) { audio.pause(); isPlaying = false; clearInterval(timer); }
+      else { audio.play().then(() => { isPlaying = true; startProgress(); }).catch(err => console.warn('Playback blocked:', err)); }
       updatePlayBtn();
       return;
     }
-
     audio.src = url;
     audio.load();
-
     updateNowPlaying();
     setupMediaSession();
     renderTracklist(album, false);
     renderAlbums();
-
-    // UPDATE ARTWORK TO SHOW PLAYING ALBUM
     updateArtwork(album);
-
-    audio.play().then(() => {
-      isPlaying = true;
-      updatePlayBtn();
-      startProgress();
-    }).catch(err => {
-      console.warn('Playback blocked:', err);
-      isPlaying = false;
-      updatePlayBtn();
-    });
+    audio.play().then(() => { isPlaying = true; updatePlayBtn(); startProgress(); }).catch(err => { isPlaying = false; updatePlayBtn(); });
   }
 
-  // ============================================================
-  // CONTROLS
-  // ============================================================
   function togglePlay() {
-    if (!playingTrack) {
-      if (viewedAlbum && !viewedAlbum.isCS) playTrack(0, viewedAlbum);
-      return;
-    }
-    if (isPlaying) {
-      audio.pause();
-      isPlaying = false;
-      clearInterval(timer);
-    } else {
-      audio.play().then(() => {
-        isPlaying = true;
-        startProgress();
-      }).catch(err => console.warn('Playback blocked:', err));
-    }
+    if (!playingTrack) { if (viewedAlbum && !viewedAlbum.isCS) playTrack(0, viewedAlbum); return; }
+    if (isPlaying) { audio.pause(); isPlaying = false; clearInterval(timer); }
+    else { audio.play().then(() => { isPlaying = true; startProgress(); }).catch(err => console.warn('Playback blocked:', err)); }
     updatePlayBtn();
   }
 
@@ -641,27 +508,10 @@
     }
   }
 
-  function nextTrack() {
-    if (!playingAlbum) return;
-    const nextIdx = (playingIdx + 1) % playingAlbum.tracks.length;
-    albumStates[playingAlbum.id] = { playingIdx: nextIdx };
-    playTrack(nextIdx, playingAlbum);
-  }
+  function nextTrack() { if (!playingAlbum) return; const nextIdx = (playingIdx + 1) % playingAlbum.tracks.length; albumStates[playingAlbum.id] = { playingIdx: nextIdx }; playTrack(nextIdx, playingAlbum); }
+  function prevTrack() { if (!playingAlbum) return; const prevIdx = (playingIdx - 1 + playingAlbum.tracks.length) % playingAlbum.tracks.length; albumStates[playingAlbum.id] = { playingIdx: prevIdx }; playTrack(prevIdx, playingAlbum); }
 
-  function prevTrack() {
-    if (!playingAlbum) return;
-    const prevIdx = (playingIdx - 1 + playingAlbum.tracks.length) % playingAlbum.tracks.length;
-    albumStates[playingAlbum.id] = { playingIdx: prevIdx };
-    playTrack(prevIdx, playingAlbum);
-  }
-
-  function goBack() {
-    showAlbumList();
-    updateArtwork(playingAlbum); // Show playing album art if any, else countdown
-    if (artBuyContainer) artBuyContainer.style.display = 'none';
-    if (tlBuyBtn) tlBuyBtn.style.display = 'none';
-  }
-
+  function goBack() { showAlbumList(); updateArtwork(playingAlbum); if (artBuyContainer) artBuyContainer.style.display = 'none'; if (tlBuyBtn) tlBuyBtn.style.display = 'none'; }
   function openFull() { if (pf) pf.classList.add('active'); }
   function closeFull() { if (pf) pf.classList.remove('active'); }
 
@@ -688,20 +538,14 @@
   // ============================================================
   renderAlbums();
   showAlbumList();
-
-  // Start with HTC5 + countdown (nothing playing)
   updateArtwork(null);
-
   updateMobileText('Select a track', '—');
   if (footerArt) footerArt.src = getImage(allAlbums[4]);
   if (pmArt) pmArt.src = getImage(allAlbums[4]);
-
   if (artBuyContainer) artBuyContainer.style.display = 'none';
   if (tlBuyBtn) tlBuyBtn.style.display = 'none';
-
   updateCountdown();
   setInterval(updateCountdown, 1000);
-
   updateVolumeIcon();
 
   const main = document.getElementById('main');
@@ -712,5 +556,4 @@
   };
   resize();
   window.onresize = resize;
-
 })();
