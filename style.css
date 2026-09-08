@@ -4,17 +4,20 @@
   box-sizing: border-box;
   font-family: 'Roboto', -apple-system, sans-serif;
 }
-html,
-body {
+
+html, body {
   height: 100%;
   background: #0b0b0b;
+  overflow: hidden;
 }
+
 body {
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 20px;
 }
+
 #app {
   max-width: 1360px;
   width: 100%;
@@ -27,9 +30,12 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  position: relative;
 }
 
-/* HEADER */
+/* ============================================================
+   HEADER - STICKY
+   ============================================================ */
 header {
   display: flex;
   justify-content: space-between;
@@ -38,23 +44,31 @@ header {
   padding: 14px 24px;
   flex-shrink: 0;
   min-height: 64px;
+  background: #0f0f0f;
+  z-index: 10;
+  position: sticky;
+  top: 0;
 }
+
 .header-left {
   display: flex;
   align-items: center;
   gap: 12px;
 }
+
 #logo {
   height: 32px;
   width: auto;
   object-fit: contain;
 }
+
 #brandName {
   color: #e5de69;
   font-size: 1.2rem;
   font-weight: 700;
   letter-spacing: -0.5px;
 }
+
 #backBtn {
   background: none;
   border: none;
@@ -66,12 +80,15 @@ header {
   border-radius: 20px;
   display: none;
 }
+
 #backBtn:hover {
   background: #1e1d12;
 }
+
 #backBtn i {
   margin-right: 6px;
 }
+
 #headerBadge {
   color: #fff;
   font-size: 0.8rem;
@@ -82,7 +99,9 @@ header {
   font-weight: 300;
 }
 
-/* MAIN */
+/* ============================================================
+   MAIN CONTENT - FILLS REMAINING SPACE
+   ============================================================ */
 main {
   display: flex;
   gap: 24px;
@@ -92,7 +111,9 @@ main {
   overflow: hidden;
 }
 
-/* LEFT: ART - STATIC */
+/* ============================================================
+   LEFT: ART - STATIC
+   ============================================================ */
 .art-section {
   flex: 0 0 42%;
   display: flex;
@@ -102,6 +123,7 @@ main {
   height: 100%;
   overflow: hidden;
 }
+
 .art-wrap {
   position: relative;
   width: 100%;
@@ -112,6 +134,7 @@ main {
   border: 1px solid #2a2a2a;
   flex-shrink: 0;
 }
+
 .art-wrap img {
   width: 100%;
   height: 100%;
@@ -134,11 +157,13 @@ main {
   padding: 20px;
   backdrop-filter: blur(4px);
 }
+
 .countdown-icon {
   color: #e5de69;
   font-size: 2rem;
   margin-bottom: 8px;
 }
+
 .countdown-badge {
   color: #e5de69;
   font-size: 0.8rem;
@@ -150,17 +175,20 @@ main {
   border: 1px solid #e5de69;
   margin-bottom: 10px;
 }
+
 .countdown-timer {
   display: flex;
   gap: 12px;
   margin: 8px 0;
 }
+
 .countdown-block {
   display: flex;
   flex-direction: column;
   align-items: center;
   min-width: 50px;
 }
+
 .countdown-number {
   color: #fff;
   font-size: 2rem;
@@ -168,6 +196,7 @@ main {
   line-height: 1;
   letter-spacing: -1px;
 }
+
 .countdown-label {
   color: #999;
   font-size: 0.55rem;
@@ -176,14 +205,17 @@ main {
   margin-top: 2px;
   font-weight: 300;
 }
+
 .countdown-sub {
   color: #aaa;
   font-size: 0.85rem;
 }
+
 .countdown-overlay small {
   color: #888;
   font-size: 0.75rem;
 }
+
 .countdown-overlay small i {
   color: #e5de69;
 }
@@ -197,6 +229,7 @@ main {
   padding: 8px 0;
   flex-shrink: 0;
 }
+
 .buy-btn {
   background: #e5de69;
   color: #0f0f0f;
@@ -211,17 +244,21 @@ main {
   align-items: center;
   gap: 10px;
 }
+
 .buy-btn:hover {
   background: #f5ee79;
   transform: scale(1.02);
 }
+
 .buy-price {
   color: #e5de69;
   font-size: 1rem;
   font-weight: 700;
 }
 
-/* RIGHT: SCROLLABLE PLAYLIST */
+/* ============================================================
+   RIGHT: SCROLLABLE PLAYLIST
+   ============================================================ */
 .list-section {
   flex: 1;
   display: flex;
@@ -230,6 +267,7 @@ main {
   overflow: hidden;
   height: 100%;
 }
+
 #albumList {
   display: flex;
   flex-direction: column;
@@ -238,6 +276,7 @@ main {
   padding-right: 4px;
   flex: 1;
 }
+
 .album-item {
   display: flex;
   align-items: center;
@@ -250,10 +289,12 @@ main {
   transition: 0.2s;
   flex-shrink: 0;
 }
+
 .album-item:hover {
   background: #1d1d1d;
   border-color: #e5de6960;
 }
+
 .album-item .ai-art {
   width: 44px;
   height: 44px;
@@ -262,15 +303,18 @@ main {
   flex-shrink: 0;
   border: 1px solid #333;
 }
+
 .album-item .ai-art img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
+
 .album-item .ai-info {
   flex: 1;
   min-width: 0;
 }
+
 .album-item .ai-info .ai-title {
   color: #fff;
   font-weight: 500;
@@ -279,6 +323,7 @@ main {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 .album-item .ai-info .ai-artist {
   color: #aaa;
   font-size: 0.8rem;
@@ -287,6 +332,7 @@ main {
   text-overflow: ellipsis;
   font-weight: 300;
 }
+
 .album-item .ai-badge {
   color: #e5de69;
   font-size: 0.7rem;
@@ -297,6 +343,7 @@ main {
   border: 1px solid #e5de6940;
   flex-shrink: 0;
 }
+
 .album-item .ai-cart {
   color: #e5de69;
   font-size: 1rem;
@@ -305,19 +352,23 @@ main {
   cursor: pointer;
   flex-shrink: 0;
 }
+
 .album-item:hover .ai-cart {
   opacity: 0.6;
 }
+
 .album-item .ai-cart:hover {
   opacity: 1 !important;
   transform: scale(1.1);
 }
+
 .album-item .ai-play {
   color: #e5de69;
   font-size: 1.2rem;
   opacity: 0;
   transition: 0.2s;
 }
+
 .album-item:hover .ai-play {
   opacity: 0.5;
 }
@@ -333,6 +384,7 @@ main {
   border: 1px solid #262626;
   overflow: hidden;
 }
+
 #tracklistHeader {
   display: flex;
   align-items: center;
@@ -343,16 +395,19 @@ main {
   flex-shrink: 0;
   flex-wrap: wrap;
 }
+
 #tlTitle {
   color: #fff;
   font-weight: 500;
   font-size: 0.95rem;
 }
+
 #tlArtist {
   color: #aaa;
   font-size: 0.8rem;
   font-weight: 300;
 }
+
 .buy-btn-small {
   background: #e5de69;
   color: #0f0f0f;
@@ -369,15 +424,18 @@ main {
   margin-left: auto;
   flex-shrink: 0;
 }
+
 .buy-btn-small:hover {
   background: #f5ee79;
   transform: scale(1.02);
 }
+
 #tracklist {
   flex: 1;
   overflow-y: auto;
   padding: 4px 0;
 }
+
 .track-item {
   display: flex;
   align-items: center;
@@ -388,13 +446,16 @@ main {
   border-bottom: 1px solid #1a1a1a;
   flex-shrink: 0;
 }
+
 .track-item:hover {
   background: #1d1d1d;
 }
+
 .track-item.active {
   background: #1a1910;
   border-left: 3px solid #e5de69;
 }
+
 .track-item .ti-play {
   color: #e5de69;
   font-size: 1rem;
@@ -402,10 +463,12 @@ main {
   text-align: center;
   flex-shrink: 0;
 }
+
 .track-item .ti-info {
   flex: 1;
   min-width: 0;
 }
+
 .track-item .ti-info .ti-title {
   color: #fff;
   font-weight: 500;
@@ -414,6 +477,7 @@ main {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 .track-item .ti-info .ti-artist {
   color: #aaa;
   font-size: 0.75rem;
@@ -422,33 +486,42 @@ main {
   text-overflow: ellipsis;
   font-weight: 300;
 }
+
 .track-item.active .ti-info .ti-title {
   color: #e5de69;
 }
+
 .track-item .ti-dur {
   color: #666;
   font-size: 0.7rem;
   flex-shrink: 0;
 }
+
 .track-item.locked {
   opacity: 0.5;
   cursor: default;
   pointer-events: none;
 }
+
 .track-item.locked .ti-play {
   color: #444;
 }
+
 .track-item.locked .ti-info .ti-title {
   color: #666;
 }
+
 .track-item.locked .ti-info .ti-artist {
   color: #555;
 }
+
 .track-item.locked .ti-dur {
   color: #444;
 }
 
-/* PC FOOTER */
+/* ============================================================
+   PC FOOTER - STICKY
+   ============================================================ */
 #pcFooter {
   display: flex;
   align-items: center;
@@ -459,7 +532,11 @@ main {
   flex-shrink: 0;
   gap: 16px;
   min-height: 72px;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
 }
+
 .footer-left {
   display: flex;
   align-items: center;
@@ -467,6 +544,7 @@ main {
   min-width: 160px;
   flex: 0 0 28%;
 }
+
 #footerArt {
   width: 44px;
   height: 44px;
@@ -474,11 +552,13 @@ main {
   object-fit: cover;
   border: 1px solid #333;
 }
+
 .footer-info {
   display: flex;
   flex-direction: column;
   min-width: 0;
 }
+
 #footerTitle {
   color: #fff;
   font-size: 0.85rem;
@@ -487,6 +567,7 @@ main {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 #footerArtist {
   color: #aaa;
   font-size: 0.7rem;
@@ -495,6 +576,7 @@ main {
   text-overflow: ellipsis;
   font-weight: 300;
 }
+
 .footer-center {
   flex: 1;
   display: flex;
@@ -504,19 +586,23 @@ main {
   min-width: 0;
   padding: 0 16px;
 }
+
 .footer-controls {
   display: flex;
   align-items: center;
   gap: 20px;
   color: #e5de69;
 }
+
 .footer-controls i {
   font-size: 1.1rem;
   cursor: pointer;
 }
+
 .footer-controls i:nth-child(2) {
   font-size: 1.8rem;
 }
+
 .footer-progress {
   display: flex;
   align-items: center;
@@ -524,12 +610,14 @@ main {
   width: 100%;
   max-width: 450px;
 }
+
 #footerCur,
 #footerTot {
   color: #888;
   font-size: 0.6rem;
   min-width: 28px;
 }
+
 .footer-progress-bar {
   flex: 1;
   height: 3px;
@@ -539,12 +627,14 @@ main {
   cursor: pointer;
   position: relative;
 }
+
 .footer-progress-fill {
   height: 100%;
   background: #e5de69;
   border-radius: 2px;
   width: 0%;
 }
+
 .footer-right {
   flex: 0 0 28%;
   display: flex;
@@ -553,11 +643,13 @@ main {
   gap: 10px;
   min-width: 100px;
 }
+
 #volumeIcon {
   color: #888;
   font-size: 1rem;
   cursor: pointer;
 }
+
 #volumeSlider {
   width: 80px;
   height: 4px;
@@ -567,6 +659,7 @@ main {
   outline: none;
   cursor: pointer;
 }
+
 #volumeSlider::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: 12px;
@@ -576,7 +669,9 @@ main {
   cursor: pointer;
 }
 
-/* MOBILE BOTTOM PLAYER */
+/* ============================================================
+   MOBILE BOTTOM PLAYER - STICKY
+   ============================================================ */
 #playerMobile {
   display: none;
   position: sticky;
@@ -586,11 +681,13 @@ main {
   border-top: 1px solid #2a2a2a;
   align-items: center;
   justify-content: space-between;
-  z-index: 100;
+  z-index: 10;
   min-height: 60px;
   gap: 10px;
   flex-shrink: 0;
+  margin-top: auto;
 }
+
 .pm-left {
   display: flex;
   align-items: center;
@@ -598,6 +695,7 @@ main {
   flex: 1;
   min-width: 0;
 }
+
 .pm-left img {
   width: 40px;
   height: 40px;
@@ -605,6 +703,7 @@ main {
   object-fit: cover;
   border: 1px solid #333;
 }
+
 .pm-info {
   flex: 1;
   min-width: 0;
@@ -614,6 +713,7 @@ main {
   justify-content: center;
   overflow: hidden;
 }
+
 #pmTitle {
   color: #fff;
   font-weight: 500;
@@ -623,12 +723,14 @@ main {
   text-overflow: ellipsis;
   width: 100%;
 }
+
 #pmTitle.scroll {
   animation: scroll-title 12s linear infinite;
   width: fit-content;
   max-width: none;
   padding-right: 30px;
 }
+
 #pmArtist {
   color: #aaa;
   font-size: 0.65rem;
@@ -638,12 +740,14 @@ main {
   width: 100%;
   font-weight: 300;
 }
+
 #pmArtist.scroll {
   animation: scroll-title 12s linear infinite;
   width: fit-content;
   max-width: none;
   padding-right: 30px;
 }
+
 @keyframes scroll-title {
   0% {
     transform: translateX(0);
@@ -652,6 +756,7 @@ main {
     transform: translateX(-50%);
   }
 }
+
 .pm-controls {
   display: flex;
   align-items: center;
@@ -659,10 +764,12 @@ main {
   color: #e5de69;
   flex-shrink: 0;
 }
+
 .pm-controls i {
   font-size: 1.4rem;
   cursor: pointer;
 }
+
 .pm-expand {
   color: #666;
   padding: 0 4px;
@@ -683,9 +790,11 @@ main {
   padding: 20px 24px 30px;
   z-index: 1000;
 }
+
 #playerFull.active {
   display: flex;
 }
+
 .pf-header {
   display: flex;
   justify-content: space-between;
@@ -694,15 +803,18 @@ main {
   color: #fff;
   flex-shrink: 0;
 }
+
 .pf-header i {
   font-size: 1.4rem;
   cursor: pointer;
   color: #888;
 }
+
 .pf-header span {
   font-weight: 500;
   color: #fff;
 }
+
 #playerFull img {
   width: 100%;
   max-width: 320px;
@@ -713,21 +825,25 @@ main {
   border: 1px solid #2a2a2a;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
 }
+
 .pf-info {
   text-align: center;
   margin-bottom: 12px;
   flex-shrink: 0;
 }
+
 #pfTitle {
   color: #fff;
   font-size: 1rem;
   font-weight: 500;
 }
+
 #pfArtist {
   color: #aaa;
   font-size: 0.8rem;
   font-weight: 300;
 }
+
 .pf-bar {
   display: flex;
   align-items: center;
@@ -735,11 +851,13 @@ main {
   margin-bottom: 16px;
   flex-shrink: 0;
 }
+
 .pf-bar span {
   color: #888;
   font-size: 0.65rem;
   min-width: 32px;
 }
+
 .pf-progress {
   flex: 1;
   height: 4px;
@@ -749,12 +867,14 @@ main {
   cursor: pointer;
   position: relative;
 }
+
 .pf-fill {
   height: 100%;
   background: #e5de69;
   border-radius: 2px;
   width: 0%;
 }
+
 .pf-btns {
   display: flex;
   justify-content: center;
@@ -763,15 +883,18 @@ main {
   color: #e5de69;
   flex-shrink: 0;
 }
+
 .pf-btns i {
   font-size: 1.8rem;
   cursor: pointer;
 }
+
 .pf-btns i:first-child,
 .pf-btns i:last-child {
   font-size: 1.2rem;
   opacity: 0.7;
 }
+
 .pf-btns i:nth-child(2) {
   font-size: 2.8rem;
 }
@@ -781,10 +904,12 @@ main {
 #tracklist::-webkit-scrollbar {
   width: 3px;
 }
+
 #albumList::-webkit-scrollbar-track,
 #tracklist::-webkit-scrollbar-track {
   background: #1a1a1a;
 }
+
 #albumList::-webkit-scrollbar-thumb,
 #tracklist::-webkit-scrollbar-thumb {
   background: #e5de69;
@@ -798,6 +923,7 @@ main {
   body {
     padding: 0;
   }
+
   #app {
     height: 100vh;
     max-height: none;
@@ -807,21 +933,29 @@ main {
     padding-top: env(safe-area-inset-top, 0);
     padding-bottom: env(safe-area-inset-bottom, 0);
   }
+
   header {
     padding: 10px 16px;
     min-height: 56px;
     flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
   }
+
   #logo {
     height: 24px;
   }
+
   #brandName {
     font-size: 1rem;
   }
+
   #headerBadge {
     font-size: 0.65rem;
     padding: 4px 10px;
   }
+
   #backBtn {
     font-size: 0.8rem;
     padding: 4px 10px;
@@ -842,30 +976,38 @@ main {
     margin: 0 auto;
     height: auto;
   }
+
   .art-wrap {
     border-radius: 16px;
   }
+
   .countdown-number {
     font-size: 1.6rem;
     min-width: 36px;
   }
+
   .countdown-block {
     min-width: 38px;
   }
+
   .countdown-timer {
     gap: 6px;
   }
+
   .countdown-badge {
     font-size: 0.7rem;
     padding: 3px 14px;
   }
+
   .art-buy-container {
     padding: 6px 0;
   }
+
   .buy-btn {
     padding: 8px 18px;
     font-size: 0.85rem;
   }
+
   .buy-price {
     font-size: 0.85rem;
   }
@@ -875,21 +1017,26 @@ main {
     min-height: 0;
     height: auto;
   }
+
   #albumList {
     flex: 1;
     gap: 4px;
     min-height: 0;
   }
+
   .album-item {
     padding: 6px 10px;
   }
+
   .album-item .ai-art {
     width: 32px;
     height: 32px;
   }
+
   .album-item .ai-info .ai-title {
     font-size: 0.75rem;
   }
+
   .album-item .ai-info .ai-artist {
     font-size: 0.65rem;
   }
@@ -898,25 +1045,32 @@ main {
     flex: 1;
     min-height: 0;
   }
+
   #tracklistHeader {
     padding: 6px 10px;
   }
+
   #tlTitle {
     font-size: 0.8rem;
   }
+
   #tlArtist {
     font-size: 0.65rem;
   }
+
   .buy-btn-small {
     padding: 3px 10px;
     font-size: 0.6rem;
   }
+
   .track-item {
     padding: 5px 10px;
   }
+
   .track-item .ti-info .ti-title {
     font-size: 0.75rem;
   }
+
   .track-item .ti-info .ti-artist {
     font-size: 0.65rem;
   }
@@ -926,7 +1080,7 @@ main {
     display: none;
   }
 
-  /* Mobile bottom player */
+  /* Mobile bottom player - STICKY */
   #playerMobile {
     display: flex;
     position: sticky;
@@ -934,12 +1088,15 @@ main {
     margin-top: auto;
     padding-bottom: env(safe-area-inset-bottom, 10px);
   }
+
   #pmTitle {
     font-size: 0.75rem;
   }
+
   #pmArtist {
     font-size: 0.6rem;
   }
+
   .pm-controls i {
     font-size: 1.2rem;
   }
@@ -950,72 +1107,92 @@ main {
     padding: 8px 12px;
     min-height: 48px;
   }
+
   #logo {
     height: 20px;
   }
+
   #brandName {
     font-size: 0.85rem;
   }
+
   #headerBadge {
     font-size: 0.55rem;
     padding: 3px 8px;
   }
+
   #backBtn {
     font-size: 0.7rem;
     padding: 3px 8px;
   }
+
   main {
     padding: 8px 12px;
     gap: 8px;
   }
+
   .art-section {
     max-width: 220px;
   }
+
   .countdown-number {
     font-size: 1.2rem;
     min-width: 28px;
   }
+
   .countdown-block {
     min-width: 30px;
   }
+
   .countdown-timer {
     gap: 4px;
   }
+
   .buy-btn {
     padding: 6px 14px;
     font-size: 0.75rem;
   }
+
   .buy-price {
     font-size: 0.75rem;
   }
+
   .album-item .ai-art {
     width: 28px;
     height: 28px;
   }
+
   .album-item .ai-info .ai-title {
     font-size: 0.7rem;
   }
+
   .track-item .ti-info .ti-title {
     font-size: 0.7rem;
   }
+
   .track-item .ti-info .ti-artist {
     font-size: 0.6rem;
   }
+
   #playerMobile {
     padding: 6px 10px;
     min-height: 50px;
   }
+
   .pm-left img {
     width: 32px;
     height: 32px;
   }
+
   #pmTitle {
     font-size: 0.7rem;
   }
+
   #pmArtist {
     font-size: 0.55rem;
   }
+
   .pm-controls i {
     font-size: 1.1rem;
   }
-    } 
+  }
