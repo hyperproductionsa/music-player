@@ -12,9 +12,6 @@
 </head>
 <body>
 
-<div id="app">
-
-  <!-- HEADER -->
   <header>
     <div class="header-left">
       <img src="http://hyperproduction.co.za/logo/HPSA-gold.png" alt="Hyper Production" id="logo" />
@@ -24,64 +21,42 @@
     <span id="headerBadge">5 albums</span>
   </header>
 
-  <!-- MAIN CONTENT -->
   <main id="main">
-
-    <!-- LEFT: COVER ART (STATIC) -->
     <section class="art-section" id="artSection">
       <div class="art-wrap" id="artWrap">
         <img id="artImg" src="https://cdn.htcoll.shop/images/HTC5.jpg" alt="cover" />
         <div class="countdown-overlay" id="countdownOverlay">
           <div class="countdown-icon"><i class="fas fa-clock"></i></div>
           <div class="countdown-badge">RELEASING IN</div>
-          <div class="countdown-timer" id="countdownTimer">
-            <span class="countdown-block">
-              <span class="countdown-number" id="cdDays">00</span>
-              <span class="countdown-label">Days</span>
-            </span>
-            <span class="countdown-block">
-              <span class="countdown-number" id="cdHours">00</span>
-              <span class="countdown-label">Hours</span>
-            </span>
-            <span class="countdown-block">
-              <span class="countdown-number" id="cdMinutes">00</span>
-              <span class="countdown-label">Mins</span>
-            </span>
-            <span class="countdown-block">
-              <span class="countdown-number" id="cdSeconds">00</span>
-              <span class="countdown-label">Secs</span>
-            </span>
+          <div class="countdown-timer">
+            <span class="countdown-block"><span class="countdown-number" id="cdDays">00</span><span class="countdown-label">Days</span></span>
+            <span class="countdown-block"><span class="countdown-number" id="cdHours">00</span><span class="countdown-label">Hours</span></span>
+            <span class="countdown-block"><span class="countdown-number" id="cdMinutes">00</span><span class="countdown-label">Mins</span></span>
+            <span class="countdown-block"><span class="countdown-number" id="cdSeconds">00</span><span class="countdown-label">Secs</span></span>
           </div>
           <div class="countdown-sub">HTs Collections V · 14 tracks</div>
           <small><i class="fas fa-calendar"></i> <span id="csDate">25 Sep 2026</span></small>
         </div>
       </div>
       <div class="art-buy-container" id="artBuyContainer" style="display:none;">
-        <button class="buy-btn" id="artBuyBtn">
-          <i class="fas fa-shopping-cart"></i> Buy Now
-        </button>
+        <button class="buy-btn" id="artBuyBtn"><i class="fas fa-shopping-cart"></i> Buy Now</button>
         <span class="buy-price" id="artBuyPrice">R150</span>
       </div>
     </section>
 
-    <!-- RIGHT: SCROLLABLE PLAYLIST -->
     <section class="list-section" id="listSection">
       <div id="albumList"></div>
       <div id="tracklistWrap" style="display:none;">
         <div id="tracklistHeader">
           <span id="tlTitle">HTs Collections</span>
           <span id="tlArtist">HyperSOUL-X · 2019</span>
-          <button class="buy-btn-small" id="tlBuyBtn" style="display:none;">
-            <i class="fas fa-shopping-cart"></i> Buy
-          </button>
+          <button class="buy-btn-small" id="tlBuyBtn" style="display:none;"><i class="fas fa-shopping-cart"></i> Buy</button>
         </div>
         <div id="tracklist"></div>
       </div>
     </section>
-
   </main>
 
-  <!-- PC FOOTER (STICKY) -->
   <footer id="pcFooter">
     <div class="footer-left">
       <img id="footerArt" src="https://cdn.htcoll.shop/images/HTC5.jpg" alt="cover" />
@@ -108,7 +83,6 @@
     </div>
   </footer>
 
-  <!-- MOBILE BOTTOM PLAYER -->
   <div id="playerMobile">
     <div class="pm-left">
       <img id="pmArt" src="https://cdn.htcoll.shop/images/HTC5.jpg" alt="cover" />
@@ -121,36 +95,20 @@
       <i class="fas fa-play-circle" id="pmPlay"></i>
       <i class="fas fa-forward" id="pmNext"></i>
     </div>
-    <div class="pm-expand" id="pmExpand">
-      <i class="fas fa-chevron-up"></i>
-    </div>
+    <div class="pm-expand" id="pmExpand"><i class="fas fa-chevron-up"></i></div>
   </div>
 
-  <!-- MOBILE FULL PLAYER -->
   <div id="playerFull">
-    <div class="pf-header">
-      <i class="fas fa-chevron-down" id="pfClose"></i>
-      <span>Now Playing</span>
-      <i class="fas fa-ellipsis-h"></i>
-    </div>
+    <div class="pf-header"><i class="fas fa-chevron-down" id="pfClose"></i><span>Now Playing</span><i class="fas fa-ellipsis-h"></i></div>
     <img id="pfArt" src="https://cdn.htcoll.shop/images/HTC5.jpg" alt="cover" />
-    <div class="pf-info">
-      <div id="pfTitle">Select a track</div>
-      <div id="pfArtist">—</div>
-    </div>
-    <div class="pf-bar">
-      <span id="pfCur">0:00</span>
-      <div class="pf-progress" id="pfProgress"><div class="pf-fill" id="pfFill"></div></div>
-      <span id="pfTot">0:00</span>
-    </div>
+    <div class="pf-info"><div id="pfTitle">Select a track</div><div id="pfArtist">—</div></div>
+    <div class="pf-bar"><span id="pfCur">0:00</span><div class="pf-progress" id="pfProgress"><div class="pf-fill" id="pfFill"></div></div><span id="pfTot">0:00</span></div>
     <div class="pf-btns">
       <i class="fas fa-step-backward" id="pfPrev"></i>
       <i class="fas fa-play-circle" id="pfPlay"></i>
       <i class="fas fa-step-forward" id="pfNext"></i>
     </div>
   </div>
-
-</div>
 
 <script src="player.js"></script>
 </body>
