@@ -592,28 +592,34 @@
   setInterval(updateCountdown, 1000);
   updateVolumeIcon();
 
+  // ============================================================
+  // RESIZE - FIXED MOBILE FOOTER
+  // ============================================================
   const main = document.getElementById('main');
-  const footer = document.getElementById('pcFooter');
+  const pcFooter = document.getElementById('pcFooter');
   const mobileFooter = document.getElementById('playerMobile');
 
-  const resize = () => {
+  function handleResize() {
     const isMobile = window.innerWidth <= 860;
+    
     if (main) {
       main.style.flexDirection = isMobile ? 'column' : 'row';
     }
-    // Show/hide PC footer
-    if (footer) {
-      footer.style.display = isMobile ? 'none' : 'flex';
+    
+    // PC footer - hide on mobile, show on desktop
+    if (pcFooter) {
+      pcFooter.style.display = isMobile ? 'none' : 'flex';
     }
-    // Show/hide mobile footer
+    
+    // Mobile footer - show on mobile, hide on desktop
     if (mobileFooter) {
       mobileFooter.style.display = isMobile ? 'flex' : 'none';
     }
-    // Update artwork on resize
+    
     updateArtwork(playingAlbum);
-  };
+  }
 
-  resize();
-  window.onresize = resize;
+  handleResize();
+  window.addEventListener('resize', handleResize);
 
 })();
