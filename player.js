@@ -1,1 +1,719 @@
-(async function(){const e=await fetch("data.json"),t=await e.json(),{baseUrl:r,comingSoon:a,albums:n,comingSoonAlbum:o}=t,i=new Date(a),s=new Audio,l=(e,t)=>`${r}/m4a/${e.folder}/${t.file}`,c=(e)=>`${r}/images/${e.cover}`;let d=null,u=null,m=0,p=!1,h=null,f=null,g={},v=document.getElementById.bind(document),b=v("albumList"),y=v("tracklistWrap"),w=v("tracklist"),A=v("tlTitle"),x=v("tlArtist"),E=v("tlBuyBtn"),C=v("backBtn"),S=v("headerBadge"),T=v("artImg"),B=v("countdownOverlay"),k=v("artBuyContainer"),M=v("artBuyBtn"),L=v("artBuyPrice"),O=v("cdDays"),P=v("cdHours"),N=v("cdMinutes"),I=v("cdSeconds"),R=v("csDate"),D=v("footerArt"),j=v("footerTitle"),F=v("footerArtist"),V=v("footerFill"),q=v("footerCur"),W=v("footerTot"),z=v("footerProgress"),H=v("footerPlay"),J=v("footerPrev"),K=v("footerNext"),Q=v("volumeSlider"),U=v("volumeIcon"),X=v("pmArt"),Y=v("pmTitle"),Z=v("pmArtist"),$=v("pmPlay"),ee=v("pmNext"),te=v("pmExpand"),re=v("playerFull"),ae=v("pfArt"),ne=v("pfTitle"),oe=v("pfArtist"),ie=v("pfFill"),se=v("pfCur"),le=v("pfTot"),ce=v("pfProgress"),de=v("pfPlay"),ue=v("pfPrev"),me=v("pfNext"),pe=v("pfClose"),he=[...n,{...o,isCS:!0}];s.volume=.8,Q&&(Q.value=.8,Q.addEventListener("input",function(){s.volume=parseFloat(this.value),function(){if(!U)return;const e=s.volume;0===e?U.className="fas fa-volume-mute":e<.5?U.className="fas fa-volume-down":U.className="fas fa-volume-up"}()})),U&&U.addEventListener("click",function(){s.volume>0?(s.volume=0,Q&&(Q.value=0)):(s.volume=.8,Q&&(Q.value=.8)),function(){if(!U)return;const e=s.volume;0===e?U.className="fas fa-volume-mute":e<.5?U.className="fas fa-volume-down":U.className="fas fa-volume-up"}()});window.buyAlbum=async function(e){const t="https://yoco-checkout.hyperproductionsa.workers.dev";console.log("\ud83d\udd35 Buy Album clicked:",e);try{const r=await fetch(t,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({productId:e,price:15000})}),a=await r.json();console.log("\ud83d\udd35 Response data:",a),a.checkoutId&&(localStorage.setItem("checkoutId",a.checkoutId),console.log("\u2705 Stored checkoutId in localStorage"));const n=a.redirectUrl||a.checkoutUrl;r.ok&&n?(console.log("\u2705 Redirecting to:",n),window.location.href=n):(alert("Payment error: "+(a.error||a.message||"Please try again.")),console.error("\u274c Payment error:",a))}catch(e){console.error("\u274c Fetch error:",e),alert("Payment error: "+e.message)}};function ge(){if(!B)return;const e=new Date,t=i-e;if(t<=0){B.innerHTML=`\n        <div style="color:#e5de69;font-size:2rem;margin-bottom:8px;"><i class="fas fa-check-circle"></i></div>\n        <div style="color:#e5de69;font-size:1rem;font-weight:700;background:#1e1d12;padding:6px 20px;border-radius:40px;border:2px solid #e5de69;margin-bottom:10px;">NOW AVAILABLE</div>\n        <h2 style="color:#fff;font-size:1.6rem;">HTs Collections V</h2>\n        <p style="color:#aaa;font-size:.85rem;margin:4px 0;">HyperSOUL-X \u00b7 2026 \u00b7 14 tracks</p>\n      `;return}const r=Math.floor(t/(864e5)),a=Math.floor(t%864e5/36e5),n=Math.floor(t%36e5/6e4),o=Math.floor(t%6e4/1e3);O&&(O.textContent=String(r).padStart(2,"0")),P&&(P.textContent=String(a).padStart(2,"0")),N&&(N.textContent=String(n).padStart(2,"0")),I&&(I.textContent=String(o).padStart(2,"0")),R&&(R.textContent=i.toLocaleDateString("en-US",{day:"numeric",month:"short",year:"numeric"})),B.style.display="flex"}function ve(e){if(!T||!B)return;const t=window.innerWidth<=860;if(t){const e=he[4];T.src=c(e),B.style.display="flex",ge();return}e&&!e.isCS?(T.src=c(e),B.style.display="none"):(T.src=c(he[4]),B.style.display="flex",ge())}function be(e){e&&!e.isCS?(k&&(k.style.display="flex",M&&(M.onclick=()=>buyAlbum(e.id),L&&(L.textContent="R150"))),E&&(E.style.display="flex",E.onclick=()=>buyAlbum(e.id))):(k&&(k.style.display="none"),E&&(E.style.display="none"))}function ye(e,t){Y?(Y.textContent=e||"Select a track",Z&&(Z.textContent=t||"—"),Y.classList.remove("scroll"),void Y.offsetWidth,Y.scrollWidth>Y.clientWidth&&Y.classList.add("scroll"),Z&&(Z.classList.remove("scroll"),void Z.offsetWidth,Z.scrollWidth>Z.clientWidth&&Z.classList.add("scroll"))):(j&&(j.textContent=e||"Select a track"),F&&(F.textContent=t||"—"))}function we(){if(d&&u){const e=u.mix?`${u.title} (${u.mix})`:u.title;j&&(j.textContent=e),F&&(F.textContent=u.artist),ne&&(ne.textContent=e),oe&&(oe.textContent=u.artist),ye(e,u.artist);const t=c(d);D&&(D.src=t),X&&(X.src=t),ae&&(ae.src=t)}else j&&(j.textContent="Select a track"),F&&(F.textContent="—"),ne&&(ne.textContent="Select a track"),oe&&(oe.textContent="—"),ye("Select a track","—")}function Ae(){if("mediaSession"in navigator&&u&&d){const e=u.mix?`${u.title} (${u.mix})`:u.title;navigator.mediaSession.metadata=new MediaMetadata({title:e,artist:u.artist,album:d.title,artwork:[{src:c(d),sizes:"512x512",type:"image/jpeg"}]}),navigator.mediaSession.setActionHandler("play",()=>{s.play(),p=!0,xe(),ke()}),navigator.mediaSession.setActionHandler("pause",()=>{s.pause(),p=!1,xe(),clearInterval(h)}),navigator.mediaSession.setActionHandler("previoustrack",()=>{d&&_e()}),navigator.mediaSession.setActionHandler("nexttrack",()=>{d&&Ce()})}}function xe(){const e=p?"fa-pause-circle":"fa-play-circle";H&&(H.className=`fas ${e}`),$&&($.className=`fas ${e}`),de&&(de.className=`fas ${e}`)}function ke(){clearInterval(h),h=setInterval(()=>{if(s.duration&&!isNaN(s.duration)){const e=s.currentTime/s.duration*100;V&&(V.style.width=e+"%"),ie&&(ie.style.width=e+"%");const t=Math.floor(s.currentTime/60),r=Math.floor(s.currentTime%60),a=Math.floor(s.duration/60),n=Math.floor(s.duration%60);q&&(q.textContent=`${t}:${String(r).padStart(2,"0")}`),se&&(se.textContent=q?q.textContent:"0:00"),W&&(W.textContent=`${a}:${String(n).padStart(2,"0")}`),le&&(le.textContent=W?W.textContent:"0:00")}},200)}function Me(e,t,r,a,n){const o=t.getBoundingClientRect(),i=(e.clientX-o.left)/o.width,l=Math.min(1,Math.max(0,i));if(s.duration&&!isNaN(s.duration)){s.currentTime=l*s.duration,r.style.width=l*100+"%";const e=Math.floor(s.currentTime/60),t=Math.floor(s.currentTime%60);a.textContent=`${e}:${String(t).padStart(2,"0")}`;const o=Math.floor(s.duration/60),i=Math.floor(s.duration%60);n.textContent=`${o}:${String(i).padStart(2,"0")}`}}function Le(){if(!d)return;const e=(m+1)%d.tracks.length;g[d.id]={playingIdx:e},_e(e,d)}function Oe(){if(!d)return;const e=(m-1+d.tracks.length)%d.tracks.length;g[d.id]={playingIdx:e},_e(e,d)}function Pe(){b&&(b.style.display="flex"),y&&(y.style.display="none"),C&&(C.style.display="none"),S&&(S.style.display="inline",S.textContent="5 albums"),E&&(E.style.display="none")}function Ne(){b&&(b.style.display="none"),y&&(y.style.display="flex"),C&&(C.style.display="inline"),S&&(S.style.display="none")}function Ie(){if(!b)return;const e=[...he].reverse();b.innerHTML=e.map((e,t)=>{const r=he.indexOf(e),a=e.isCS||!1,n=d&&d.id===e.id,o=void 0!==g[e.id];return`\n        <div class="album-item" data-idx="${r}">\n          <div class="ai-art"><img src="${c(e)}" alt="${e.title}" /></div>\n          <div class="ai-info">\n            <div class="ai-title">${e.title} ${n?"▶":""} ${o&&!n?"●":""}</div>\n            <div class="ai-artist">${e.artist} · ${e.year}</div>\n          </div>\n          ${a?'<div class="ai-badge">\ud83d\udd1c</div>':""}\n          <div class="ai-cart" onclick="event.stopPropagation(); buyAlbum('${e.id}')" title="Buy album"><i class="fas fa-shopping-cart"></i></div>\n          <div class="ai-play"><i class="fas fa-play-circle"></i></div>\n        </div>\n      `}).join(""),b.querySelectorAll(".album-item").forEach(e=>{e.onclick=()=>Re(parseInt(e.dataset.idx))})}function Re(e){const t=he[e],r=t.isCS||!1;f=t,ve(t),be(t),Ne(),A&&(A.textContent=t.title),x&&(x.textContent=`${t.artist} · ${t.year}`),r||t.isCS?(w.innerHTML=`\n        <div class="track-item locked" style="background:#1a1a1a;border-bottom:1px solid #2a2a2a;padding:10px 14px;cursor:default;">\n          <div class="ti-info" style="text-align:center;">\n            <div class="ti-title" style="color:#e5de69;font-size:.85rem;"><i class="fas fa-clock"></i> Coming ${new Date(t.releaseDate).toLocaleDateString("en-US",{day:"numeric",month:"short",year:"numeric"})}</div>\n            <div class="ti-artist" style="color:#888;">${t.trackCount||t.tracks.length} tracks</div>\n          </div>\n        </div>\n      `,t.tracks.forEach(e=>{const r=e.mix?`${e.title} (${e.mix})`:e.title;w.innerHTML+=`\n          <div class="track-item locked">\n            <div class="ti-play" style="color:#444;"><i class="fas fa-lock"></i></div>\n            <div class="ti-info">\n              <div class="ti-title" style="color:#666;">${r}</div>\n              <div class="ti-artist" style="color:#555;">${e.artist}</div>\n            </div>\n            <div class="ti-dur" style="color:#444;">\ud83d\udd12</div>\n          </div>\n        `})):(()=>{const e=g[t.id],r=e?e.playingIdx:0;w.innerHTML=t.tracks.map((e,a)=>{const n=g[t.id]&&a===r,o=d&&d.id===t.id&&a===m,i=e.mix?`${e.title} (${e.mix})`:e.title;return`\n        <div class="track-item ${o?"active":""}" data-idx="${a}">\n          <div class="ti-play"><i class="fas ${o?"fa-play-circle":"fa-play"}"></i></div>\n          <div class="ti-info">\n            <div class="ti-title">${i}</div>\n            <div class="ti-artist">${e.artist}</div>\n          </div>\n          <div class="ti-dur">${o?"\u25b6":n?"\u25cf":"\u266b"}</div>\n        </div>\n      `}).join(""),w.querySelectorAll(".track-item:not(.locked)").forEach(e=>{e.onclick=()=>{const t=f;if(!t||t.isCS)return;const r=parseInt(e.dataset.idx);De(r,t)}})})(),Ie()}function De(e,t){if(t||(t=f),!t||t.isCS)return;const r=t.tracks[e];if(!r)return;d=t,u=r,m=e,g[t.id]={playingIdx:e};const a=l(t,r);s.src===a?p?(s.pause(),p=!1,clearInterval(h)):(s.play().then(()=>{p=!0,xe(),ke()}).catch(()=>{}),xe()):(s.src=a,s.load(),we(),Ae(),Re(t,!1),Ie(),s.play().then(()=>{p=!0,xe(),ke()}).catch(()=>{p=!1,xe()}))}function je(){if(!u){if(f&&!f.isCS)return De(0,f);return}p?(s.pause(),p=!1,clearInterval(h)):s.play().then(()=>{p=!0,ke()}).catch(()=>{}),xe()}function Fe(){if(C)return C.onclick=function(){Pe(),ve(d),k&&(k.style.display="none"),E&&(E.style.display="none")};Pe();const e=he[4];ve(e),k&&(k.style.display="none"),E&&(E.style.display="none")}function Ve(){re&&re.classList.add("active")}function qe(){re&&re.classList.remove("active")}function We(){H&&(H.onclick=je),J&&(J.onclick=Oe),K&&(K.onclick=Le),$&&($.onclick=je),ee&&(ee.onclick=Le),te&&(te.onclick=Ve),de&&(de.onclick=je),ue&&(ue.onclick=Oe),me&&(me.onclick=Le),pe&&(pe.onclick=qe),C&&(C.onclick=Fe),s.onended=Le,z&&z.addEventListener("click",e=>Me(e,z,V,q,W)),ce&&ce.addEventListener("click",e=>Me(e,ce,ie,se,le))}Ie(),Pe();const ze=he[4];ve(ze),ye("Select a track","—"),D&&(D.src=c(ze)),X&&(X.src=c(ze)),k&&(k.style.display="none"),E&&(E.style.display="none"),ge(),setInterval(ge,1e3),function(){if(!U)return;const e=s.volume;0===e?U.className="fas fa-volume-mute":e<.5?U.className="fas fa-volume-down":U.className="fas fa-volume-up"}(),We();const He=document.getElementById("main"),Je=()=>{He&&(He.style.flexDirection=window.innerWidth<=860?"column":"row");const e=document.getElementById("pcFooter");e&&(e.style.display=window.innerWidth<=860?"none":"flex"),ve(d)};Je(),window.onresize=Je})();
+(async function() {
+  // ------------------------------------------------------------
+  // LOAD DATA
+  // ------------------------------------------------------------
+  const res = await fetch('data.json');
+  const DATA = await res.json();
+  const { baseUrl, comingSoon, albums, comingSoonAlbum } = DATA;
+
+  const releaseDate = new Date(comingSoon);
+  const audio = new Audio();
+
+  // --- Helper functions ---
+  const getAudio = (a, t) => `${baseUrl}/m4a/${a.folder}/${t.file}`;
+  const getImage = (a) => `${baseUrl}/images/${a.cover}`;
+
+  let playingAlbum = null;
+  let playingTrack = null;
+  let playingIdx = 0;
+  let isPlaying = false;
+  let timer = null;
+  let viewedAlbum = null;
+  const albumStates = {};
+
+  // ------------------------------------------------------------
+  // DOM ELEMENTS
+  // ------------------------------------------------------------
+  const $ = id => document.getElementById(id);
+  const albumList = $('albumList');
+  const tracklistWrap = $('tracklistWrap');
+  const tracklist = $('tracklist');
+  const tlTitle = $('tlTitle');
+  const tlArtist = $('tlArtist');
+  const tlBuyBtn = $('tlBuyBtn');
+  const backBtn = $('backBtn');
+  const headerBadge = $('headerBadge');
+  const artImg = $('artImg');
+  const countdownOverlay = $('countdownOverlay');
+  const artBuyContainer = $('artBuyContainer');
+  const artBuyBtn = $('artBuyBtn');
+  const artBuyPrice = $('artBuyPrice');
+  const cdDays = $('cdDays');
+  const cdHours = $('cdHours');
+  const cdMinutes = $('cdMinutes');
+  const cdSeconds = $('cdSeconds');
+  const csDate = $('csDate');
+  const footerArt = $('footerArt');
+  const footerTitle = $('footerTitle');
+  const footerArtist = $('footerArtist');
+  const footerFill = $('footerFill');
+  const footerCur = $('footerCur');
+  const footerTot = $('footerTot');
+  const footerProgress = $('footerProgress');
+  const footerPlay = $('footerPlay');
+  const footerPrev = $('footerPrev');
+  const footerNext = $('footerNext');
+  const volumeSlider = $('volumeSlider');
+  const volumeIcon = $('volumeIcon');
+  const pmArt = $('pmArt');
+  const pmTitle = $('pmTitle');
+  const pmArtist = $('pmArtist');
+  const pmPlay = $('pmPlay');
+  const pmNext = $('pmNext');
+  const pmExpand = $('pmExpand');
+  const pf = $('playerFull');
+  const pfArt = $('pfArt');
+  const pfTitle = $('pfTitle');
+  const pfArtist = $('pfArtist');
+  const pfFill = $('pfFill');
+  const pfCur = $('pfCur');
+  const pfTot = $('pfTot');
+  const pfProgress = $('pfProgress');
+  const pfPlay = $('pfPlay');
+  const pfPrev = $('pfPrev');
+  const pfNext = $('pfNext');
+  const pfClose = $('pfClose');
+
+  const allAlbums = [...albums, { ...comingSoonAlbum, isCS: true }];
+
+  // ------------------------------------------------------------
+  // VOLUME CONTROL
+  // ------------------------------------------------------------
+  audio.volume = 0.8;
+  if (volumeSlider) {
+    volumeSlider.value = 0.8;
+    volumeSlider.addEventListener('input', function() {
+      audio.volume = parseFloat(this.value);
+      updateVolumeIcon();
+    });
+  }
+
+  function updateVolumeIcon() {
+    if (!volumeIcon) return;
+    const vol = audio.volume;
+    volumeIcon.className = vol === 0 ? 'fas fa-volume-mute' : vol < 0.5 ? 'fas fa-volume-down' : 'fas fa-volume-up';
+  }
+
+  if (volumeIcon) {
+    volumeIcon.addEventListener('click', function() {
+      if (audio.volume > 0) {
+        audio.volume = 0;
+        if (volumeSlider) volumeSlider.value = 0;
+      } else {
+        audio.volume = 0.8;
+        if (volumeSlider) volumeSlider.value = 0.8;
+      }
+      updateVolumeIcon();
+    });
+  }
+
+  // ------------------------------------------------------------
+  // BUY ALBUM FUNCTION
+  // ------------------------------------------------------------
+  window.buyAlbum = async function(albumId) {
+    const workerUrl = 'https://yoco-checkout.hyperproductionsa.workers.dev';
+    console.log('🔵 Buy Album clicked:', albumId);
+
+    try {
+      const response = await fetch(workerUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId: albumId })
+      });
+      const data = await response.json();
+      if (response.ok && data.redirectUrl) {
+        // Store product name for modal later
+        localStorage.setItem('lastPurchasedAlbum', albumId);
+        window.location.href = data.redirectUrl;
+      } else {
+        alert('Payment error: ' + (data.error || 'Please try again.'));
+      }
+    } catch (error) {
+      console.error('❌ Payment error:', error);
+      alert('Payment error. Please try again.');
+    }
+  };
+
+  // ------------------------------------------------------------
+  // CHECK PAYMENT SUCCESS ON PAGE LOAD (MODAL)
+  // ------------------------------------------------------------
+  (function checkPaymentSuccess() {
+    const url = new URL(window.location.href);
+    const checkoutId = url.searchParams.get('checkoutId');
+    if (checkoutId) {
+      console.log('✅ Payment success! Checkout ID:', checkoutId);
+      // Show modal after a short delay
+      setTimeout(() => showSuccessModal(checkoutId), 500);
+      // Clean URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  })();
+
+  // ------------------------------------------------------------
+  // SUCCESS MODAL
+  // ------------------------------------------------------------
+  function showSuccessModal(checkoutId) {
+    const productId = localStorage.getItem('lastPurchasedAlbum') || 'htc1';
+    // Find product name from data
+    const album = allAlbums.find(a => a.id === productId);
+    const productName = album ? album.title : 'HTs Collections';
+    // TEMPORARY: Since download URL is generated server-side, we'll show a message
+    // In production, you'd fetch the download URL from your success worker
+
+    const overlay = document.createElement('div');
+    overlay.id = 'successModal';
+    overlay.style.cssText = `
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center;
+      z-index: 9999; backdrop-filter: blur(8px);
+    `;
+
+    overlay.innerHTML = `
+      <div style="
+        background: #0f0f0f; border-radius: 24px; padding: 40px; max-width: 500px; width: 90%;
+        border: 1px solid #2a2a2a; text-align: center; position: relative;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.9);
+      ">
+        <div style="font-size: 64px; color: #e5de69; margin-bottom: 16px;">✓</div>
+        <h2 style="color: #e5de69; font-size: 1.8rem; font-weight: 700; margin-bottom: 8px;">Payment Successful!</h2>
+        <p style="color: #aaa; margin-bottom: 12px;">Thank you for your purchase.</p>
+        <div style="
+          color: #fff; font-weight: 500; font-size: 1.1rem; padding: 12px;
+          background: #1a1a1a; border-radius: 12px; border: 1px solid #2a2a2a;
+          margin: 16px 0;
+        ">${productName}</div>
+
+        <div style="display: flex; flex-direction: column; gap: 12px; margin: 20px 0;">
+          <a href="#" onclick="alert('Download link will be available here. Check your email.'); return false;" style="
+            background: #e5de69; color: #0f0f0f; padding: 14px 24px;
+            border-radius: 40px; text-decoration: none; font-weight: 700;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            border: none; cursor: pointer; font-size: 1rem;
+          ">
+            <i class="fas fa-download"></i> Download Now
+          </a>
+          <button onclick="sendEmailModal('${checkoutId}', '${productName}')" style="
+            background: transparent; color: #e5de69; padding: 14px 24px;
+            border-radius: 40px; text-decoration: none; font-weight: 700;
+            border: 2px solid #e5de69; cursor: pointer; font-size: 1rem;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+          ">
+            <i class="fas fa-envelope"></i> Send Via Email
+          </button>
+        </div>
+
+        <p style="color: #666; font-size: .85rem;">🔒 You will receive a download link shortly.</p>
+
+        <button onclick="closeModal()" style="
+          margin-top: 20px; background: none; border: none; color: #666;
+          cursor: pointer; font-size: .85rem;
+        ">Close</button>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+  }
+
+  window.closeModal = function() {
+    const modal = document.getElementById('successModal');
+    if (modal) modal.remove();
+  };
+
+  window.sendEmailModal = function(checkoutId, productName) {
+    const email = prompt('Enter your email address to receive the download link:');
+    if (!email || !email.includes('@')) {
+      if (email) alert('Please enter a valid email address.');
+      return;
+    }
+
+    // Call your success worker's email endpoint
+    fetch('https://yoco-success.hyperproductionsa.workers.dev/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        checkoutId: checkoutId,
+        email: email,
+        productName: productName
+      })
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        alert('✅ Download link sent to ' + email + '!');
+      } else {
+        alert('❌ Failed to send email. Please try again.');
+      }
+    })
+    .catch(() => alert('❌ Error sending email.'));
+  };
+
+  // ------------------------------------------------------------
+  // COUNTDOWN TIMER
+  // ------------------------------------------------------------
+  function updateCountdown() {
+    if (!countdownOverlay) return;
+    const now = new Date();
+    const diff = releaseDate - now;
+
+    if (diff <= 0) {
+      countdownOverlay.innerHTML = `
+        <div style="color:#e5de69;font-size:2rem;margin-bottom:8px;"><i class="fas fa-check-circle"></i></div>
+        <div style="color:#e5de69;font-size:1rem;font-weight:700;background:#1e1d12;padding:6px 20px;border-radius:40px;border:2px solid #e5de69;margin-bottom:10px;">NOW AVAILABLE</div>
+        <h2 style="color:#fff;font-size:1.6rem;">HTs Collections V</h2>
+        <p style="color:#aaa;font-size:.85rem;margin:4px 0;">HyperSOUL-X · 2026 · 14 tracks</p>
+      `;
+      return;
+    }
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+    if (cdDays) cdDays.textContent = String(days).padStart(2, '0');
+    if (cdHours) cdHours.textContent = String(hours).padStart(2, '0');
+    if (cdMinutes) cdMinutes.textContent = String(minutes).padStart(2, '0');
+    if (cdSeconds) cdSeconds.textContent = String(seconds).padStart(2, '0');
+    if (csDate) csDate.textContent = releaseDate.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+    countdownOverlay.style.display = 'flex';
+  }
+
+  // ------------------------------------------------------------
+  // UPDATE ARTWORK - Desktop vs Mobile Logic
+  // ------------------------------------------------------------
+  function updateArtwork(album) {
+    if (!artImg || !countdownOverlay) return;
+
+    const isMobile = window.innerWidth <= 860;
+
+    if (isMobile) {
+      // MOBILE: Always show HTC5 with countdown
+      const defaultAlbum = allAlbums[4];
+      artImg.src = getImage(defaultAlbum);
+      countdownOverlay.style.display = 'flex';
+      updateCountdown();
+      return;
+    }
+
+    // DESKTOP: Show playing album artwork, or HTC5 with countdown if nothing playing
+    if (album && !album.isCS) {
+      artImg.src = getImage(album);
+      countdownOverlay.style.display = 'none';
+    } else {
+      const defaultAlbum = allAlbums[4];
+      artImg.src = getImage(defaultAlbum);
+      countdownOverlay.style.display = 'flex';
+      updateCountdown();
+    }
+  }
+
+  // ------------------------------------------------------------
+  // BUY BUTTON
+  // ------------------------------------------------------------
+  function updateBuyButton(album) {
+    if (!album || album.isCS) {
+      if (artBuyContainer) artBuyContainer.style.display = 'none';
+      if (tlBuyBtn) tlBuyBtn.style.display = 'none';
+      return;
+    }
+    if (artBuyContainer) {
+      artBuyContainer.style.display = 'flex';
+      if (artBuyBtn) artBuyBtn.onclick = () => buyAlbum(album.id);
+      if (artBuyPrice) artBuyPrice.textContent = 'R150';
+    }
+    if (tlBuyBtn) {
+      tlBuyBtn.style.display = 'flex';
+      tlBuyBtn.onclick = () => buyAlbum(album.id);
+    }
+  }
+
+  // ------------------------------------------------------------
+  // UPDATE NOW PLAYING UI
+  // ------------------------------------------------------------
+  function updateNowPlaying() {
+    if (!playingTrack || !playingAlbum) {
+      if (footerTitle) footerTitle.textContent = 'Select a track';
+      if (footerArtist) footerArtist.textContent = '—';
+      if (pfTitle) pfTitle.textContent = 'Select a track';
+      if (pfArtist) pfArtist.textContent = '—';
+      updateMobileText('Select a track', '—');
+      return;
+    }
+    const title = playingTrack.mix ? `${playingTrack.title} (${playingTrack.mix})` : playingTrack.title;
+    if (footerTitle) footerTitle.textContent = title;
+    if (footerArtist) footerArtist.textContent = playingTrack.artist;
+    if (pfTitle) pfTitle.textContent = title;
+    if (pfArtist) pfArtist.textContent = playingTrack.artist;
+    updateMobileText(title, playingTrack.artist);
+
+    const art = getImage(playingAlbum);
+    if (footerArt) footerArt.src = art;
+    if (pmArt) pmArt.src = art;
+    if (pfArt) pfArt.src = art;
+  }
+
+  // ------------------------------------------------------------
+  // MOBILE TEXT SCROLL
+  // ------------------------------------------------------------
+  function updateMobileText(title, artist) {
+    if (!pmTitle || !pmArtist) return;
+    pmTitle.textContent = title || 'Select a track';
+    pmArtist.textContent = artist || '—';
+
+    pmTitle.classList.remove('scroll');
+    void pmTitle.offsetWidth;
+    if (pmTitle.scrollWidth > pmTitle.clientWidth) pmTitle.classList.add('scroll');
+
+    pmArtist.classList.remove('scroll');
+    void pmArtist.offsetWidth;
+    if (pmArtist.scrollWidth > pmArtist.clientWidth) pmArtist.classList.add('scroll');
+  }
+
+  // ------------------------------------------------------------
+  // MEDIA SESSION API
+  // ------------------------------------------------------------
+  function setupMediaSession() {
+    if (!('mediaSession' in navigator) || !playingTrack || !playingAlbum) return;
+    const title = playingTrack.mix ? `${playingTrack.title} (${playingTrack.mix})` : playingTrack.title;
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: title,
+      artist: playingTrack.artist,
+      album: playingAlbum.title,
+      artwork: [{ src: getImage(playingAlbum), sizes: '512x512', type: 'image/jpeg' }]
+    });
+
+    navigator.mediaSession.setActionHandler('play', () => {
+      audio.play();
+      isPlaying = true;
+      updatePlayBtn();
+      startProgress();
+    });
+    navigator.mediaSession.setActionHandler('pause', () => {
+      audio.pause();
+      isPlaying = false;
+      updatePlayBtn();
+      clearInterval(timer);
+    });
+    navigator.mediaSession.setActionHandler('previoustrack', () => {
+      if (playingAlbum) prevTrack();
+    });
+    navigator.mediaSession.setActionHandler('nexttrack', () => {
+      if (playingAlbum) nextTrack();
+    });
+  }
+
+  // ------------------------------------------------------------
+  // VIEW FUNCTIONS
+  // ------------------------------------------------------------
+  function showAlbumList() {
+    if (albumList) albumList.style.display = 'flex';
+    if (tracklistWrap) tracklistWrap.style.display = 'none';
+    if (backBtn) backBtn.style.display = 'none';
+    if (headerBadge) {
+      headerBadge.style.display = 'inline';
+      headerBadge.textContent = '5 albums';
+    }
+    if (tlBuyBtn) tlBuyBtn.style.display = 'none';
+  }
+
+  function showTracklist() {
+    if (albumList) albumList.style.display = 'none';
+    if (tracklistWrap) tracklistWrap.style.display = 'flex';
+    if (backBtn) backBtn.style.display = 'inline';
+    if (headerBadge) headerBadge.style.display = 'none';
+  }
+
+  // ------------------------------------------------------------
+  // RENDER FUNCTIONS
+  // ------------------------------------------------------------
+  function renderAlbums() {
+    if (!albumList) return;
+    const sorted = [...allAlbums].reverse();
+    albumList.innerHTML = sorted.map((a) => {
+      const idx = allAlbums.indexOf(a);
+      const isCS = a.isCS || false;
+      const isPlayingAlbum = playingAlbum && playingAlbum.id === a.id;
+      const hasState = albumStates[a.id] !== undefined;
+      return `
+        <div class="album-item" data-idx="${idx}">
+          <div class="ai-art"><img src="${getImage(a)}" alt="${a.title}" /></div>
+          <div class="ai-info">
+            <div class="ai-title">${a.title} ${isPlayingAlbum ? '▶' : ''} ${hasState && !isPlayingAlbum ? '●' : ''}</div>
+            <div class="ai-artist">${a.artist} · ${a.year}</div>
+          </div>
+          ${isCS ? `<div class="ai-badge">🔜</div>` : ''}
+          <div class="ai-cart" onclick="event.stopPropagation(); buyAlbum('${a.id}')" title="Buy album"><i class="fas fa-shopping-cart"></i></div>
+          <div class="ai-play"><i class="fas fa-play-circle"></i></div>
+        </div>
+      `;
+    }).join('');
+    albumList.querySelectorAll('.album-item').forEach(el => {
+      el.onclick = () => loadAlbum(parseInt(el.dataset.idx));
+    });
+  }
+
+  function renderTracklist(album, isLocked = false) {
+    if (!tracklistWrap || !tracklist) return;
+    showTracklist();
+    if (tlTitle) tlTitle.textContent = album.title;
+    if (tlArtist) tlArtist.textContent = `${album.artist} · ${album.year}`;
+    viewedAlbum = album;
+
+    updateBuyButton(album);
+
+    if (isLocked || album.isCS) {
+      tracklist.innerHTML = `
+        <div class="track-item locked" style="background:#1a1a1a;border-bottom:1px solid #2a2a2a;padding:10px 14px;cursor:default;">
+          <div class="ti-info" style="text-align:center;">
+            <div class="ti-title" style="color:#e5de69;font-size:.85rem;"><i class="fas fa-clock"></i> Coming ${new Date(album.releaseDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+            <div class="ti-artist" style="color:#888;">${album.trackCount || album.tracks.length} tracks</div>
+          </div>
+        </div>
+      `;
+      album.tracks.forEach((t) => {
+        const title = t.mix ? `${t.title} (${t.mix})` : t.title;
+        tracklist.innerHTML += `
+          <div class="track-item locked">
+            <div class="ti-play" style="color:#444;"><i class="fas fa-lock"></i></div>
+            <div class="ti-info">
+              <div class="ti-title" style="color:#666;">${title}</div>
+              <div class="ti-artist" style="color:#555;">${t.artist}</div>
+            </div>
+            <div class="ti-dur" style="color:#444;">🔒</div>
+          </div>
+        `;
+      });
+      return;
+    }
+
+    const state = albumStates[album.id];
+    const savedIdx = state ? state.playingIdx : 0;
+
+    tracklist.innerHTML = album.tracks.map((t, i) => {
+      const isSavedTrack = (state && i === savedIdx);
+      const isActive = (playingAlbum && playingAlbum.id === album.id && i === playingIdx);
+      const title = t.mix ? `${t.title} (${t.mix})` : t.title;
+      return `
+        <div class="track-item ${isActive ? 'active' : ''}" data-idx="${i}">
+          <div class="ti-play"><i class="fas ${isActive ? 'fa-play-circle' : 'fa-play'}"></i></div>
+          <div class="ti-info">
+            <div class="ti-title">${title}</div>
+            <div class="ti-artist">${t.artist}</div>
+          </div>
+          <div class="ti-dur">${isActive ? '▶' : (isSavedTrack ? '●' : '♫')}</div>
+        </div>
+      `;
+    }).join('');
+    tracklist.querySelectorAll('.track-item:not(.locked)').forEach(el => {
+      el.onclick = () => {
+        const albumToPlay = viewedAlbum;
+        if (!albumToPlay || albumToPlay.isCS) return;
+        const trackIdx = parseInt(el.dataset.idx);
+        playTrack(trackIdx, albumToPlay);
+      };
+    });
+  }
+
+  // ------------------------------------------------------------
+  // LOAD ALBUM
+  // ------------------------------------------------------------
+  function loadAlbum(idx) {
+    const album = allAlbums[idx];
+    const isLocked = album.isCS || false;
+    viewedAlbum = album;
+
+    updateArtwork(album);
+    updateBuyButton(album);
+    renderTracklist(album, isLocked);
+  }
+
+  // ------------------------------------------------------------
+  // PLAY TRACK
+  // ------------------------------------------------------------
+  function playTrack(idx, album) {
+    if (!album) album = viewedAlbum;
+    if (!album || album.isCS) return;
+
+    const track = album.tracks[idx];
+    if (!track) return;
+
+    playingAlbum = album;
+    playingTrack = track;
+    playingIdx = idx;
+    albumStates[album.id] = { playingIdx: idx };
+
+    const url = getAudio(album, track);
+
+    // If same track, toggle play/pause
+    if (audio.src === url) {
+      if (isPlaying) {
+        audio.pause();
+        isPlaying = false;
+        clearInterval(timer);
+      } else {
+        audio.play().then(() => {
+          isPlaying = true;
+          startProgress();
+        }).catch(err => console.warn('Playback blocked:', err));
+      }
+      updatePlayBtn();
+      return;
+    }
+
+    // New track
+    audio.src = url;
+    audio.load();
+
+    updateNowPlaying();
+    setupMediaSession();
+    renderTracklist(album, false);
+    renderAlbums();
+
+    // Try to play
+    audio.play().then(() => {
+      isPlaying = true;
+      updatePlayBtn();
+      startProgress();
+    }).catch(err => {
+      console.warn('Playback blocked:', err);
+      isPlaying = false;
+      updatePlayBtn();
+    });
+  }
+
+  // ------------------------------------------------------------
+  // CONTROLS
+  // ------------------------------------------------------------
+  function togglePlay() {
+    if (!playingTrack) {
+      if (viewedAlbum && !viewedAlbum.isCS) playTrack(0, viewedAlbum);
+      return;
+    }
+    if (isPlaying) {
+      audio.pause();
+      isPlaying = false;
+      clearInterval(timer);
+    } else {
+      audio.play().then(() => {
+        isPlaying = true;
+        startProgress();
+      }).catch(err => console.warn('Playback blocked:', err));
+    }
+    updatePlayBtn();
+  }
+
+  function updatePlayBtn() {
+    const icon = isPlaying ? 'fa-pause-circle' : 'fa-play-circle';
+    if (footerPlay) footerPlay.className = `fas ${icon}`;
+    if (pmPlay) pmPlay.className = `fas ${icon}`;
+    if (pfPlay) pfPlay.className = `fas ${icon}`;
+  }
+
+  function startProgress() {
+    clearInterval(timer);
+    timer = setInterval(() => {
+      if (audio.duration && !isNaN(audio.duration)) {
+        const p = (audio.currentTime / audio.duration) * 100;
+        if (footerFill) footerFill.style.width = p + '%';
+        if (pfFill) pfFill.style.width = p + '%';
+        const cm = Math.floor(audio.currentTime / 60);
+        const cs = Math.floor(audio.currentTime % 60);
+        const tm = Math.floor(audio.duration / 60);
+        const ts = Math.floor(audio.duration % 60);
+        if (footerCur) footerCur.textContent = `${cm}:${String(cs).padStart(2, '0')}`;
+        if (pfCur) pfCur.textContent = footerCur.textContent;
+        if (footerTot) footerTot.textContent = `${tm}:${String(ts).padStart(2, '0')}`;
+        if (pfTot) pfTot.textContent = footerTot.textContent;
+      }
+    }, 200);
+  }
+
+  function seekTo(e, progressEl, fillEl, curTimeEl, totalTimeEl) {
+    const rect = progressEl.getBoundingClientRect();
+    const x = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+    if (audio.duration && !isNaN(audio.duration)) {
+      audio.currentTime = x * audio.duration;
+      fillEl.style.width = (x * 100) + '%';
+      const cm = Math.floor(audio.currentTime / 60);
+      const cs = Math.floor(audio.currentTime % 60);
+      const tm = Math.floor(audio.duration / 60);
+      const ts = Math.floor(audio.duration % 60);
+      curTimeEl.textContent = `${cm}:${String(cs).padStart(2, '0')}`;
+      totalTimeEl.textContent = `${tm}:${String(ts).padStart(2, '0')}`;
+    }
+  }
+
+  function nextTrack() {
+    if (!playingAlbum) return;
+    const nextIdx = (playingIdx + 1) % playingAlbum.tracks.length;
+    albumStates[playingAlbum.id] = { playingIdx: nextIdx };
+    playTrack(nextIdx, playingAlbum);
+  }
+
+  function prevTrack() {
+    if (!playingAlbum) return;
+    const prevIdx = (playingIdx - 1 + playingAlbum.tracks.length) % playingAlbum.tracks.length;
+    albumStates[playingAlbum.id] = { playingIdx: prevIdx };
+    playTrack(prevIdx, playingAlbum);
+  }
+
+  function goBack() {
+    showAlbumList();
+    updateArtwork(playingAlbum); // Show playing album art on desktop if any
+    if (artBuyContainer) artBuyContainer.style.display = 'none';
+    if (tlBuyBtn) tlBuyBtn.style.display = 'none';
+  }
+
+  function openFull() { if (pf) pf.classList.add('active'); }
+  function closeFull() { if (pf) pf.classList.remove('active'); }
+
+  // ------------------------------------------------------------
+  // EVENT LISTENERS
+  // ------------------------------------------------------------
+  if (footerPlay) footerPlay.onclick = togglePlay;
+  if (footerPrev) footerPrev.onclick = prevTrack;
+  if (footerNext) footerNext.onclick = nextTrack;
+  if (pmPlay) pmPlay.onclick = togglePlay;
+  if (pmNext) pmNext.onclick = nextTrack;
+  if (pmExpand) pmExpand.onclick = openFull;
+  if (pfPlay) pfPlay.onclick = togglePlay;
+  if (pfPrev) pfPrev.onclick = prevTrack;
+  if (pfNext) pfNext.onclick = nextTrack;
+  if (pfClose) pfClose.onclick = closeFull;
+  if (backBtn) backBtn.onclick = goBack;
+  audio.onended = nextTrack;
+  if (footerProgress) footerProgress.addEventListener('click', (e) => seekTo(e, footerProgress, footerFill, footerCur, footerTot));
+  if (pfProgress) pfProgress.addEventListener('click', (e) => seekTo(e, pfProgress, pfFill, pfCur, pfTot));
+
+  // ------------------------------------------------------------
+  // INIT
+  // ------------------------------------------------------------
+  renderAlbums();
+  showAlbumList();
+
+  // Set initial artwork (desktop: HTC5 with countdown, mobile: HTC5 with countdown)
+  updateArtwork(null);
+
+  updateMobileText('Select a track', '—');
+  if (footerArt) footerArt.src = getImage(allAlbums[4]);
+  if (pmArt) pmArt.src = getImage(allAlbums[4]);
+
+  if (artBuyContainer) artBuyContainer.style.display = 'none';
+  if (tlBuyBtn) tlBuyBtn.style.display = 'none';
+
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
+  updateVolumeIcon();
+
+  const main = document.getElementById('main');
+  const resize = () => {
+    if (main) main.style.flexDirection = window.innerWidth <= 860 ? 'column' : 'row';
+    const footer = document.getElementById('pcFooter');
+    if (footer) footer.style.display = window.innerWidth <= 860 ? 'none' : 'flex';
+    updateArtwork(playingAlbum);
+  };
+  resize();
+  window.onresize = resize;
+
+})();
