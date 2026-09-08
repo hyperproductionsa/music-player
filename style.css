@@ -1,6 +1,6 @@
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Roboto',-apple-system,sans-serif}
 html,body{height:100%;background:#0b0b0b;overflow:hidden}
-body{display:flex;flex-direction:column;padding:0;height:100vh}
+body{display:flex;flex-direction:column;padding:0}
 
 header{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #e5de69;padding:14px 24px;flex-shrink:0;min-height:64px;background:#0f0f0f;z-index:10;position:sticky;top:0}
 .header-left{display:flex;align-items:center;gap:12px}
@@ -11,7 +11,7 @@ header{display:flex;justify-content:space-between;align-items:center;border-bott
 #backBtn i{margin-right:6px}
 #headerBadge{color:#fff;font-size:.8rem;background:#1a1a1a;padding:6px 16px;border-radius:30px;border:1px solid #2a2a2a;font-weight:300}
 
-main{display:flex;gap:24px;flex:1;min-height:0;padding:16px 24px 16px 24px;overflow:hidden}
+main{display:flex;gap:24px;flex:1;min-height:0;padding:16px 24px;overflow:hidden}
 
 /* LEFT: ART */
 .art-section{flex:0 0 38%;display:flex;flex-direction:column;gap:12px;min-width:0;height:100%;overflow:hidden}
@@ -91,8 +91,8 @@ main{display:flex;gap:24px;flex:1;min-height:0;padding:16px 24px 16px 24px;overf
 #volumeSlider{width:80px;height:4px;-webkit-appearance:none;background:#2a2a2a;border-radius:2px;outline:none;cursor:pointer}
 #volumeSlider::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:#e5de69;cursor:pointer}
 
-/* MOBILE FOOTER */
-#playerMobile{display:none;position:sticky;bottom:0;background:#1a1a1a;padding:10px 14px;border-top:1px solid #2a2a2a;align-items:center;justify-content:space-between;z-index:10;min-height:60px;gap:10px;flex-shrink:0;margin-top:auto;width:100%}
+/* MOBILE FOOTER - ALWAYS VISIBLE ON MOBILE */
+#playerMobile{display:none;background:#1a1a1a;padding:10px 14px;border-top:1px solid #2a2a2a;align-items:center;justify-content:space-between;z-index:10;min-height:60px;gap:10px;flex-shrink:0;margin-top:auto;width:100%}
 .pm-left{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
 .pm-left img{width:40px;height:40px;border-radius:8px;object-fit:cover;border:1px solid #333}
 .pm-info{flex:1;min-width:0;height:40px;display:flex;flex-direction:column;justify-content:center;overflow:hidden}
@@ -127,7 +127,9 @@ main{display:flex;gap:24px;flex:1;min-height:0;padding:16px 24px 16px 24px;overf
 #albumList::-webkit-scrollbar-track,#tracklist::-webkit-scrollbar-track{background:#1a1a1a}
 #albumList::-webkit-scrollbar-thumb,#tracklist::-webkit-scrollbar-thumb{background:#e5de69;border-radius:10px}
 
-/* RESPONSIVE */
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
 @media(max-width:860px){
   body{padding:0}
   header{padding:10px 16px;min-height:56px}
@@ -159,9 +161,10 @@ main{display:flex;gap:24px;flex:1;min-height:0;padding:16px 24px 16px 24px;overf
   .track-item{padding:5px 10px}
   .track-item .ti-info .ti-title{font-size:.75rem}
   .track-item .ti-info .ti-artist{font-size:.65rem}
-  #pcFooter{display:none}
-  /* MOBILE FOOTER - VISIBLE */
-  #playerMobile{display:flex;position:sticky;bottom:0;margin-top:auto;padding-bottom:env(safe-area-inset-bottom,10px)}
+  /* PC FOOTER HIDDEN */
+  #pcFooter{display:none !important}
+  /* MOBILE FOOTER VISIBLE */
+  #playerMobile{display:flex !important;position:sticky;bottom:0;margin-top:auto;padding-bottom:env(safe-area-inset-bottom,10px)}
   #pmTitle{font-size:.75rem}
   #pmArtist{font-size:.6rem}
   .pm-controls i{font-size:1.2rem}
