@@ -186,7 +186,7 @@
   }
 
   // ============================================================
-  // BUY BUTTON - HTC5 COMPLETELY HIDDEN
+  // UPDATE BUY BUTTON - HTC5 COMPLETELY HIDDEN
   // ============================================================
   function updateBuyButton(album) {
     // HTC5 (isCS) → COMPLETELY HIDE everything
@@ -310,7 +310,7 @@
             <div class="ai-artist">${a.artist} · ${a.year}</div>
           </div>
           ${isCS ? `<div class="ai-badge">🔜</div>` : ''}
-          <div class="ai-cart" onclick="event.stopPropagation(); buyAlbum('${a.id}')" title="Buy album"><i class="fas fa-shopping-cart"></i></div>
+          ${!isCS ? `<div class="ai-cart" onclick="event.stopPropagation(); buyAlbum('${a.id}')" title="Buy album"><i class="fas fa-shopping-cart"></i></div>` : ''}
           <div class="ai-play"><i class="fas fa-play-circle"></i></div>
         </div>
       `;
