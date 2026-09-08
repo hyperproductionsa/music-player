@@ -9,10 +9,14 @@ header{display:flex;justify-content:space-between;align-items:center;border-bott
 #backBtn:hover{background:#1e1d12}
 #backBtn i{margin-right:6px}
 #headerBadge{color:#fff;font-size:.8rem;background:#1a1a1a;padding:6px 16px;border-radius:30px;border:1px solid #2a2a2a;font-weight:300}
+
 main{display:flex;gap:24px;flex:1;min-height:0;padding:20px 24px;overflow:hidden}
-.art-section{flex:0 0 42%;display:flex;flex-direction:column;gap:16px;min-width:0;height:100%;overflow:hidden}
-.art-wrap{position:relative;width:100%;aspect-ratio:1;border-radius:20px;overflow:hidden;background:#141414;border:1px solid #2a2a2a;flex-shrink:0}
+
+/* LEFT: ART - 80% OF ORIGINAL SIZE */
+.art-section{flex:0 0 33%;display:flex;flex-direction:column;gap:16px;min-width:0;height:100%;overflow:hidden}
+.art-wrap{position:relative;width:100%;aspect-ratio:1;border-radius:20px;overflow:hidden;background:#141414;border:1px solid #2a2a2a;flex-shrink:0;max-width:400px;margin:0 auto}
 .art-wrap img{width:100%;height:100%;object-fit:cover}
+
 .countdown-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.8);display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:20px;backdrop-filter:blur(4px)}
 .countdown-icon{color:#e5de69;font-size:2rem;margin-bottom:8px}
 .countdown-badge{color:#e5de69;font-size:.8rem;font-weight:700;letter-spacing:2px;background:#1e1d12;padding:4px 20px;border-radius:40px;border:1px solid #e5de69;margin-bottom:10px}
@@ -22,10 +26,15 @@ main{display:flex;gap:24px;flex:1;min-height:0;padding:20px 24px;overflow:hidden
 .countdown-label{color:#999;font-size:.55rem;text-transform:uppercase;letter-spacing:1px;margin-top:2px;font-weight:300}
 .countdown-sub{color:#aaa;font-size:.85rem}
 .countdown-overlay small{color:#888;font-size:.75rem}
+
+/* BUY BUTTON - HIDDEN FOR HTC5 */
 .art-buy-container{display:flex;align-items:center;justify-content:center;gap:14px;padding:8px 0;flex-shrink:0}
+.art-buy-container.hidden{display:none}
 .buy-btn{background:#e5de69;color:#0f0f0f;border:none;padding:10px 24px;border-radius:40px;font-size:.95rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:10px}
 .buy-btn:hover{background:#f5ee79;transform:scale(1.02)}
 .buy-price{color:#e5de69;font-size:1rem;font-weight:700}
+
+/* RIGHT: LIST */
 .list-section{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;height:100%}
 #albumList{display:flex;flex-direction:column;gap:6px;overflow-y:auto;padding-right:4px;flex:1}
 .album-item{display:flex;align-items:center;gap:14px;padding:10px 14px;background:#141414;border-radius:12px;border:1px solid #262626;cursor:pointer;transition:.2s;flex-shrink:0}
@@ -41,12 +50,14 @@ main{display:flex;gap:24px;flex:1;min-height:0;padding:20px 24px;overflow:hidden
 .album-item .ai-cart:hover{opacity:1!important;transform:scale(1.1)}
 .album-item .ai-play{color:#e5de69;font-size:1.2rem;opacity:0;transition:.2s}
 .album-item:hover .ai-play{opacity:.5}
+
 #tracklistWrap{display:none;flex-direction:column;flex:1;min-height:0;background:#141414;border-radius:12px;border:1px solid #262626;overflow:hidden}
 #tracklistHeader{display:flex;align-items:center;gap:12px;padding:10px 16px;background:#1a1a1a;border-bottom:1px solid #262626;flex-shrink:0;flex-wrap:wrap}
 #tlTitle{color:#fff;font-weight:500;font-size:.95rem}
 #tlArtist{color:#aaa;font-size:.8rem;font-weight:300}
 .buy-btn-small{background:#e5de69;color:#0f0f0f;border:none;padding:4px 14px;border-radius:30px;font-size:.7rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0}
 .buy-btn-small:hover{background:#f5ee79;transform:scale(1.02)}
+.buy-btn-small.hidden{display:none}
 #tracklist{flex:1;overflow-y:auto;padding:4px 0}
 .track-item{display:flex;align-items:center;gap:12px;padding:8px 14px;cursor:pointer;transition:.15s;border-bottom:1px solid #1a1a1a;flex-shrink:0}
 .track-item:hover{background:#1d1d1d}
@@ -58,6 +69,7 @@ main{display:flex;gap:24px;flex:1;min-height:0;padding:20px 24px;overflow:hidden
 .track-item.active .ti-info .ti-title{color:#e5de69}
 .track-item .ti-dur{color:#666;font-size:.7rem;flex-shrink:0}
 .track-item.locked{opacity:.5;cursor:default;pointer-events:none}
+
 #pcFooter{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;background:#1a1a1a;border-top:1px solid #2a2a2a;flex-shrink:0;gap:16px;min-height:72px;position:sticky;bottom:0;z-index:10;width:100%}
 .footer-left{display:flex;align-items:center;gap:14px;min-width:160px;flex:0 0 28%}
 #footerArt{width:44px;height:44px;border-radius:8px;object-fit:cover;border:1px solid #333}
@@ -76,6 +88,7 @@ main{display:flex;gap:24px;flex:1;min-height:0;padding:20px 24px;overflow:hidden
 #volumeIcon{color:#888;font-size:1rem;cursor:pointer}
 #volumeSlider{width:80px;height:4px;-webkit-appearance:none;background:#2a2a2a;border-radius:2px;outline:none;cursor:pointer}
 #volumeSlider::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:#e5de69;cursor:pointer}
+
 #playerMobile{display:none;position:sticky;bottom:0;background:#1a1a1a;padding:10px 14px;border-top:1px solid #2a2a2a;align-items:center;justify-content:space-between;z-index:10;min-height:60px;gap:10px;flex-shrink:0;margin-top:auto;width:100%}
 .pm-left{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
 .pm-left img{width:40px;height:40px;border-radius:8px;object-fit:cover;border:1px solid #333}
@@ -88,6 +101,7 @@ main{display:flex;gap:24px;flex:1;min-height:0;padding:20px 24px;overflow:hidden
 .pm-controls{display:flex;align-items:center;gap:14px;color:#e5de69;flex-shrink:0}
 .pm-controls i{font-size:1.4rem;cursor:pointer}
 .pm-expand{color:#666;padding:0 4px;cursor:pointer;flex-shrink:0}
+
 #playerFull{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:#0f0f0f;flex-direction:column;padding:20px 24px 30px;z-index:1000}
 #playerFull.active{display:flex}
 .pf-header{display:flex;justify-content:space-between;align-items:center;padding-bottom:16px;color:#fff;flex-shrink:0}
@@ -105,8 +119,70 @@ main{display:flex;gap:24px;flex:1;min-height:0;padding:20px 24px;overflow:hidden
 .pf-btns i{font-size:1.8rem;cursor:pointer}
 .pf-btns i:first-child,.pf-btns i:last-child{font-size:1.2rem;opacity:.7}
 .pf-btns i:nth-child(2){font-size:2.8rem}
+
 #albumList::-webkit-scrollbar,#tracklist::-webkit-scrollbar{width:3px}
 #albumList::-webkit-scrollbar-track,#tracklist::-webkit-scrollbar-track{background:#1a1a1a}
 #albumList::-webkit-scrollbar-thumb,#tracklist::-webkit-scrollbar-thumb{background:#e5de69;border-radius:10px}
-@media(max-width:860px){body{padding:0}header{padding:10px 16px;min-height:56px}#logo{height:24px}#brandName{font-size:1rem}#headerBadge{font-size:.65rem;padding:4px 10px}#backBtn{font-size:.8rem;padding:4px 10px}main{flex-direction:column;padding:12px 16px;gap:12px;overflow:hidden;flex:1}.art-section{flex:0 0 auto;width:100%;max-width:280px;margin:0 auto;height:auto}.art-wrap{border-radius:16px}.countdown-number{font-size:1.6rem;min-width:36px}.countdown-block{min-width:38px}.countdown-timer{gap:6px}.countdown-badge{font-size:.7rem;padding:3px 14px}.art-buy-container{padding:6px 0}.buy-btn{padding:8px 18px;font-size:.85rem}.buy-price{font-size:.85rem}.list-section{flex:1;min-height:0;height:auto}#albumList{flex:1;gap:4px;min-height:0}.album-item{padding:6px 10px}.album-item .ai-art{width:32px;height:32px}.album-item .ai-info .ai-title{font-size:.75rem}.album-item .ai-info .ai-artist{font-size:.65rem}#tracklistWrap{flex:1;min-height:0}#tracklistHeader{padding:6px 10px}#tlTitle{font-size:.8rem}#tlArtist{font-size:.65rem}.buy-btn-small{padding:3px 10px;font-size:.6rem}.track-item{padding:5px 10px}.track-item .ti-info .ti-title{font-size:.75rem}.track-item .ti-info .ti-artist{font-size:.65rem}#pcFooter{display:none}#playerMobile{display:flex;position:sticky;bottom:0;margin-top:auto;padding-bottom:env(safe-area-inset-bottom,10px)}#pmTitle{font-size:.75rem}#pmArtist{font-size:.6rem}.pm-controls i{font-size:1.2rem}}
-@media(max-width:480px){header{padding:8px 12px;min-height:48px}#logo{height:20px}#brandName{font-size:.85rem}#headerBadge{font-size:.55rem;padding:3px 8px}#backBtn{font-size:.7rem;padding:3px 8px}main{padding:8px 12px;gap:8px}.art-section{max-width:220px}.countdown-number{font-size:1.2rem;min-width:28px}.countdown-block{min-width:30px}.countdown-timer{gap:4px}.buy-btn{padding:6px 14px;font-size:.75rem}.buy-price{font-size:.75rem}.album-item .ai-art{width:28px;height:28px}.album-item .ai-info .ai-title{font-size:.7rem}.track-item .ti-info .ti-title{font-size:.7rem}.track-item .ti-info .ti-artist{font-size:.6rem}#playerMobile{padding:6px 10px;min-height:50px}.pm-left img{width:32px;height:32px}#pmTitle{font-size:.7rem}#pmArtist{font-size:.55rem}.pm-controls i{font-size:1.1rem}}
+
+/* RESPONSIVE */
+@media(max-width:860px){
+  body{padding:0}
+  header{padding:10px 16px;min-height:56px}
+  #logo{height:24px}
+  #brandName{font-size:1rem}
+  #headerBadge{font-size:.65rem;padding:4px 10px}
+  #backBtn{font-size:.8rem;padding:4px 10px}
+  main{flex-direction:column;padding:12px 16px;gap:12px;overflow:hidden;flex:1}
+  .art-section{flex:0 0 auto;width:100%;max-width:280px;margin:0 auto;height:auto}
+  .art-wrap{border-radius:16px;max-width:100%}
+  .countdown-number{font-size:1.6rem;min-width:36px}
+  .countdown-block{min-width:38px}
+  .countdown-timer{gap:6px}
+  .countdown-badge{font-size:.7rem;padding:3px 14px}
+  .art-buy-container{padding:6px 0}
+  .buy-btn{padding:8px 18px;font-size:.85rem}
+  .buy-price{font-size:.85rem}
+  .list-section{flex:1;min-height:0;height:auto}
+  #albumList{flex:1;gap:4px;min-height:0}
+  .album-item{padding:6px 10px}
+  .album-item .ai-art{width:32px;height:32px}
+  .album-item .ai-info .ai-title{font-size:.75rem}
+  .album-item .ai-info .ai-artist{font-size:.65rem}
+  #tracklistWrap{flex:1;min-height:0}
+  #tracklistHeader{padding:6px 10px}
+  #tlTitle{font-size:.8rem}
+  #tlArtist{font-size:.65rem}
+  .buy-btn-small{padding:3px 10px;font-size:.6rem}
+  .track-item{padding:5px 10px}
+  .track-item .ti-info .ti-title{font-size:.75rem}
+  .track-item .ti-info .ti-artist{font-size:.65rem}
+  #pcFooter{display:none}
+  #playerMobile{display:flex;position:sticky;bottom:0;margin-top:auto;padding-bottom:env(safe-area-inset-bottom,10px)}
+  #pmTitle{font-size:.75rem}
+  #pmArtist{font-size:.6rem}
+  .pm-controls i{font-size:1.2rem}
+}
+
+@media(max-width:480px){
+  header{padding:8px 12px;min-height:48px}
+  #logo{height:20px}
+  #brandName{font-size:.85rem}
+  #headerBadge{font-size:.55rem;padding:3px 8px}
+  #backBtn{font-size:.7rem;padding:3px 8px}
+  main{padding:8px 12px;gap:8px}
+  .art-section{max-width:220px}
+  .countdown-number{font-size:1.2rem;min-width:28px}
+  .countdown-block{min-width:30px}
+  .countdown-timer{gap:4px}
+  .buy-btn{padding:6px 14px;font-size:.75rem}
+  .buy-price{font-size:.75rem}
+  .album-item .ai-art{width:28px;height:28px}
+  .album-item .ai-info .ai-title{font-size:.7rem}
+  .track-item .ti-info .ti-title{font-size:.7rem}
+  .track-item .ti-info .ti-artist{font-size:.6rem}
+  #playerMobile{padding:6px 10px;min-height:50px}
+  .pm-left img{width:32px;height:32px}
+  #pmTitle{font-size:.7rem}
+  #pmArtist{font-size:.55rem}
+  .pm-controls i{font-size:1.1rem}
+}
