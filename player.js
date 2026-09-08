@@ -107,13 +107,20 @@
   }
 
   // ============================================================
-  // BUY ALBUM FUNCTION - CORRECTED
+  // BUY ALBUM FUNCTION - WITH EMAIL PROMPT (ZeptoMail via Worker)
   // ============================================================
   window.buyAlbum = async function(albumId) {
     const workerUrl = 'https://yoco-checkout.hyperproductionsa.workers.dev';
     
+    // Prompt for email
+    const customerEmail = prompt('Enter your email address to receive your download link:');
+    if (!customerEmail || !customerEmail.includes('@')) {
+      alert('Please enter a valid email address.');
+      return;
+    }
+    
     console.log('🔵 Buy Album clicked:', albumId);
-    console.log('🔵 Calling worker:', workerUrl);
+    console.log('📧 Customer email:', customerEmail);
     
     try {
       const response = await fetch(workerUrl, {
@@ -123,7 +130,8 @@
         },
         body: JSON.stringify({ 
           productId: albumId,
-          price: 15000 // R150 in cents
+          price: 15000,
+          customerEmail: customerEmail
         })
       });
       
@@ -131,10 +139,10 @@
       const data = await response.json();
       console.log('🔵 Response data:', data);
       
-      // ✅ CORRECT: Use checkoutId (not sessionId)
       if (data.checkoutId) {
         localStorage.setItem('checkoutId', data.checkoutId);
-        console.log('✅ Stored checkoutId in localStorage:', data.checkoutId);
+        localStorage.setItem('customerEmail', customerEmail);
+        console.log('✅ Stored checkoutId and email in localStorage');
       }
       
       const redirectUrl = data.redirectUrl || data.checkoutUrl;
@@ -157,6 +165,7 @@
   // ============================================================
   function updateCountdown() {
     if (!countdownOverlay) return;
+    
     const now = new Date();
     const diff = releaseDate - now;
     
@@ -180,36 +189,29 @@
     if (cdMinutes) cdMinutes.textContent = String(minutes).padStart(2, '0');
     if (cdSeconds) cdSeconds.textContent = String(seconds).padStart(2, '0');
     if (csDate) csDate.textContent = releaseDate.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+    
+    countdownOverlay.style.display = 'flex';
   }
 
   // ============================================================
-  // SMART CAROUSEL
-  // ============================================================
-  function updateMobileText(title, artist) {
-    if (!pmTitle || !pmArtist) return;
-    
-    pmTitle.textContent = title || 'Select a track';
-    pmArtist.textContent = artist || '—';
-    
-    pmTitle.classList.remove('scroll');
-    void pmTitle.offsetWidth;
-    if (pmTitle.scrollWidth > pmTitle.clientWidth) {
-      pmTitle.classList.add('scroll');
-    }
-    
-    pmArtist.classList.remove('scroll');
-    void pmArtist.offsetWidth;
-    if (pmArtist.scrollWidth > pmArtist.clientWidth) {
-      pmArtist.classList.add('scroll');
-    }
-  }
-
-  // ============================================================
-  // UPDATE ARTWORK
+  // UPDATE ARTWORK - Desktop vs Mobile Logic
   // ============================================================
   function updateArtwork(album) {
     if (!artImg || !countdownOverlay) return;
-    if (album) {
+    
+    const isMobile = window.innerWidth <= 860;
+    
+    if (isMobile) {
+      // MOBILE: Always show HTC5 with countdown
+      const defaultAlbum = allAlbums[4];
+      artImg.src = getImage(defaultAlbum);
+      countdownOverlay.style.display = 'flex';
+      updateCountdown();
+      return;
+    }
+    
+    // DESKTOP: Show playing album artwork, or HTC5 with countdown if nothing playing
+    if (album && !album.isCS) {
       artImg.src = getImage(album);
       countdownOverlay.style.display = 'none';
     } else {
@@ -237,6 +239,28 @@
     if (tlBuyBtn) {
       tlBuyBtn.style.display = 'flex';
       tlBuyBtn.onclick = () => buyAlbum(album.id);
+    }
+  }
+
+  // ============================================================
+  // SMART CAROUSEL
+  // ============================================================
+  function updateMobileText(title, artist) {
+    if (!pmTitle || !pmArtist) return;
+    
+    pmTitle.textContent = title || 'Select a track';
+    pmArtist.textContent = artist || '—';
+    
+    pmTitle.classList.remove('scroll');
+    void pmTitle.offsetWidth;
+    if (pmTitle.scrollWidth > pmTitle.clientWidth) {
+      pmTitle.classList.add('scroll');
+    }
+    
+    pmArtist.classList.remove('scroll');
+    void pmArtist.offsetWidth;
+    if (pmArtist.scrollWidth > pmArtist.clientWidth) {
+      pmArtist.classList.add('scroll');
     }
   }
 
@@ -560,8 +584,8 @@
   // ============================================================
   function goBack() {
     showAlbumList();
-    const defaultAlbum = allAlbums[4];
-    updateArtwork(defaultAlbum);
+    // Show HTC5 with countdown on desktop if nothing playing, or mobile always shows countdown
+    updateArtwork(playingAlbum);
     if (artBuyContainer) artBuyContainer.style.display = 'none';
     if (tlBuyBtn) tlBuyBtn.style.display = 'none';
   }
@@ -592,22 +616,17 @@
   }
 
   // ============================================================
-  // INIT - COUNTDOWN VISIBLE ON HTC5
+  // INIT
   // ============================================================
   renderAlbums();
   showAlbumList();
 
-  // Start with HTC5 - COUNTDOWN VISIBLE
-  const defaultAlbum = allAlbums[4];
-  artImg.src = getImage(defaultAlbum);
-  countdownOverlay.style.display = 'flex';
-  csTitle.textContent = defaultAlbum.title;
-  csSub.textContent = `${defaultAlbum.artist} · ${defaultAlbum.year} · ${defaultAlbum.trackCount} tracks`;
-  csDate.textContent = new Date(defaultAlbum.releaseDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+  // Set initial artwork (desktop: HTC5 with countdown, mobile: HTC5 with countdown)
+  updateArtwork(null);
 
   updateMobileText('Select a track', '—');
-  if (footerArt) footerArt.src = getImage(defaultAlbum);
-  if (pmArt) pmArt.src = getImage(defaultAlbum);
+  if (footerArt) footerArt.src = getImage(allAlbums[4]);
+  if (pmArt) pmArt.src = getImage(allAlbums[4]);
 
   if (artBuyContainer) artBuyContainer.style.display = 'none';
   if (tlBuyBtn) tlBuyBtn.style.display = 'none';
@@ -622,6 +641,8 @@
     if (main) main.style.flexDirection = window.innerWidth <= 860 ? 'column' : 'row';
     const footer = document.getElementById('pcFooter');
     if (footer) footer.style.display = window.innerWidth <= 860 ? 'none' : 'flex';
+    // Update artwork on resize (desktop/mobile switch)
+    updateArtwork(playingAlbum);
   };
   resize();
   window.onresize = resize;
