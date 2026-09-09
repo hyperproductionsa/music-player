@@ -3,7 +3,59 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>HTs Collections</title>
+
+  <!-- ============================================================
+       BASIC SEO
+  ============================================================ -->
+  <title>HTs Collections · Music Player by HyperSOUL-X</title>
+  <meta name="description" content="Stream the HTs Collections albums. HyperSOUL-X · Afro House music. 5 albums, 65 tracks." />
+  <meta name="keywords" content="HTs Collections, HyperSOUL-X, Afro House, music player, South African music" />
+  <meta name="author" content="Hyper Production (SA)" />
+  <link rel="canonical" href="https://htcoll.shop" />
+
+  <!-- ============================================================
+       FAVICON (from repo)
+  ============================================================ -->
+  <link rel="icon" type="image/png" sizes="512x512" href="/images/icon-512x512.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/images/icon-192x192.png" />
+  <link rel="apple-touch-icon" href="/images/icon-192x192.png" />
+
+  <!-- ============================================================
+       OPEN GRAPH (Facebook, WhatsApp, etc.) - HTC5
+  ============================================================ -->
+  <meta property="og:title" content="HTs Collections Music Player" />
+  <meta property="og:description" content="Stream HTs Collections by HyperSOUL-X. Afro House music." />
+  <meta property="og:image" content="https://cdn.htcoll.shop/images/HTC5.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:url" content="https://htcoll.shop" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="HTs Collections" />
+
+  <!-- ============================================================
+       TWITTER CARD - HTC5
+  ============================================================ -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="HTs Collections Music Player" />
+  <meta name="twitter:description" content="Stream HTs Collections by HyperSOUL-X. Afro House music." />
+  <meta name="twitter:image" content="https://cdn.htcoll.shop/images/HTC5.jpg" />
+
+  <!-- ============================================================
+       PWA MANIFEST
+  ============================================================ -->
+  <link rel="manifest" href="/manifest.json" />
+
+  <!-- ============================================================
+       THEME COLORS
+  ============================================================ -->
+  <meta name="theme-color" content="#0b0b0b" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <meta name="apple-mobile-web-app-title" content="HTs Player" />
+
+  <!-- ============================================================
+       FONTS & STYLES
+  ============================================================ -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
@@ -12,6 +64,9 @@
 </head>
 <body>
 
+  <!-- ============================================================
+       HEADER
+  ============================================================ -->
   <header>
     <div class="header-left">
       <img src="http://hyperproduction.co.za/logo/HPSA-gold.png" alt="Hyper Production" id="logo" />
@@ -21,10 +76,15 @@
     <span id="headerBadge">5 albums</span>
   </header>
 
+  <!-- ============================================================
+       MAIN CONTENT
+  ============================================================ -->
   <main id="main">
+
+    <!-- LEFT: ART SECTION -->
     <section class="art-section" id="artSection">
       <div class="art-wrap" id="artWrap">
-        <img id="artImg" src="https://cdn.htcoll.shop/images/HTC5.jpg" alt="cover" />
+        <img id="artImg" src="https://cdn.htcoll.shop/images/HTC5.jpg" alt="HTs Collections V cover" />
         <div class="countdown-overlay" id="countdownOverlay">
           <div class="countdown-icon"><i class="fas fa-clock"></i></div>
           <div class="countdown-badge">RELEASING IN</div>
@@ -44,6 +104,7 @@
       </div>
     </section>
 
+    <!-- RIGHT: LIST SECTION -->
     <section class="list-section" id="listSection">
       <div id="albumList"></div>
       <div id="tracklistWrap" style="display:none;">
@@ -55,11 +116,15 @@
         <div id="tracklist"></div>
       </div>
     </section>
+
   </main>
 
+  <!-- ============================================================
+       PC FOOTER
+  ============================================================ -->
   <footer id="pcFooter">
     <div class="footer-left">
-      <img id="footerArt" src="https://cdn.htcoll.shop/images/HTC5.jpg" alt="cover" />
+      <img id="footerArt" src="https://cdn.htcoll.shop/images/HTC5.jpg" alt="Now playing" />
       <div class="footer-info">
         <div id="footerTitle">Select a track</div>
         <div id="footerArtist">—</div>
@@ -83,9 +148,12 @@
     </div>
   </footer>
 
+  <!-- ============================================================
+       MOBILE FOOTER
+  ============================================================ -->
   <div id="playerMobile">
     <div class="pm-left">
-      <img id="pmArt" src="https://cdn.htcoll.shop/images/HTC5.jpg" alt="cover" />
+      <img id="pmArt" src="https://cdn.htcoll.shop/images/HTC5.jpg" alt="Now playing" />
       <div class="pm-info">
         <div id="pmTitle">Select a track</div>
         <div id="pmArtist">—</div>
@@ -98,9 +166,12 @@
     <div class="pm-expand" id="pmExpand"><i class="fas fa-chevron-up"></i></div>
   </div>
 
+  <!-- ============================================================
+       FULL PLAYER OVERLAY
+  ============================================================ -->
   <div id="playerFull">
     <div class="pf-header"><i class="fas fa-chevron-down" id="pfClose"></i><span>Now Playing</span><i class="fas fa-ellipsis-h"></i></div>
-    <img id="pfArt" src="https://cdn.htcoll.shop/images/HTC5.jpg" alt="cover" />
+    <img id="pfArt" src="https://cdn.htcoll.shop/images/HTC5.jpg" alt="Now playing" />
     <div class="pf-info"><div id="pfTitle">Select a track</div><div id="pfArtist">—</div></div>
     <div class="pf-bar"><span id="pfCur">0:00</span><div class="pf-progress" id="pfProgress"><div class="pf-fill" id="pfFill"></div></div><span id="pfTot">0:00</span></div>
     <div class="pf-btns">
@@ -110,6 +181,27 @@
     </div>
   </div>
 
-<script src="player.js"></script>
+  <!-- ============================================================
+       SERVICE WORKER REGISTRATION
+  ============================================================ -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js')
+          .then(function(registration) {
+            console.log('✅ Service Worker registered:', registration);
+          })
+          .catch(function(error) {
+            console.warn('⚠️ Service Worker registration failed:', error);
+          });
+      });
+    }
+  </script>
+
+  <!-- ============================================================
+       MAIN PLAYER SCRIPT
+  ============================================================ -->
+  <script src="player.js"></script>
+
 </body>
 </html>
