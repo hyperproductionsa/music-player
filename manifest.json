@@ -1,0 +1,21 @@
+{
+  "name": "HTs Collections Music Player",
+  "short_name": "HTs Player",
+  "description": "Stream the HTs Collections albums from HyperSOUL-X.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b0b0b",
+  "theme_color": "#e5de69",
+  "icons": [
+    {
+      "src": "/images/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/images/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
