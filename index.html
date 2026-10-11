@@ -185,19 +185,27 @@
        SERVICE WORKER REGISTRATION
   ============================================================ -->
   <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function() {
+  if ('serviceWorker' in navigator) {
+    // One-shot cleanup of any previously-installed SW + caches.
+    if (!localStorage.getItem('sw-cleaned-v3')) {
+      navigator.serviceWorker.getRegistrations().then(regs => {
+        regs.forEach(reg => reg.unregister());
+      });
+      if (window.caches) {
+        caches.keys().then(names => names.forEach(n => caches.delete(n)));
+      }
+      localStorage.setItem('sw-cleaned-v3', '1');
+      // Reload once so the fresh SW installs cleanly.
+      location.reload();
+    } else {
+      window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js')
-          .then(function(registration) {
-            console.log('✅ Service Worker registered:', registration);
-          })
-          .catch(function(error) {
-            console.warn('⚠️ Service Worker registration failed:', error);
-          });
+          .then(reg => console.log('✅ SW registered:', reg.scope))
+          .catch(err => console.warn('⚠️ SW registration failed:', err));
       });
     }
-  </script>
-
+  }
+</script>
   <!-- ============================================================
        MAIN PLAYER SCRIPT
   ============================================================ -->
