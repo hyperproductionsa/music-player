@@ -50,6 +50,36 @@
     goBack({ push: false });
   });
 
+  // -------- LOCAL STORAGE (A + B) --------
+  const STORAGE_KEY = 'htcoll-last';
+
+  function saveState() {
+    if (!playingAlbum || !playingTrack) return;
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        albumId: playingAlbum.id,
+        trackIdx: playingIdx,
+        position: audio.currentTime || 0,
+        timestamp: Date.now()
+      }));
+    } catch (e) {}
+  }
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return null;
+      const s = JSON.parse(raw);
+      if (!s || !s.albumId || typeof s.trackIdx !== 'number') return null;
+      return s;
+    } catch (e) { return null; }
+  }
+
+  window.addEventListener('beforeunload', saveState);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') saveState();
+  });
+
   // -------- VOLUME --------
   audio.volume = .8;
   if (volumeSlider) {
@@ -155,7 +185,7 @@
       artwork: [{ src: getImage(playingAlbum), sizes: '512x512', type: 'image/jpeg' }]
     });
     navigator.mediaSession.setActionHandler('play', () => { audio.play(); isPlaying = true; updatePlayBtn(); startProgress(); });
-    navigator.mediaSession.setActionHandler('pause', () => { audio.pause(); isPlaying = false; updatePlayBtn(); clearInterval(timer); });
+    navigator.mediaSession.setActionHandler('pause', () => { audio.pause(); isPlaying = false; updatePlayBtn(); clearInterval(timer); saveState(); });
     navigator.mediaSession.setActionHandler('previoustrack', () => { if (playingAlbum) prevTrack(); });
     navigator.mediaSession.setActionHandler('nexttrack', () => { if (playingAlbum) nextTrack(); });
   }
@@ -245,17 +275,18 @@
     const u = getAudio(a, t);
     if (!u) { console.warn('No audio URL for', a.id, i); return; }
     if (audio.src === u) {
-      if (isPlaying) { audio.pause(); isPlaying = false; clearInterval(timer); updatePlayBtn(); return; }
+      if (isPlaying) { audio.pause(); isPlaying = false; clearInterval(timer); updatePlayBtn(); saveState(); return; }
       else { audio.play().then(() => { isPlaying = true; updatePlayBtn(); startProgress(); }).catch(e => { console.warn('Playback blocked:', e); isPlaying = false; updatePlayBtn(); }); return; }
     }
     audio.src = u; audio.load();
     updateNowPlaying(); setupMediaSession(); renderTracklist(a); renderAlbums(); updateArtwork(a);
+    saveState();
     audio.play().then(() => { isPlaying = true; updatePlayBtn(); startProgress(); }).catch(e => { console.warn('Playback blocked:', e); isPlaying = false; updatePlayBtn(); });
   }
 
   function togglePlay() {
     if (!playingTrack) { if (viewedAlbum) playTrack(0, viewedAlbum); return; }
-    if (isPlaying) { audio.pause(); isPlaying = false; clearInterval(timer); updatePlayBtn(); }
+    if (isPlaying) { audio.pause(); isPlaying = false; clearInterval(timer); updatePlayBtn(); saveState(); }
     else { audio.play().then(() => { isPlaying = true; updatePlayBtn(); startProgress(); }).catch(e => { console.warn('Playback blocked:', e); isPlaying = false; updatePlayBtn(); }); }
   }
 
@@ -266,8 +297,10 @@
     if (pfPlay) pfPlay.className = `fas ${i}`;
   }
 
+  let progressTick = 0;
   function startProgress() {
     clearInterval(timer);
+    progressTick = 0;
     timer = setInterval(() => {
       if (audio.duration && !isNaN(audio.duration)) {
         const p = audio.currentTime / audio.duration * 100;
@@ -278,6 +311,11 @@
         if (pfCur) pfCur.textContent = footerCur.textContent;
         if (footerTot) footerTot.textContent = `${tm}:${String(ts).padStart(2, '0')}`;
         if (pfTot) pfTot.textContent = footerTot.textContent;
+        progressTick++;
+        if (progressTick >= 25) { // ~5 seconds (200ms * 25)
+          progressTick = 0;
+          saveState();
+        }
       }
     }, 200);
   }
@@ -290,6 +328,7 @@
       const cm = Math.floor(audio.currentTime / 60), cs = Math.floor(audio.currentTime % 60), tm = Math.floor(audio.duration / 60), ts = Math.floor(audio.duration % 60);
       c.textContent = `${cm}:${String(cs).padStart(2, '0')}`;
       t.textContent = `${tm}:${String(ts).padStart(2, '0')}`;
+      saveState();
     }
   }
 
@@ -308,6 +347,30 @@
   function openFull() { if (pf) pf.classList.add('active'); }
   function closeFull() { if (pf) pf.classList.remove('active'); }
 
+  // -------- PRIME A TRACK (no autoplay) --------
+  function primeTrack(album, trackIdx, position) {
+    const t = album.tracks[trackIdx];
+    if (!t) return;
+    playingAlbum = album;
+    playingTrack = t;
+    playingIdx = trackIdx;
+    albumStates[album.id] = { playingIdx: trackIdx };
+    const u = getAudio(album, t);
+    if (u) {
+      audio.src = u;
+      audio.load();
+      // Set currentTime after metadata is loaded (browsers may reject before)
+      const setPos = () => {
+        try { audio.currentTime = position || 0; } catch (e) {}
+        audio.removeEventListener('loadedmetadata', setPos);
+      };
+      audio.addEventListener('loadedmetadata', setPos);
+    }
+    updateNowPlaying();
+    setupMediaSession();
+    updatePlayBtn(); // shows "play" because isPlaying is false
+  }
+
   // -------- WIRING --------
   if (footerPlay) footerPlay.onclick = togglePlay;
   if (footerPrev) footerPrev.onclick = prevTrack;
@@ -320,25 +383,48 @@
   if (pfNext) pfNext.onclick = nextTrack;
   if (pfClose) pfClose.onclick = closeFull;
   if (backBtn) backBtn.onclick = () => goBack({ push: true });
-  audio.onended = nextTrack;
+  audio.onended = () => { saveState(); nextTrack(); };
   if (footerProgress) footerProgress.addEventListener('click', e => seekTo(e, footerProgress, footerFill, footerCur, footerTot));
   if (pfProgress) pfProgress.addEventListener('click', e => seekTo(e, pfProgress, pfFill, pfCur, pfTot));
 
   // -------- INIT --------
   renderAlbums();
 
+  const stored = loadState();
+
   if (activeAlbumIdFromUrl) {
     const idx = allAlbums.findIndex(a => a.id === activeAlbumIdFromUrl);
     if (idx >= 0) {
-      // Land directly on the album's tracklist. Countdown hidden.
       const a = allAlbums[idx];
       viewedAlbum = a;
       updateArtwork(a);
       updateBuyButton(a);
-      renderTracklist(a);
-      // hide countdown overlay even though updateArtwork would normally show it via updateArtwork(null)
       if (countdownOverlay) countdownOverlay.style.display = 'none';
       countdownVisible = false;
+      // If the stored album matches the URL album, prime the stored track + position.
+      // Otherwise prime track 0 at position 0.
+      if (stored && stored.albumId === a.id) {
+        primeTrack(a, Math.min(stored.trackIdx, a.tracks.length - 1), stored.position);
+      } else {
+        primeTrack(a, 0, 0);
+      }
+      renderTracklist(a);
+      renderAlbums();
+    } else {
+      showAlbumList();
+      updateArtwork(null);
+    }
+  } else if (stored) {
+    const a = allAlbums.find(x => x.id === stored.albumId);
+    if (a) {
+      viewedAlbum = a;
+      updateArtwork(a);
+      updateBuyButton(a);
+      if (countdownOverlay) countdownOverlay.style.display = 'none';
+      countdownVisible = false;
+      primeTrack(a, Math.min(stored.trackIdx, a.tracks.length - 1), stored.position);
+      renderTracklist(a);
+      renderAlbums();
     } else {
       showAlbumList();
       updateArtwork(null);
