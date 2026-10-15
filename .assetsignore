@@ -1,4 +1,8 @@
 _worker.js
+wrangler.jsonc
+wrangler.toml
 .git
+.gitignore
+.node_modules
 .wrangler
-node_modules
+README.md
