@@ -1,0 +1,13 @@
+{
+  "name": "music-player",
+  "compatibility_date": "2026-10-12",
+  "main": "_worker.js",
+  "observability": {
+    "enabled": true
+  },
+  "assets": {
+    "directory": ".",
+    "binding": "ASSETS",
+    "run_worker_first": ["/htc1", "/htc2", "/htc3", "/htc4", "/htc5"]
+  }
+}
