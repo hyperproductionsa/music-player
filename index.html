@@ -175,14 +175,14 @@
   <script>
   if ('serviceWorker' in navigator) {
     // One-shot cleanup of any previously-installed SW + caches.
-    if (!localStorage.getItem('sw-cleaned-v6')) {
+    if (!localStorage.getItem('sw-cleaned-v7')) {
       navigator.serviceWorker.getRegistrations().then(regs => {
         regs.forEach(reg => reg.unregister());
       });
       if (window.caches) {
         caches.keys().then(names => names.forEach(n => caches.delete(n)));
       }
-      localStorage.setItem('sw-cleaned-v6', '1');
+      localStorage.setItem('sw-cleaned-v7', '1');
       // Reload once so the fresh SW installs cleanly.
       location.reload();
     } else {
