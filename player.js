@@ -246,6 +246,7 @@
         const al = viewedAlbum;
         if (!al) return;
         playTrack(parseInt(el.dataset.idx), al);
+        if (window.innerWidth <= 860) openFull();
       };
     });
   }
@@ -384,6 +385,12 @@
   if (pmPlay) pmPlay.onclick = togglePlay;
   if (pmNext) pmNext.onclick = nextTrack;
   if (pmExpand) pmExpand.onclick = openFull;
+  const mobileFooter = $('playerMobile');
+  if (mobileFooter) mobileFooter.addEventListener('click', e => {
+    // The whole mini-player opens the full player except its playback controls.
+    if (e.target.closest('#pmPlay, #pmNext')) return;
+    openFull();
+  });
   if (pfPlay) pfPlay.onclick = togglePlay;
   if (pfPrev) pfPrev.onclick = prevTrack;
   if (pfNext) pfNext.onclick = nextTrack;
