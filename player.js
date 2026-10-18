@@ -45,8 +45,8 @@
   }
 
   function getInfoSlug(path) {
-    const allowed = ['how-purchases-work', 'terms', 'refund-policy', 'privacy-policy'];
-    const slug = String(path || '').replace(/^\/+|\/+$/g, '');
+    const allowed = ['terms', 'refund-policy', 'privacy-policy'];
+    const slug = String(path || '').replace(/^\\/+|\\/+$/g, '');
     return allowed.includes(slug) ? slug : null;
   }
 
@@ -215,53 +215,16 @@
     if (tlBuyBtn) tlBuyBtn.style.display = 'none';
   }
   function showInfoPage(slug, push = true) {
-    const policyLinks = $('policyLinks'), infoPage = $('infoPage');
-    if (!infoPage) return;
-    const pages = {
-      'how-purchases-work': {
-        title: 'How purchases work',
-        body: `
-          <p>Each purchase is for one complete HTs Collections album. After your payment is confirmed by Yoco, a download link is sent to the email address you provide at checkout.</p>
-          <ol><li>Choose an album and press <strong>Buy Now</strong>.</li><li>Complete payment on Yoco’s checkout page.</li><li>Check your email for the album download link.</li><li>Open the link and download the album ZIP within 24 hours, before the link expires.</li><li>Extract the ZIP file on your device to access the album’s MP3 tracks.</li></ol>
-          <p>Check your inbox and spam/junk folder if the email does not appear. If payment succeeded but the email or download link is missing or does not work, use your purchase confirmation to contact support.</p>
-          <p>The link expires 24 hours after it is issued. Download and save your ZIP promptly.</p>`
-      },
-      'terms': {
-        title: 'Terms & Conditions',
-        body: `
-          <p>By purchasing an album through HTs Collections, you agree to these purchase terms.</p>
-          <h3>Digital delivery</h3><p>Albums are supplied as ZIP files containing MP3 audio tracks. After successful payment through Yoco, a download link is sent to the email address entered at checkout. The link expires 24 hours after issue, so download the file in time and keep your downloaded copy safe.</p>
-          <h3>Licence and copyright</h3><p>Your purchase grants you a personal-use licence to listen to the purchased music. Copyright and other intellectual-property rights remain with their respective owners. Unless you have separate written permission, you may not resell, redistribute, publicly share, upload, or commercially exploit the files or claim the music as your own.</p>
-          <h3>Payments and technical requirements</h3><p>Payments are processed through Yoco. You need a compatible device, software capable of extracting ZIP files and playing MP3 audio, and an internet connection to download your purchase. If payment is deducted but your order or link is missing, retain your payment confirmation and contact support.</p>
-          <p>These terms do not remove any rights you may have under applicable consumer-protection law.</p>`
-      },
-      'refund-policy': {
-        title: 'Refund Policy',
-        body: `
-          <p>HTs Collections aims to ensure that every paid album can be downloaded successfully.</p>
-          <ul><li><strong>Payment succeeded but no link arrived:</strong> check your spam/junk folder and retain your payment confirmation. Contact support so delivery can be investigated.</li><li><strong>Broken or incomplete ZIP:</strong> contact support with your purchase details so we can investigate and help resolve the problem.</li><li><strong>Duplicate or incorrect charge:</strong> provide the payment confirmation so the transaction can be checked.</li><li><strong>Expired link:</strong> links expire 24 hours after issue. Contact support if a technical or delivery problem prevented downloading.</li></ul>
-          <p>Refund requests are assessed individually and handled in accordance with applicable South African consumer-protection law. Nothing in this policy limits rights that cannot legally be excluded. A refund is not automatically guaranteed simply because a link expired after successful delivery, but genuine delivery or product faults will be considered.</p>`
-      },
-      'privacy-policy': {
-        title: 'Privacy Policy',
-        body: `
-          <p>HTs Collections aims to collect as little customer information as practical. The email address entered at checkout is used to send the album download link and, where needed, information about that purchase or a support request.</p>
-          <p>Payments are handled by Yoco. Payment processing may involve information provided directly to Yoco; HTs Collections does not ask you to send card details by email. Please review Yoco’s privacy information for details about its processing.</p>
-          <p>Purchase-related information may be used for delivery, payment/order verification, customer support, and applicable legal or accounting obligations. We do not sell your email address.</p>
-          <p>The download link expires 24 hours after it is issued. This does not necessarily mean related purchase records or emails are deleted at that time; records may be retained where reasonably necessary for support, security or legal obligations.</p>
-          <p>For privacy questions or requests concerning your information, reply to the email relating to your purchase and identify the order without sending payment-card details.</p>`
-      }
-    };
-    const page = pages[slug];
-    if (!page) return;
-    if (push) setUrl('/' + slug);
+    const infoPage = $('infoPage');
+    if (!infoPage || !getInfoSlug(slug)) return;
+    if (push) { window.location.href = '/' + slug; return; }
     document.body.classList.add('info-mode');
     if (albumList) albumList.style.display = 'none';
+    const policyLinks = $('policyLinks');
     if (policyLinks) policyLinks.style.display = 'none';
     if (tracklistWrap) tracklistWrap.style.display = 'none';
     const artSection = $('artSection');
     if (artSection) artSection.style.display = 'none';
-    infoPage.innerHTML = '<h1>' + page.title + '</h1><div class="info-copy">' + page.body + '</div>';
     infoPage.style.display = 'block';
     if (backBtn) backBtn.style.display = 'inline';
     if (headerBadge) headerBadge.style.display = 'none';
@@ -269,6 +232,8 @@
 
   function showTracklist() {
     if (albumList) albumList.style.display = 'none';
+    const policyLinks = $('policyLinks');
+    if (policyLinks) policyLinks.style.display = 'none';
     if (tracklistWrap) tracklistWrap.style.display = 'flex';
     if (backBtn) backBtn.style.display = 'inline';
     if (headerBadge) headerBadge.style.display = 'none';
@@ -470,13 +435,7 @@
   if (pfNext) pfNext.onclick = nextTrack;
   if (pfClose) pfClose.onclick = closeFull;
   if (backBtn) backBtn.onclick = () => goBack({ push: true });
-  const policyLinks = $('policyLinks');
-  if (policyLinks) policyLinks.addEventListener('click', e => {
-    const link = e.target.closest('[data-info-page]');
-    if (!link) return;
-    e.preventDefault();
-    showInfoPage(link.dataset.infoPage, true);
-  });
+
   audio.onended = () => { saveState(); nextTrack(); };
   if (footerProgress) footerProgress.addEventListener('click', e => seekTo(e, footerProgress, footerFill, footerCur, footerTot));
   if (pfProgress) pfProgress.addEventListener('click', e => seekTo(e, pfProgress, pfFill, pfCur, pfTot));
