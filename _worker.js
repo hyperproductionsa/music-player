@@ -47,13 +47,13 @@ export default {
       return res;
     }
 
-    // ─────────────────────────────────────────────
+    // Policy pages: content is injected from policy-pages.json.
+    const policyMatch = path.match(/^\/(terms|refund-policy|privacy-policy)\/?$/);
+    if (policyMatch) return renderPolicyPage(request, env, policyMatch[1]);
+
     // Album pages: /htc1 … /htc5
-    // ─────────────────────────────────────────────
     const match = path.match(/^\/(htc[1-5])\/?$/);
-    if (match) {
-      return renderAlbumPage(request, env, match[1]);
-    }
+    if (match) return renderAlbumPage(request, env, match[1]);
 
     // ─────────────────────────────────────────────
     // Everything else → static assets
@@ -61,6 +61,34 @@ export default {
     return env.ASSETS.fetch(request);
   }
 };
+
+
+async function renderPolicyPage(request, env, slug) {
+  const url = new URL(request.url);
+  const [shell, policyRes] = await Promise.all([
+    env.ASSETS.fetch(new URL("/", url.origin)),
+    env.ASSETS.fetch(new URL("/policy-pages.json", url.origin))
+  ]);
+  if (!shell.ok || !policyRes.ok) return new Response("Policy page unavailable", { status: 503 });
+  const pages = await policyRes.json();
+  const page = pages[slug];
+  if (!page || !page.title || !page.body) return new Response("Policy page not found", { status: 404 });
+  const pageUrl = `${CANONICAL}/${slug}`;
+  const description = `${page.title} for HTs Collections digital album purchases.`;
+  return new HTMLRewriter()
+    .on("title", { element(el) { el.setInnerContent(`${page.title} | HTs Collections`); } })
+    .on('meta[name="description"]', { element(el) { el.setAttribute("content", description); } })
+    .on('link[rel="canonical"]', { element(el) { el.setAttribute("href", pageUrl); } })
+    .on('meta[property="og:title"]', { element(el) { el.setAttribute("content", `${page.title} | HTs Collections`); } })
+    .on('meta[property="og:description"]', { element(el) { el.setAttribute("content", description); } })
+    .on('meta[property="og:url"]', { element(el) { el.setAttribute("content", pageUrl); } })
+    .on("#infoPage", { element(el) {
+      el.setInnerContent(`<h1>${page.title}</h1><div class="info-copy">${page.body}</div>`, { html: true });
+    }})
+    .transform(new Response(await shell.text(), {
+      headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache" }
+    }));
+}
 
 // ─────────────────────────────────────────────
 // Album page SSR
