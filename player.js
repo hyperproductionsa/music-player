@@ -57,7 +57,13 @@
     if (m) {
       const id = `htc${m[1]}`;
       const idx = allAlbums.findIndex(a => a.id === id);
-      if (idx >= 0) { loadAlbum(idx, { push: false }); return; }
+      if (idx >= 0) {
+        document.body.classList.remove('info-mode');
+        const artSection = $('artSection');
+        if (artSection) artSection.style.display = '';
+        loadAlbum(idx, { push: false });
+        return;
+      }
     }
     goBack({ push: false });
   });
