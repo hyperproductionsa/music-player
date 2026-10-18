@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hts-player-v5.4';   // bump this string on every deploy
+const CACHE_NAME = 'hts-player-v5.5';   // bump this string on every deploy
 const PRECACHE = [
   '/',
   '/index.html',
