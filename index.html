@@ -85,18 +85,6 @@
     <section class="art-section" id="artSection">
       <div class="art-wrap" id="artWrap">
         <img id="artImg" src="https://cdn.htcoll.shop/images/HTC5.jpg" alt="HTs Collections V cover" />
-        <div class="countdown-overlay" id="countdownOverlay">
-          <div class="countdown-icon"><i class="fas fa-clock"></i></div>
-          <div class="countdown-badge">RELEASING IN</div>
-          <div class="countdown-timer">
-            <span class="countdown-block"><span class="countdown-number" id="cdDays">00</span><span class="countdown-label">Days</span></span>
-            <span class="countdown-block"><span class="countdown-number" id="cdHours">00</span><span class="countdown-label">Hours</span></span>
-            <span class="countdown-block"><span class="countdown-number" id="cdMinutes">00</span><span class="countdown-label">Mins</span></span>
-            <span class="countdown-block"><span class="countdown-number" id="cdSeconds">00</span><span class="countdown-label">Secs</span></span>
-          </div>
-          <div class="countdown-sub">HTs Collections V · 14 tracks</div>
-          <small><i class="fas fa-calendar"></i> <span id="csDate">25 Sep 2026</span></small>
-        </div>
       </div>
       <div class="art-buy-container" id="artBuyContainer" style="display:none;">
         <button class="buy-btn" id="artBuyBtn"><i class="fas fa-shopping-cart"></i> Buy Now</button>
@@ -126,8 +114,8 @@
     <div class="footer-left">
       <img id="footerArt" src="https://cdn.htcoll.shop/images/HTC5.jpg" alt="Now playing" />
       <div class="footer-info">
-        <div id="footerTitle">Select a track</div>
-        <div id="footerArtist">—</div>
+        <div id="footerTitle">HTs Collections</div>
+        <div id="footerArtist">HyperSOUL-X</div>
       </div>
     </div>
     <div class="footer-center">
@@ -155,8 +143,8 @@
     <div class="pm-left">
       <img id="pmArt" src="https://cdn.htcoll.shop/images/HTC5.jpg" alt="Now playing" />
       <div class="pm-info">
-        <div id="pmTitle">Select a track</div>
-        <div id="pmArtist">—</div>
+        <div id="pmTitle">HTs Collections</div>
+        <div id="pmArtist">HyperSOUL-X</div>
       </div>
     </div>
     <div class="pm-controls">
@@ -172,7 +160,7 @@
   <div id="playerFull">
     <div class="pf-header"><i class="fas fa-chevron-down" id="pfClose"></i><span>Now Playing</span><i class="fas fa-ellipsis-h"></i></div>
     <img id="pfArt" src="https://cdn.htcoll.shop/images/HTC5.jpg" alt="Now playing" />
-    <div class="pf-info"><div id="pfTitle">Select a track</div><div id="pfArtist">—</div></div>
+    <div class="pf-info"><div id="pfTitle">HTs Collections</div><div id="pfArtist">HyperSOUL-X</div></div>
     <div class="pf-bar"><span id="pfCur">0:00</span><div class="pf-progress" id="pfProgress"><div class="pf-fill" id="pfFill"></div></div><span id="pfTot">0:00</span></div>
     <div class="pf-btns">
       <i class="fas fa-step-backward" id="pfPrev"></i>
@@ -187,14 +175,14 @@
   <script>
   if ('serviceWorker' in navigator) {
     // One-shot cleanup of any previously-installed SW + caches.
-    if (!localStorage.getItem('sw-cleaned-v3')) {
+    if (!localStorage.getItem('sw-cleaned-v4')) {
       navigator.serviceWorker.getRegistrations().then(regs => {
         regs.forEach(reg => reg.unregister());
       });
       if (window.caches) {
         caches.keys().then(names => names.forEach(n => caches.delete(n)));
       }
-      localStorage.setItem('sw-cleaned-v3', '1');
+      localStorage.setItem('sw-cleaned-v4', '1');
       // Reload once so the fresh SW installs cleanly.
       location.reload();
     } else {
