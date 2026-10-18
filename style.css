@@ -198,3 +198,25 @@ main{display:flex;gap:24px;flex:1;min-height:0;padding:16px 24px;overflow:hidden
   #pmArtist{font-size:.55rem}
   .pm-controls i{font-size:1.1rem}
 }
+
+/* In-player information links and simple policy pages */
+#policyLinks{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:8px 16px;padding:10px 4px 4px;flex-shrink:0}
+#policyLinks a{color:#aaa;font-size:.7rem;text-decoration:underline;text-decoration-color:#555;text-underline-offset:3px;white-space:nowrap}
+#policyLinks a:hover{color:#e5de69;text-decoration-color:#e5de69}
+#infoPage{flex:1;min-height:0;overflow-y:auto;background:#141414;border:1px solid #262626;border-radius:12px;padding:24px;color:#ddd}
+#infoPage h1{color:#e5de69;font-size:1.25rem;font-weight:700;margin-bottom:18px}
+#infoPage .info-copy{max-width:760px;font-size:.9rem;line-height:1.7}
+#infoPage .info-copy p{margin:0 0 14px}
+#infoPage .info-copy h3{color:#fff;font-size:.95rem;margin:18px 0 6px}
+#infoPage .info-copy ol,#infoPage .info-copy ul{padding-left:22px;margin:0 0 16px}
+#infoPage .info-copy li{padding-left:4px;margin-bottom:7px}
+body.info-mode main{display:block}
+body.info-mode #listSection{height:100%;width:100%;min-width:0}
+body.info-mode #infoPage{height:100%}
+@media(max-width:860px){
+ #policyLinks{justify-content:center;gap:8px 14px;padding:10px 2px 12px}
+ #policyLinks a{font-size:.68rem}
+ #infoPage{padding:18px 16px}
+ #infoPage h1{font-size:1.1rem}
+ #infoPage .info-copy{font-size:.82rem;line-height:1.65}
+}
