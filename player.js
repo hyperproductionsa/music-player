@@ -4,11 +4,10 @@
     throw new Error(`Failed to load data.json (HTTP ${res.status})`);
   }
   const DATA = await res.json();
-  if (!DATA || !Array.isArray(DATA.albums) || !DATA.comingSoonAlbum) {
-    throw new Error('data.json is missing required album data');
+  if (!DATA || !Array.isArray(DATA.albums) || DATA.albums.length === 0) {
+    throw new Error('data.json is missing album data');
   }
-  const { baseUrl, comingSoon, albums, comingSoonAlbum } = DATA;
-  const releaseDate = new Date(comingSoon);
+  const { baseUrl, albums } = DATA;
   const audio = new Audio();
   const getAudio = (a, t) => {
     if (!a || !a.folder) { console.warn('⚠️ Missing folder on album:', a && a.id, a && a.title); return ''; }
@@ -16,15 +15,14 @@
   };
   const getImage = a => `${baseUrl}/images/${a.cover}`;
 
-  let playingAlbum = null, playingTrack = null, playingIdx = 0, isPlaying = false, timer = null, viewedAlbum = null, countdownVisible = true;
+  let playingAlbum = null, playingTrack = null, playingIdx = 0, isPlaying = false, timer = null, viewedAlbum = null;
   const albumStates = {};
   const $ = id => document.getElementById(id);
   const albumList = $('albumList'), tracklistWrap = $('tracklistWrap'), tracklist = $('tracklist'),
         tlTitle = $('tlTitle'), tlArtist = $('tlArtist'), tlBuyBtn = $('tlBuyBtn'),
         backBtn = $('backBtn'), headerBadge = $('headerBadge'), artImg = $('artImg'),
-        countdownOverlay = $('countdownOverlay'), artBuyContainer = $('artBuyContainer'),
+        artBuyContainer = $('artBuyContainer'),
         artBuyBtn = $('artBuyBtn'), artBuyPrice = $('artBuyPrice'),
-        cdDays = $('cdDays'), cdHours = $('cdHours'), cdMinutes = $('cdMinutes'), cdSeconds = $('cdSeconds'), csDate = $('csDate'),
         footerArt = $('footerArt'), footerTitle = $('footerTitle'), footerArtist = $('footerArtist'),
         footerFill = $('footerFill'), footerCur = $('footerCur'), footerTot = $('footerTot'),
         footerProgress = $('footerProgress'), footerPlay = $('footerPlay'), footerPrev = $('footerPrev'), footerNext = $('footerNext'),
@@ -34,8 +32,7 @@
         pfFill = $('pfFill'), pfCur = $('pfCur'), pfTot = $('pfTot'), pfProgress = $('pfProgress'),
         pfPlay = $('pfPlay'), pfPrev = $('pfPrev'), pfNext = $('pfNext'), pfClose = $('pfClose');
 
-  const allAlbums = [...albums, { ...comingSoonAlbum }];
-  const comingSoonIndex = allAlbums.length - 1;
+  const allAlbums = albums;
 
   // -------- ROUTING --------
   const pathMatch = window.location.pathname.match(/^\/htc([1-5])$/);
@@ -60,14 +57,15 @@
   const STORAGE_KEY = 'htcoll-last';
 
   function saveState() {
-    if (!playingAlbum || !playingTrack) return;
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({
-        albumId: playingAlbum.id,
-        trackIdx: playingIdx,
-        position: audio.currentTime || 0,
-        timestamp: Date.now()
-      }));
+      const previous = loadState() || {};
+      const state = { ...previous, volume: audio.volume, timestamp: Date.now() };
+      if (playingAlbum && playingTrack) {
+        state.albumId = playingAlbum.id;
+        state.trackIdx = playingIdx;
+        state.position = Number.isFinite(audio.currentTime) ? audio.currentTime : (previous.position || 0);
+      }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     } catch (e) {}
   }
 
@@ -76,8 +74,9 @@
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return null;
       const s = JSON.parse(raw);
-      if (!s || !s.albumId || typeof s.trackIdx !== 'number') return null;
-      return s;
+      if (!s || typeof s !== 'object') return null;
+      if (s.albumId && typeof s.trackIdx === 'number') return s;
+      return Number.isFinite(s.volume) ? s : null;
     } catch (e) { return null; }
   }
 
@@ -87,10 +86,18 @@
   });
 
   // -------- VOLUME --------
-  audio.volume = .8;
+  const initialState = loadState();
+  const savedVolume = initialState && Number.isFinite(initialState.volume)
+    ? Math.min(1, Math.max(0, initialState.volume))
+    : .8;
+  audio.volume = savedVolume;
   if (volumeSlider) {
-    volumeSlider.value = .8;
-    volumeSlider.addEventListener('input', function () { audio.volume = parseFloat(this.value); updateVolumeIcon(); });
+    volumeSlider.value = savedVolume;
+    volumeSlider.addEventListener('input', function () {
+      audio.volume = Math.min(1, Math.max(0, parseFloat(this.value) || 0));
+      updateVolumeIcon();
+      saveState();
+    });
   }
   function updateVolumeIcon() {
     if (!volumeIcon) return;
@@ -99,8 +106,13 @@
   }
   if (volumeIcon) volumeIcon.addEventListener('click', function () {
     if (audio.volume > 0) { audio.volume = 0; if (volumeSlider) volumeSlider.value = 0; }
-    else { audio.volume = .8; if (volumeSlider) volumeSlider.value = .8; }
+    else {
+      const remembered = initialState && Number.isFinite(initialState.volume) && initialState.volume > 0 ? initialState.volume : .8;
+      audio.volume = remembered;
+      if (volumeSlider) volumeSlider.value = remembered;
+    }
     updateVolumeIcon();
+    saveState();
   });
 
   // -------- BUY --------
@@ -114,32 +126,10 @@
     } catch (e) { console.error('❌ Payment error:', e); alert('Payment error. Please try again.'); }
   };
 
-  // -------- COUNTDOWN --------
-  function updateCountdown() {
-    if (!countdownOverlay) return;
-    if (!countdownVisible) { countdownOverlay.style.display = 'none'; return; }
-    countdownOverlay.style.display = 'flex';
-    const now = new Date(), diff = releaseDate - now;
-    if (diff <= 0) {
-      countdownOverlay.innerHTML = `<div style="color:#e5de69;font-size:2rem;margin-bottom:8px;"><i class="fas fa-check-circle"></i></div><div style="color:#e5de69;font-size:1rem;font-weight:700;background:#1e1d12;padding:6px 20px;border-radius:40px;border:2px solid #e5de69;margin-bottom:10px;">NOW AVAILABLE</div><h2 style="color:#fff;font-size:1.6rem;">HTs Collections V</h2><p style="color:#aaa;font-size:.85rem;margin:4px 0;">HyperSOUL-X · 2026 · 14 tracks</p>`;
-      return;
-    }
-    const d = Math.floor(diff / 864e5), h = Math.floor(diff % 864e5 / 36e5), m = Math.floor(diff % 36e5 / 6e4), s = Math.floor(diff % 6e4 / 1e3);
-    if (cdDays) cdDays.textContent = String(d).padStart(2, '0');
-    if (cdHours) cdHours.textContent = String(h).padStart(2, '0');
-    if (cdMinutes) cdMinutes.textContent = String(m).padStart(2, '0');
-    if (cdSeconds) cdSeconds.textContent = String(s).padStart(2, '0');
-    if (csDate) csDate.textContent = releaseDate.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
-  }
-
   function updateArtwork(a) {
-    if (!artImg || !countdownOverlay) return;
-    if (a) { artImg.src = getImage(a); countdownOverlay.style.display = 'none'; countdownVisible = false; return; }
-    const d = allAlbums[comingSoonIndex];
-    artImg.src = getImage(d);
-    countdownVisible = true;
-    countdownOverlay.style.display = 'flex';
-    updateCountdown();
+    if (!artImg) return;
+    const artworkAlbum = a || allAlbums[allAlbums.length - 1];
+    if (artworkAlbum) artImg.src = getImage(artworkAlbum);
   }
 
   function updateBuyButton(a) {
@@ -154,11 +144,11 @@
 
   function updateNowPlaying() {
     if (!playingTrack || !playingAlbum) {
-      if (footerTitle) footerTitle.textContent = 'Select a track';
-      if (footerArtist) footerArtist.textContent = '—';
-      if (pfTitle) pfTitle.textContent = 'Select a track';
-      if (pfArtist) pfArtist.textContent = '—';
-      updateMobileText('Select a track', '—');
+      if (footerTitle) footerTitle.textContent = 'HTs Collections';
+      if (footerArtist) footerArtist.textContent = 'HyperSOUL-X';
+      if (pfTitle) pfTitle.textContent = 'HTs Collections';
+      if (pfArtist) pfArtist.textContent = 'HyperSOUL-X';
+      updateMobileText('HTs Collections', 'HyperSOUL-X');
       return;
     }
     const t = playingTrack.mix ? `${playingTrack.title} (${playingTrack.mix})` : playingTrack.title;
@@ -175,7 +165,7 @@
 
   function updateMobileText(t, a) {
     if (!pmTitle || !pmArtist) return;
-    pmTitle.textContent = t || 'Select a track';
+    pmTitle.textContent = t || 'HTs Collections';
     pmArtist.textContent = a || '—';
     pmTitle.classList.remove('scroll'); void pmTitle.offsetWidth;
     if (pmTitle.scrollWidth > pmTitle.clientWidth) pmTitle.classList.add('scroll');
@@ -200,7 +190,7 @@
     if (albumList) albumList.style.display = 'flex';
     if (tracklistWrap) tracklistWrap.style.display = 'none';
     if (backBtn) backBtn.style.display = 'none';
-    if (headerBadge) { headerBadge.style.display = 'inline'; headerBadge.textContent = '5 albums'; }
+    if (headerBadge) { headerBadge.style.display = 'inline'; headerBadge.textContent = allAlbums.length + ' albums'; }
     if (tlBuyBtn) tlBuyBtn.style.display = 'none';
   }
   function showTracklist() {
@@ -303,28 +293,34 @@
     if (pfPlay) pfPlay.className = `fas ${i}`;
   }
 
+  function updateProgressDisplay() {
+    if (!audio.duration || !Number.isFinite(audio.duration)) return;
+    const percent = Math.min(100, Math.max(0, audio.currentTime / audio.duration * 100));
+    if (footerFill) footerFill.style.width = percent + '%';
+    if (pfFill) pfFill.style.width = percent + '%';
+    const cm = Math.floor(audio.currentTime / 60), cs = Math.floor(audio.currentTime % 60);
+    const tm = Math.floor(audio.duration / 60), ts = Math.floor(audio.duration % 60);
+    const current = `${cm}:${String(cs).padStart(2, '0')}`;
+    const total = `${tm}:${String(ts).padStart(2, '0')}`;
+    if (footerCur) footerCur.textContent = current;
+    if (pfCur) pfCur.textContent = current;
+    if (footerTot) footerTot.textContent = total;
+    if (pfTot) pfTot.textContent = total;
+  }
+
   let progressTick = 0;
   function startProgress() {
     clearInterval(timer);
     progressTick = 0;
     timer = setInterval(() => {
-      if (audio.duration && !isNaN(audio.duration)) {
-        const p = audio.currentTime / audio.duration * 100;
-        if (footerFill) footerFill.style.width = p + '%';
-        if (pfFill) pfFill.style.width = p + '%';
-        const cm = Math.floor(audio.currentTime / 60), cs = Math.floor(audio.currentTime % 60), tm = Math.floor(audio.duration / 60), ts = Math.floor(audio.duration % 60);
-        if (footerCur) footerCur.textContent = `${cm}:${String(cs).padStart(2, '0')}`;
-        if (pfCur) pfCur.textContent = footerCur.textContent;
-        if (footerTot) footerTot.textContent = `${tm}:${String(ts).padStart(2, '0')}`;
-        if (pfTot) pfTot.textContent = footerTot.textContent;
+      updateProgressDisplay();
+      if (audio.duration && Number.isFinite(audio.duration)) {
         progressTick++;
-        if (progressTick >= 25) { // ~5 seconds (200ms * 25)
-          progressTick = 0;
-          saveState();
-        }
+        if (progressTick >= 25) { progressTick = 0; saveState(); }
       }
     }, 200);
   }
+  audio.addEventListener('timeupdate', updateProgressDisplay);
 
   function seekTo(e, p, f, c, t) {
     const r = p.getBoundingClientRect(), x = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
@@ -367,7 +363,11 @@
       audio.load();
       // Set currentTime after metadata is loaded (browsers may reject before)
       const setPos = () => {
-        try { audio.currentTime = position || 0; } catch (e) {}
+        try {
+          const maxPosition = Number.isFinite(audio.duration) ? Math.max(0, audio.duration - 0.25) : 0;
+          audio.currentTime = Math.min(Math.max(0, Number(position) || 0), maxPosition);
+        } catch (e) {}
+        updateProgressDisplay();
         audio.removeEventListener('loadedmetadata', setPos);
       };
       audio.addEventListener('loadedmetadata', setPos);
@@ -405,10 +405,7 @@
       viewedAlbum = a;
       updateArtwork(a);
       updateBuyButton(a);
-      if (countdownOverlay) countdownOverlay.style.display = 'none';
-      countdownVisible = false;
-      // If the stored album matches the URL album, prime the stored track + position.
-      // Otherwise prime track 0 at position 0.
+      // If the stored album matches the URL album, restore its last track and position.
       if (stored && stored.albumId === a.id) {
         primeTrack(a, Math.min(stored.trackIdx, a.tracks.length - 1), stored.position);
       } else {
@@ -426,9 +423,7 @@
       viewedAlbum = a;
       updateArtwork(a);
       updateBuyButton(a);
-      if (countdownOverlay) countdownOverlay.style.display = 'none';
-      countdownVisible = false;
-      primeTrack(a, Math.min(stored.trackIdx, a.tracks.length - 1), stored.position);
+      primeTrack(a, Math.min(Math.max(0, stored.trackIdx), a.tracks.length - 1), stored.position);
       renderTracklist(a);
       renderAlbums();
     } else {
@@ -440,13 +435,10 @@
     updateArtwork(null);
   }
 
-  updateMobileText('Select a track', '—');
-  if (footerArt) footerArt.src = getImage(allAlbums[comingSoonIndex]);
-  if (pmArt) pmArt.src = getImage(allAlbums[comingSoonIndex]);
+  if (!playingTrack) updateNowPlaying();
   if (artBuyContainer) { artBuyContainer.style.display = 'none'; artBuyContainer.classList.add('hidden'); }
   if (tlBuyBtn) { tlBuyBtn.style.display = 'none'; tlBuyBtn.classList.add('hidden'); }
-  updateCountdown();
-  setInterval(updateCountdown, 1e3);
+  updateArtwork(playingAlbum);
   updateVolumeIcon();
 
   const main = document.getElementById('main'), pcFooter = document.getElementById('pcFooter'), mobileFooter = document.getElementById('playerMobile');
@@ -456,7 +448,6 @@
     if (pcFooter) pcFooter.style.display = m ? 'none' : 'flex';
     if (mobileFooter) mobileFooter.style.display = m ? 'flex' : 'none';
     updateArtwork(playingAlbum);
-    if (activeAlbumIdFromUrl) { if (countdownOverlay) countdownOverlay.style.display = 'none'; }
   }
   handleResize();
   window.addEventListener('resize', handleResize);
