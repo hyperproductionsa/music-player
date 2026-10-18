@@ -46,7 +46,7 @@
 
   function getInfoSlug(path) {
     const allowed = ['terms', 'refund-policy', 'privacy-policy'];
-    const slug = String(path || '').replace(/^\\/+|\\/+$/g, '');
+    const slug = String(path || '').replace(/^\/+|\/+$/g, '');
     return allowed.includes(slug) ? slug : null;
   }
 
