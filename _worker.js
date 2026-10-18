@@ -197,7 +197,10 @@ async function buildSitemap(origin, env) {
 
   // Static entries
   const staticEntries = [
-    { loc: "/", priority: "1.0", changefreq: "weekly" }
+    { loc: "/", priority: "1.0", changefreq: "weekly" },
+    { loc: "/terms", priority: "0.4", changefreq: "yearly" },
+    { loc: "/refund-policy", priority: "0.4", changefreq: "yearly" },
+    { loc: "/privacy-policy", priority: "0.4", changefreq: "yearly" }
   ];
 
   // Album entries — one per /htcN
