@@ -35,7 +35,7 @@ export default {
       const cached = await cache.match(cacheKey);
       if (cached) return cached;
 
-      const xml = await buildSitemap(url.origin, env);
+      const xml = await buildSitemap(CANONICAL, env);
       const res = new Response(xml, {
         headers: {
           "Content-Type": "application/xml; charset=utf-8",
@@ -85,9 +85,10 @@ async function renderAlbumPage(request, env, albumId) {
   const dateLine  = album.releaseDate
     ? `Released ${album.releaseDate}.`
     : `Released ${album.year}.`;
-  const description = `${album.title} by ${album.artist}. ${album.tracks.length} tracks. ${dateLine} Stream on HTs Collections.`;
+  const tracks = Array.isArray(album.tracks) ? album.tracks : [];
+  const description = `${album.title} by ${album.artist}. ${tracks.length} tracks. ${dateLine} Stream on HTs Collections.`;
 
-  const tracklistText = (album.tracks || []).map((t, i) => {
+  const tracklistText = tracks.map((t, i) => {
     const mix = t.mix ? ` (${t.mix})` : "";
     return `${i + 1}. ${t.artist} - ${t.title}${mix}`;
   }).join("\n");
@@ -95,7 +96,7 @@ async function renderAlbumPage(request, env, albumId) {
   const hiddenBlock = `
 <div style="display:none" aria-hidden="true">
 ${album.title} — ${album.artist} (${album.year})
-${album.tracks.length} tracks. ${dateLine}
+${tracks.length} tracks. ${dateLine}
 Tracklist:
 ${tracklistText}
 </div>`;
