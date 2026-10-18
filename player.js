@@ -385,8 +385,8 @@
   if (pmPlay) pmPlay.onclick = togglePlay;
   if (pmNext) pmNext.onclick = nextTrack;
   if (pmExpand) pmExpand.onclick = openFull;
-  const mobileFooter = $('playerMobile');
-  if (mobileFooter) mobileFooter.addEventListener('click', e => {
+  const mobileFooterTapTarget = $('playerMobile');
+  if (mobileFooterTapTarget) mobileFooterTapTarget.addEventListener('click', e => {
     // The whole mini-player opens the full player except its playback controls.
     if (e.target.closest('#pmPlay, #pmNext')) return;
     openFull();
