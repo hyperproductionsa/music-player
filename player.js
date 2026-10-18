@@ -1,6 +1,12 @@
 (async function(){
   const res = await fetch('data.json');
+  if (!res.ok) {
+    throw new Error(`Failed to load data.json (HTTP ${res.status})`);
+  }
   const DATA = await res.json();
+  if (!DATA || !Array.isArray(DATA.albums) || !DATA.comingSoonAlbum) {
+    throw new Error('data.json is missing required album data');
+  }
   const { baseUrl, comingSoon, albums, comingSoonAlbum } = DATA;
   const releaseDate = new Date(comingSoon);
   const audio = new Audio();
