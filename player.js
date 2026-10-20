@@ -452,7 +452,7 @@
       if (mode === 'open' && pf.classList.contains('active')) return;
       if (mode === 'close' && !pf.classList.contains('active')) return;
       event.preventDefault();
-      drag = { mode, id: event.pointerId, startY: event.clientY, lastY: event.clientY,
+      drag = { mode, id: event.pointerId, surface: event.currentTarget, startY: event.clientY, lastY: event.clientY,
         lastTime: performance.now(), velocity: 0, moved: false };
       if (mode === 'open') {
         // Keep the footer as the only visible surface until the finger
@@ -525,10 +525,16 @@
         document.body.classList.add('player-expanded');
       }
       if (d.moved) {
-        // Suppress the synthetic click produced by a completed drag.
-        const suppress = e => { e.preventDefault(); e.stopPropagation(); };
-        pf.addEventListener('click', suppress, { capture: true, once: true });
-        mini.addEventListener('click', suppress, { capture: true, once: true });
+        // Suppress only the click on the surface where this drag began.
+        // Adding listeners to both surfaces leaves a stale handler behind,
+        // which can swallow the next real tap and force a double-tap.
+        const surface = d.surface;
+        const suppress = e => {
+          e.preventDefault();
+          e.stopPropagation();
+          surface.removeEventListener('click', suppress, true);
+        };
+        surface.addEventListener('click', suppress, { capture: true, once: true });
       }
     }
 
