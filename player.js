@@ -486,8 +486,7 @@
   }
 
   if (!playingTrack) updateNowPlaying();
-  if (artBuyContainer) { artBuyContainer.style.display = 'none'; artBuyContainer.classList.add('hidden'); }
-  if (tlBuyBtn) { tlBuyBtn.style.display = 'none'; tlBuyBtn.classList.add('hidden'); }
+  // Keep buy buttons visible for a directly opened album route; showAlbumList() handles list visibility.
   updateArtwork(playingAlbum);
   updateVolumeIcon();
 
