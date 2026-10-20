@@ -109,8 +109,10 @@ main{display:flex;gap:24px;flex:1;min-height:0;padding:16px 24px;overflow:hidden
 .pm-controls i{font-size:1.4rem;cursor:pointer}
 .pm-expand{color:#666;padding:0 4px;cursor:pointer;flex-shrink:0}
 
-#playerFull{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:#0f0f0f;flex-direction:column;padding:20px 24px 30px;z-index:1000}
-#playerFull.active{display:flex}
+#playerFull{display:flex;position:fixed;top:0;left:0;right:0;bottom:0;background:#0f0f0f;flex-direction:column;padding:20px 24px 30px;z-index:1000;visibility:hidden;opacity:0;pointer-events:none;transform:translateY(100%);transition:transform .32s cubic-bezier(.2,.75,.25,1),opacity .24s ease,visibility .32s;will-change:transform;touch-action:pan-y}
+#playerFull.active{visibility:visible;opacity:1;pointer-events:auto;transform:translateY(0)}
+#playerFull .pf-header{touch-action:pan-y}
+@media(prefers-reduced-motion:reduce){#playerFull{transition:none}}
 .pf-header{display:flex;justify-content:space-between;align-items:center;padding-bottom:16px;color:#fff;flex-shrink:0}
 .pf-header i{font-size:1.4rem;cursor:pointer;color:#888}
 .pf-header span{font-weight:500;color:#fff}
