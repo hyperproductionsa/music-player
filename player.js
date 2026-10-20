@@ -493,10 +493,17 @@
         }
         pf.classList.add('active');
         document.body.classList.add('player-expanded');
-      } else if (shouldClose || d.mode === 'open') {
+      } else if (shouldClose) {
+        // Let popstate perform the close when the expanded player owns a history entry.
+        if (history.state && history.state.playerExpanded) {
+          history.back();
+          return;
+        }
         pf.classList.remove('active');
         document.body.classList.remove('player-expanded');
-        if (history.state && history.state.playerExpanded) history.back();
+      } else if (d.mode === 'open') {
+        pf.classList.remove('active');
+        document.body.classList.remove('player-expanded');
       } else {
         pf.classList.add('active');
         document.body.classList.add('player-expanded');
