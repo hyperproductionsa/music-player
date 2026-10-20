@@ -50,7 +50,18 @@
     return allowed.includes(slug) ? slug : null;
   }
 
-  window.addEventListener('popstate', () => {
+  window.addEventListener('popstate', (event) => {
+    // The Android/browser Back button first dismisses the expanded player.
+    // A second Back then navigates from an album to the main album list.
+    if (pf && pf.classList.contains('active') && !(event.state && event.state.playerExpanded)) {
+      closeFull(true);
+      return;
+    }
+    // Forward navigation can restore the expanded-player state.
+    if (event.state && event.state.playerExpanded) {
+      openFull(false);
+      return;
+    }
     const infoSlug = getInfoSlug(window.location.pathname);
     if (infoSlug) { showInfoPage(infoSlug, false); return; }
     const m = window.location.pathname.match(/^\/htc([1-5])$/);
@@ -386,13 +397,22 @@
     if (tlBuyBtn) { tlBuyBtn.style.display = 'none'; tlBuyBtn.classList.add('hidden'); }
   }
 
-  function openFull() {
-    if (!pf) return;
+  function openFull(pushHistory = true) {
+    if (!pf || pf.classList.contains('active')) return;
+    // Give the expanded player its own history entry so Back collapses it
+    // instead of leaving the site. Keep the current URL (including album routes).
+    if (pushHistory && !(history.state && history.state.playerExpanded)) {
+      history.pushState({ ...(history.state || {}), playerExpanded: true }, '', window.location.href);
+    }
     pf.classList.add('active');
     document.body.classList.add('player-expanded');
   }
-  function closeFull() {
+  function closeFull(fromPopState = false) {
     if (!pf) return;
+    if (!fromPopState && history.state && history.state.playerExpanded) {
+      history.back();
+      return;
+    }
     pf.classList.remove('active');
     document.body.classList.remove('player-expanded');
   }
