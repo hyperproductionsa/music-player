@@ -455,13 +455,9 @@
       drag = { mode, id: event.pointerId, startY: event.clientY, lastY: event.clientY,
         lastTime: performance.now(), velocity: 0, moved: false };
       if (mode === 'open') {
-        // Put the full player below the viewport BEFORE revealing it.
-        // This prevents the active-state CSS from flashing it at the top
-        // before the first pointermove arrives.
+        // Keep the footer as the only visible surface until the finger
+        // actually starts an upward drag. A tap should use the normal click.
         pf.classList.add('dragging');
-        pf.style.transform = 'translateY(100%)';
-        pf.classList.add('active');
-        document.body.classList.add('player-expanded');
       } else {
         pf.classList.add('dragging');
       }
@@ -475,10 +471,17 @@
       drag.velocity = (event.clientY - drag.lastY) / Math.max(1, now - drag.lastTime);
       drag.lastY = event.clientY;
       drag.lastTime = now;
-      // Ignore tiny finger jitter; it should behave like a tap, not a drag.
+      // Ignore tiny finger jitter; a tap must not start the drag surface.
       if (Math.abs(dy) > 12) drag.moved = true;
       if (drag.mode === 'open') {
-        pf.style.transform = 'translateY(calc(100% + ' + Math.min(0, dy) + 'px))';
+        if (dy < -12) {
+          if (!pf.classList.contains('active')) {
+            pf.style.transform = 'translateY(100%)';
+            pf.classList.add('active');
+            document.body.classList.add('player-expanded');
+          }
+          pf.style.transform = 'translateY(calc(100% + ' + dy + 'px))';
+        }
       } else {
         pf.style.transform = 'translateY(' + Math.max(0, dy) + 'px)';
       }
@@ -493,11 +496,13 @@
       // Fast micro-movements are usually touch jitter, not an intentional swipe.
       const minTravel = Math.max(64, h * .09);
       const intentional = Math.abs(dy) >= minTravel;
-      const shouldOpen = d.mode === 'open' && intentional && (dy < -h * .18 || d.velocity < -.7);
+      const shouldOpen = d.mode === 'open' && d.moved && intentional && (dy < -h * .18 || d.velocity < -.7);
       const shouldClose = d.mode === 'close' && intentional && (dy > h * .18 || d.velocity > .7);
       drag = null;
       pf.classList.remove('dragging');
       pf.style.transform = '';
+      // A plain tap on the mini-player should fall through to its click handler.
+      if (d.mode === 'open' && !d.moved) return;
       if (shouldOpen) {
         if (!(history.state && history.state.playerExpanded)) {
           history.pushState({ ...(history.state || {}), playerExpanded: true }, '', window.location.href);
