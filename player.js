@@ -469,6 +469,11 @@
       if (event.target.closest(ignored)) return;
       if (mode === 'open' && pf.classList.contains('active')) return;
       if (mode === 'close' && !pf.classList.contains('active')) return;
+      // A fresh physical interaction must never inherit suppression from
+      // a previous drag. If no synthetic click followed that drag, expire
+      // its guard here so the next real tap always works.
+      suppressMiniClickUntil = 0;
+      suppressFullClickUntil = 0;
       // Do not cancel pointerdown: the browser needs it to synthesize the
       // normal click when the user taps the footer without dragging.
       drag = { mode, id: event.pointerId, surface: event.currentTarget, startY: event.clientY, lastY: event.clientY,
@@ -546,8 +551,8 @@
       if (d.moved) {
         // The drag's synthetic click, if emitted, is suppressed briefly.
         // The guard expires automatically and cannot swallow a later tap.
-        if (d.surface === mini) suppressMiniClickUntil = Date.now() + 400;
-        else suppressFullClickUntil = Date.now() + 400;
+        if (d.surface === mini) suppressMiniClickUntil = Date.now() + 120;
+        else suppressFullClickUntil = Date.now() + 120;
       }
     }
 
