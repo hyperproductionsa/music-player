@@ -455,10 +455,16 @@
       drag = { mode, id: event.pointerId, startY: event.clientY, lastY: event.clientY,
         lastTime: performance.now(), velocity: 0, moved: false };
       if (mode === 'open') {
+        // Put the full player below the viewport BEFORE revealing it.
+        // This prevents the active-state CSS from flashing it at the top
+        // before the first pointermove arrives.
+        pf.classList.add('dragging');
+        pf.style.transform = 'translateY(100%)';
         pf.classList.add('active');
         document.body.classList.add('player-expanded');
+      } else {
+        pf.classList.add('dragging');
       }
-      pf.classList.add('dragging');
       try { event.currentTarget.setPointerCapture(event.pointerId); } catch (_) {}
     }
 
