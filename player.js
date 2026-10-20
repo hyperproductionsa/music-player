@@ -386,8 +386,38 @@
     if (tlBuyBtn) { tlBuyBtn.style.display = 'none'; tlBuyBtn.classList.add('hidden'); }
   }
 
-  function openFull() { if (pf) pf.classList.add('active'); }
-  function closeFull() { if (pf) pf.classList.remove('active'); }
+  function openFull() {
+    if (!pf) return;
+    pf.classList.add('active');
+    document.body.classList.add('player-expanded');
+  }
+  function closeFull() {
+    if (!pf) return;
+    pf.classList.remove('active');
+    document.body.classList.remove('player-expanded');
+  }
+
+  // Mobile swipe gestures: pull the mini-player up to expand, or the full player
+  // down to collapse. Ignore horizontal gestures so seeking and controls remain usable.
+  function addVerticalSwipe(element, onSwipeUp, onSwipeDown) {
+    if (!element) return;
+    let startX = 0, startY = 0;
+    element.addEventListener('touchstart', event => {
+      if (!event.touches || event.touches.length !== 1) return;
+      startX = event.touches[0].clientX;
+      startY = event.touches[0].clientY;
+    }, { passive: true });
+    element.addEventListener('touchend', event => {
+      if (!event.changedTouches || event.changedTouches.length !== 1) return;
+      const dx = event.changedTouches[0].clientX - startX;
+      const dy = event.changedTouches[0].clientY - startY;
+      if (Math.abs(dy) < 55 || Math.abs(dy) < Math.abs(dx) * 1.25) return;
+      if (dy < 0 && onSwipeUp) onSwipeUp();
+      if (dy > 0 && onSwipeDown) onSwipeDown();
+    }, { passive: true });
+  }
+  addVerticalSwipe($('playerMobile'), openFull, null);
+  addVerticalSwipe(pf, null, closeFull);
 
   // -------- PRIME A TRACK (no autoplay) --------
   function primeTrack(album, trackIdx, position) {
