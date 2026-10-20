@@ -437,27 +437,87 @@
     document.body.classList.remove('player-expanded');
   }
 
-  // Mobile swipe gestures: pull the mini-player up to expand, or the full player
-  // down to collapse. Ignore horizontal gestures so seeking and controls remain usable.
-  function addVerticalSwipe(element, onSwipeUp, onSwipeDown) {
-    if (!element) return;
-    let startX = 0, startY = 0;
-    element.addEventListener('touchstart', event => {
-      if (!event.touches || event.touches.length !== 1) return;
-      startX = event.touches[0].clientX;
-      startY = event.touches[0].clientY;
-    }, { passive: true });
-    element.addEventListener('touchend', event => {
-      if (!event.changedTouches || event.changedTouches.length !== 1) return;
-      const dx = event.changedTouches[0].clientX - startX;
-      const dy = event.changedTouches[0].clientY - startY;
-      if (Math.abs(dy) < 55 || Math.abs(dy) < Math.abs(dx) * 1.25) return;
-      if (dy < 0 && onSwipeUp) onSwipeUp();
-      if (dy > 0 && onSwipeDown) onSwipeDown();
-    }, { passive: true });
+  // Finger-tracking drag: the expanded player follows the pointer, then snaps
+  // open/closed on release. Controls and progress bars remain normal tap targets.
+  function setupPlayerDrag() {
+    const mini = $('playerMobile');
+    if (!mini || !pf) return;
+    let drag = null;
+    const ignored = '#pmPlay, #pmNext, #pmExpand, .pm-controls, .pf-btns, .pf-bar, #pfClose, .pf-header i:not(#pfClose)';
+    const height = () => Math.max(1, window.innerHeight);
+
+    function begin(event, mode) {
+      if (event.pointerType === 'mouse' && event.button !== 0) return;
+      if (event.target.closest(ignored)) return;
+      if (mode === 'open' && pf.classList.contains('active')) return;
+      if (mode === 'close' && !pf.classList.contains('active')) return;
+      event.preventDefault();
+      drag = { mode, id: event.pointerId, startY: event.clientY, lastY: event.clientY,
+        lastTime: performance.now(), velocity: 0, moved: false };
+      if (mode === 'open') {
+        pf.classList.add('active');
+        document.body.classList.add('player-expanded');
+      }
+      pf.classList.add('dragging');
+      try { event.currentTarget.setPointerCapture(event.pointerId); } catch (_) {}
+    }
+
+    function move(event) {
+      if (!drag || event.pointerId !== drag.id) return;
+      const now = performance.now();
+      const dy = event.clientY - drag.startY;
+      drag.velocity = (event.clientY - drag.lastY) / Math.max(1, now - drag.lastTime);
+      drag.lastY = event.clientY;
+      drag.lastTime = now;
+      if (Math.abs(dy) > 3) drag.moved = true;
+      if (drag.mode === 'open') {
+        pf.style.transform = 'translateY(calc(100% + ' + Math.min(0, dy) + 'px))';
+      } else {
+        pf.style.transform = 'translateY(' + Math.max(0, dy) + 'px)';
+      }
+    }
+
+    function finish(event) {
+      if (!drag || (event && event.pointerId !== drag.id)) return;
+      const d = drag;
+      const dy = (event ? event.clientY : d.lastY) - d.startY;
+      const h = height();
+      const shouldOpen = d.mode === 'open' && (dy < -h * .22 || d.velocity < -.55);
+      const shouldClose = d.mode === 'close' && (dy > h * .2 || d.velocity > .55);
+      drag = null;
+      pf.classList.remove('dragging');
+      pf.style.transform = '';
+      if (shouldOpen) {
+        if (!(history.state && history.state.playerExpanded)) {
+          history.pushState({ ...(history.state || {}), playerExpanded: true }, '', window.location.href);
+        }
+        pf.classList.add('active');
+        document.body.classList.add('player-expanded');
+      } else if (shouldClose || d.mode === 'open') {
+        pf.classList.remove('active');
+        document.body.classList.remove('player-expanded');
+        if (history.state && history.state.playerExpanded) history.back();
+      } else {
+        pf.classList.add('active');
+        document.body.classList.add('player-expanded');
+      }
+      if (d.moved) {
+        // Suppress the synthetic click produced by a completed drag.
+        const suppress = e => { e.preventDefault(); e.stopPropagation(); };
+        pf.addEventListener('click', suppress, { capture: true, once: true });
+        mini.addEventListener('click', suppress, { capture: true, once: true });
+      }
+    }
+
+    mini.addEventListener('pointerdown', e => begin(e, 'open'));
+    pf.addEventListener('pointerdown', e => begin(e, 'close'));
+    [mini, pf].forEach(el => {
+      el.addEventListener('pointermove', move);
+      el.addEventListener('pointerup', finish);
+      el.addEventListener('pointercancel', finish);
+    });
   }
-  addVerticalSwipe($('playerMobile'), openFull, null);
-  addVerticalSwipe(pf, null, closeFull);
+  setupPlayerDrag();
 
   // -------- PRIME A TRACK (no autoplay) --------
   function primeTrack(album, trackIdx, position) {
