@@ -16,6 +16,7 @@
   const getImage = a => `${baseUrl}/images/${a.cover}`;
 
   let playingAlbum = null, playingTrack = null, playingIdx = 0, isPlaying = false, timer = null, viewedAlbum = null;
+  let currentInfoSlug = null, policyPagesPromise = null;
   const albumStates = {};
   const $ = id => document.getElementById(id);
   const albumList = $('albumList'), tracklistWrap = $('tracklistWrap'), tracklist = $('tracklist'),
@@ -213,6 +214,7 @@
   }
 
   function showAlbumList() {
+    currentInfoSlug = null;
     document.body.classList.remove('info-mode');
     const artSection = $('artSection');
     if (artSection) artSection.style.display = '';
@@ -228,7 +230,25 @@
   function showInfoPage(slug, push = true) {
     const infoPage = $('infoPage');
     if (!infoPage || !getInfoSlug(slug)) return;
-    if (push) { window.location.href = '/' + slug; return; }
+    if (push) {
+      setUrl('/' + slug);
+      saveState();
+    }
+    currentInfoSlug = slug;
+    // Load policy copy into the existing page shell without navigating away from
+    // the document, so the same Audio instance keeps playing.
+    if (!policyPagesPromise) {
+      policyPagesPromise = fetch('/policy-pages.json')
+        .then(response => {
+          if (!response.ok) throw new Error('Could not load policy pages');
+          return response.json();
+        });
+    }
+    policyPagesPromise.then(pages => {
+      if (currentInfoSlug !== slug || !pages[slug]) return;
+      const page = pages[slug];
+      infoPage.innerHTML = '<h1>' + page.title + '</h1><div class="info-copy">' + page.body + '</div>';
+    }).catch(error => console.warn('Policy page content unavailable:', error));
     document.body.classList.add('info-mode');
     if (albumList) albumList.style.display = 'none';
     const policyLinks = $('policyLinks');
@@ -485,6 +505,18 @@
   if (pfNext) pfNext.onclick = nextTrack;
   if (pfClose) pfClose.onclick = closeFull;
   if (backBtn) backBtn.onclick = () => goBack({ push: true });
+  const policyLinks = $('policyLinks');
+  if (policyLinks) policyLinks.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', event => {
+      const url = new URL(link.href, window.location.href);
+      const slug = getInfoSlug(url.pathname);
+      if (!slug || url.origin !== window.location.origin) return;
+      event.preventDefault();
+      if (window.location.pathname !== '/' + slug) history.pushState({}, '', '/' + slug);
+      saveState();
+      showInfoPage(slug, false);
+    });
+  });
 
   audio.onended = () => { saveState(); nextTrack(); };
   if (footerProgress) footerProgress.addEventListener('click', e => seekTo(e, footerProgress, footerFill, footerCur, footerTot));
@@ -496,6 +528,14 @@
   const stored = loadState();
 
   if (infoPageFromUrl) {
+    // Direct policy URLs start a fresh document, so restore Now Playing metadata
+    // from storage without autoplaying; in-app policy navigation never reloads audio.
+    const savedAlbum = stored && allAlbums.find(x => x.id === stored.albumId);
+    if (savedAlbum) {
+      primeTrack(savedAlbum, Math.min(Math.max(0, stored.trackIdx), savedAlbum.tracks.length - 1), stored.position);
+      renderAlbums();
+      updateArtwork(savedAlbum);
+    }
     showAlbumList();
     showInfoPage(infoPageFromUrl, false);
   } else if (activeAlbumIdFromUrl) {
