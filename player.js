@@ -469,7 +469,8 @@
       drag.velocity = (event.clientY - drag.lastY) / Math.max(1, now - drag.lastTime);
       drag.lastY = event.clientY;
       drag.lastTime = now;
-      if (Math.abs(dy) > 3) drag.moved = true;
+      // Ignore tiny finger jitter; it should behave like a tap, not a drag.
+      if (Math.abs(dy) > 12) drag.moved = true;
       if (drag.mode === 'open') {
         pf.style.transform = 'translateY(calc(100% + ' + Math.min(0, dy) + 'px))';
       } else {
@@ -482,8 +483,12 @@
       const d = drag;
       const dy = (event ? event.clientY : d.lastY) - d.startY;
       const h = height();
-      const shouldOpen = d.mode === 'open' && (dy < -h * .22 || d.velocity < -.55);
-      const shouldClose = d.mode === 'close' && (dy > h * .2 || d.velocity > .55);
+      // Require meaningful travel before either distance or velocity can commit.
+      // Fast micro-movements are usually touch jitter, not an intentional swipe.
+      const minTravel = Math.max(64, h * .09);
+      const intentional = Math.abs(dy) >= minTravel;
+      const shouldOpen = d.mode === 'open' && intentional && (dy < -h * .18 || d.velocity < -.7);
+      const shouldClose = d.mode === 'close' && intentional && (dy > h * .18 || d.velocity > .7);
       drag = null;
       pf.classList.remove('dragging');
       pf.style.transform = '';
