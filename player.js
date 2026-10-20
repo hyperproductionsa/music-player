@@ -443,15 +443,34 @@
     const mini = $('playerMobile');
     if (!mini || !pf) return;
     let drag = null;
+    let suppressMiniClickUntil = 0;
+    let suppressFullClickUntil = 0;
     const ignored = '#pmPlay, #pmNext, #pmExpand, .pm-controls, .pf-btns, .pf-bar, #pfClose, .pf-header i:not(#pfClose)';
     const height = () => Math.max(1, window.innerHeight);
+
+    // Suppress only the synthetic click immediately following a drag.
+    // A deadline avoids leaving a one-shot listener behind if the browser
+    // doesn't emit a click for the completed pointer gesture.
+    mini.addEventListener('click', e => {
+      if (Date.now() > suppressMiniClickUntil) return;
+      suppressMiniClickUntil = 0;
+      e.preventDefault();
+      e.stopPropagation();
+    }, true);
+    pf.addEventListener('click', e => {
+      if (Date.now() > suppressFullClickUntil) return;
+      suppressFullClickUntil = 0;
+      e.preventDefault();
+      e.stopPropagation();
+    }, true);
 
     function begin(event, mode) {
       if (event.pointerType === 'mouse' && event.button !== 0) return;
       if (event.target.closest(ignored)) return;
       if (mode === 'open' && pf.classList.contains('active')) return;
       if (mode === 'close' && !pf.classList.contains('active')) return;
-      event.preventDefault();
+      // Do not cancel pointerdown: the browser needs it to synthesize the
+      // normal click when the user taps the footer without dragging.
       drag = { mode, id: event.pointerId, surface: event.currentTarget, startY: event.clientY, lastY: event.clientY,
         lastTime: performance.now(), velocity: 0, moved: false };
       if (mode === 'open') {
@@ -525,16 +544,10 @@
         document.body.classList.add('player-expanded');
       }
       if (d.moved) {
-        // Suppress only the click on the surface where this drag began.
-        // Adding listeners to both surfaces leaves a stale handler behind,
-        // which can swallow the next real tap and force a double-tap.
-        const surface = d.surface;
-        const suppress = e => {
-          e.preventDefault();
-          e.stopPropagation();
-          surface.removeEventListener('click', suppress, true);
-        };
-        surface.addEventListener('click', suppress, { capture: true, once: true });
+        // The drag's synthetic click, if emitted, is suppressed briefly.
+        // The guard expires automatically and cannot swallow a later tap.
+        if (d.surface === mini) suppressMiniClickUntil = Date.now() + 400;
+        else suppressFullClickUntil = Date.now() + 400;
       }
     }
 
