@@ -518,16 +518,16 @@
       updateArtwork(null);
     }
   } else if (stored) {
+    // Restore the last-played track and playback position for Now Playing,
+    // but never restore the album's page as the landing screen. Only an
+    // explicit /htc* URL should open an album's tracklist.
     const a = allAlbums.find(x => x.id === stored.albumId);
+    showAlbumList();
     if (a) {
-      viewedAlbum = a;
-      updateArtwork(a);
-      updateBuyButton(a);
       primeTrack(a, Math.min(Math.max(0, stored.trackIdx), a.tracks.length - 1), stored.position);
-      renderTracklist(a);
       renderAlbums();
+      updateArtwork(a);
     } else {
-      showAlbumList();
       updateArtwork(null);
     }
   } else {
