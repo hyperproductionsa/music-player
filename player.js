@@ -419,7 +419,7 @@
   }
   function toggleRepeatTrack() {
     repeatTrack = !repeatTrack;
-    audio.loop = repeatTrack;
+    audio.loop = false;
     updateRepeatButtons();
   }
 
@@ -645,7 +645,19 @@
     });
   });
 
-  audio.onended = () => { if (!repeatTrack) { saveState(); nextTrack(); } };
+  audio.onended = () => {
+    if (repeatTrack && playingAlbum && playingTrack) {
+      audio.currentTime = 0;
+      audio.play().then(() => {
+        isPlaying = true;
+        updatePlayBtn();
+        startProgress();
+      }).catch(e => console.warn('Repeat playback blocked:', e));
+      return;
+    }
+    saveState();
+    nextTrack();
+  };
   updateRepeatButtons();
   if (footerProgress) footerProgress.addEventListener('click', e => seekTo(e, footerProgress, footerFill, footerCur, footerTot));
   if (pfProgress) pfProgress.addEventListener('click', e => seekTo(e, pfProgress, pfFill, pfCur, pfTot));
