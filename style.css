@@ -229,4 +229,4 @@ body.info-mode #infoPage{height:100%}
 /* Repeat-track toggle */
 #footerRepeat,#pfRepeat { color:#777; cursor:pointer; transition:color .15s ease; position:absolute; left:-34px; }
 #footerRepeat.repeat-active,#pfRepeat.repeat-active { color:#e5de69; }
-#pfRepeat { font-size:1.15rem; left:-42px; }
+#pfRepeat { font-size:1.15rem; left:calc(50% + 78px); top:50%; transform:translateY(-50%); }
