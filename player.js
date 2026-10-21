@@ -317,10 +317,11 @@
         if (!al) return;
         const idx = parseInt(el.dataset.idx, 10);
         const isCurrentTrack = playingAlbum && playingAlbum.id === al.id && playingIdx === idx;
-        // Selecting the track that is already playing should reveal Now Playing,
-        // not pass through playTrack's same-track toggle and accidentally pause it.
-        if (!(isCurrentTrack && isPlaying)) playTrack(idx, al);
+        // Open Now Playing immediately on the first tap, before playTrack can
+        // rebuild the playlist DOM or trigger asynchronous audio state changes.
         if (window.innerWidth <= 860) openFull();
+        // Selecting the already-playing track must not toggle it off.
+        if (!(isCurrentTrack && isPlaying)) playTrack(idx, al);
       };
     });
   }
