@@ -315,7 +315,11 @@
       el.onclick = () => {
         const al = viewedAlbum;
         if (!al) return;
-        playTrack(parseInt(el.dataset.idx), al);
+        const idx = parseInt(el.dataset.idx, 10);
+        const isCurrentTrack = playingAlbum && playingAlbum.id === al.id && playingIdx === idx;
+        // Selecting the track that is already playing should reveal Now Playing,
+        // not pass through playTrack's same-track toggle and accidentally pause it.
+        if (!(isCurrentTrack && isPlaying)) playTrack(idx, al);
         if (window.innerWidth <= 860) openFull();
       };
     });
