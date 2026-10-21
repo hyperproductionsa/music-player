@@ -128,10 +128,10 @@ main{display:flex;gap:24px;flex:1;min-height:0;padding:16px 24px;overflow:hidden
 .pf-fill{height:100%;background:#e5de69;border-radius:2px;width:0%}
 .pf-btns{height:52px;display:block;flex-shrink:0;position:relative;color:#e5de69}
 .pf-btns i{position:absolute;top:50%;left:50%;font-size:1.2rem;line-height:1;transform:translate(-50%,-50%);cursor:pointer}
-#pfPrev{left:calc(50% - 80px);opacity:.7}
+#pfPrev{left:calc(50% - 64px);opacity:.7}
 #pfPlay{left:50%;font-size:2.8rem}
-#pfNext{left:calc(50% + 80px);opacity:.7}
-#pfRepeat{left:calc(50% - 160px);font-size:1.15rem}
+#pfNext{left:calc(50% + 64px);opacity:.7}
+#pfRepeat{left:calc(50% - 128px);font-size:1.15rem}
 
 #albumList::-webkit-scrollbar,#tracklist::-webkit-scrollbar{width:3px}
 #albumList::-webkit-scrollbar-track,#tracklist::-webkit-scrollbar-track{background:#1a1a1a}
