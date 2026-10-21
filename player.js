@@ -15,7 +15,7 @@
   };
   const getImage = a => `${baseUrl}/images/${a.cover}`;
 
-  let playingAlbum = null, playingTrack = null, playingIdx = 0, isPlaying = false, timer = null, viewedAlbum = null;
+  let playingAlbum = null, playingTrack = null, playingIdx = 0, isPlaying = false, timer = null, viewedAlbum = null, repeatTrack = false;
   let currentInfoSlug = null, policyPagesPromise = null;
   const albumStates = {};
   const $ = id => document.getElementById(id);
@@ -26,12 +26,12 @@
         artBuyBtn = $('artBuyBtn'), artBuyPrice = $('artBuyPrice'),
         footerArt = $('footerArt'), footerTitle = $('footerTitle'), footerArtist = $('footerArtist'),
         footerFill = $('footerFill'), footerCur = $('footerCur'), footerTot = $('footerTot'),
-        footerProgress = $('footerProgress'), footerPlay = $('footerPlay'), footerPrev = $('footerPrev'), footerNext = $('footerNext'),
+        footerProgress = $('footerProgress'), footerPlay = $('footerPlay'), footerPrev = $('footerPrev'), footerNext = $('footerNext'), footerRepeat = $('footerRepeat'),
         volumeSlider = $('volumeSlider'), volumeIcon = $('volumeIcon'),
         pmArt = $('pmArt'), pmTitle = $('pmTitle'), pmArtist = $('pmArtist'), pmPlay = $('pmPlay'), pmNext = $('pmNext'), pmExpand = $('pmExpand'),
         pf = $('playerFull'), pfArt = $('pfArt'), pfTitle = $('pfTitle'), pfArtist = $('pfArtist'),
         pfFill = $('pfFill'), pfCur = $('pfCur'), pfTot = $('pfTot'), pfProgress = $('pfProgress'),
-        pfPlay = $('pfPlay'), pfPrev = $('pfPrev'), pfNext = $('pfNext'), pfClose = $('pfClose');
+        pfPlay = $('pfPlay'), pfPrev = $('pfPrev'), pfNext = $('pfNext'), pfRepeat = $('pfRepeat'), pfClose = $('pfClose');
 
   const allAlbums = albums;
 
@@ -409,6 +409,20 @@
     }
   }
 
+  function updateRepeatButtons() {
+    [footerRepeat, pfRepeat].forEach(button => {
+      if (!button) return;
+      button.classList.toggle('repeat-active', repeatTrack);
+      button.setAttribute('aria-label', repeatTrack ? 'Repeat track on' : 'Repeat track off');
+      button.title = repeatTrack ? 'Repeat track on' : 'Repeat track off';
+    });
+  }
+  function toggleRepeatTrack() {
+    repeatTrack = !repeatTrack;
+    audio.loop = repeatTrack;
+    updateRepeatButtons();
+  }
+
   function nextTrack() { if (!playingAlbum) return; const n = (playingIdx + 1) % playingAlbum.tracks.length; albumStates[playingAlbum.id] = { playingIdx: n }; playTrack(n, playingAlbum); }
   function prevTrack() { if (!playingAlbum) return; const p = (playingIdx - 1 + playingAlbum.tracks.length) % playingAlbum.tracks.length; albumStates[playingAlbum.id] = { playingIdx: p }; playTrack(p, playingAlbum); }
 
@@ -602,6 +616,7 @@
   if (footerPlay) footerPlay.onclick = togglePlay;
   if (footerPrev) footerPrev.onclick = prevTrack;
   if (footerNext) footerNext.onclick = nextTrack;
+  if (footerRepeat) footerRepeat.onclick = toggleRepeatTrack;
   if (pmPlay) pmPlay.onclick = togglePlay;
   if (pmNext) pmNext.onclick = nextTrack;
   if (pmExpand) pmExpand.onclick = openFull;
@@ -614,6 +629,7 @@
   if (pfPlay) pfPlay.onclick = togglePlay;
   if (pfPrev) pfPrev.onclick = prevTrack;
   if (pfNext) pfNext.onclick = nextTrack;
+  if (pfRepeat) pfRepeat.onclick = toggleRepeatTrack;
   if (pfClose) pfClose.onclick = closeFull;
   if (backBtn) backBtn.onclick = () => goBack({ push: true });
   const policyLinks = $('policyLinks');
@@ -629,7 +645,8 @@
     });
   });
 
-  audio.onended = () => { saveState(); nextTrack(); };
+  audio.onended = () => { if (!repeatTrack) { saveState(); nextTrack(); } };
+  updateRepeatButtons();
   if (footerProgress) footerProgress.addEventListener('click', e => seekTo(e, footerProgress, footerFill, footerCur, footerTot));
   if (pfProgress) pfProgress.addEventListener('click', e => seekTo(e, pfProgress, pfFill, pfCur, pfTot));
 
