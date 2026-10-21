@@ -126,10 +126,12 @@ main{display:flex;gap:24px;flex:1;min-height:0;padding:16px 24px;overflow:hidden
 .pf-bar span{color:#888;font-size:.65rem;min-width:32px}
 .pf-progress{flex:1;height:4px;background:#2a2a2a;border-radius:2px;overflow:hidden;cursor:pointer}
 .pf-fill{height:100%;background:#e5de69;border-radius:2px;width:0%}
-.pf-btns{display:flex;justify-content:center;align-items:center;gap:28px;color:#e5de69;flex-shrink:0;position:relative}
-.pf-btns i{font-size:1.8rem;cursor:pointer}
-.pf-btns i:first-child,.pf-btns i:last-child{font-size:1.2rem;opacity:.7}
-.pf-btns i:nth-child(2){font-size:2.8rem}
+.pf-btns{height:52px;display:block;flex-shrink:0;position:relative;color:#e5de69}
+.pf-btns i{position:absolute;top:50%;left:50%;font-size:1.2rem;line-height:1;transform:translate(-50%,-50%);cursor:pointer}
+#pfPrev{left:calc(50% - 80px);opacity:.7}
+#pfPlay{left:50%;font-size:2.8rem}
+#pfNext{left:calc(50% + 80px);opacity:.7}
+#pfRepeat{left:calc(50% - 160px);font-size:1.15rem}
 
 #albumList::-webkit-scrollbar,#tracklist::-webkit-scrollbar{width:3px}
 #albumList::-webkit-scrollbar-track,#tracklist::-webkit-scrollbar-track{background:#1a1a1a}
@@ -229,4 +231,4 @@ body.info-mode #infoPage{height:100%}
 /* Repeat-track toggle */
 #footerRepeat,#pfRepeat { color:#777; cursor:pointer; transition:color .15s ease; position:absolute; left:-34px; }
 #footerRepeat.repeat-active,#pfRepeat.repeat-active { color:#e5de69; }
-#pfRepeat { font-size:1.15rem; left:calc(50% + 78px); top:50%; transform:translateY(-50%); }
+
