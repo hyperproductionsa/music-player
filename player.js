@@ -543,8 +543,15 @@
       drag = null;
       pf.classList.remove('dragging');
       pf.style.transform = '';
-      // A plain tap on the mini-player should fall through to its click handler.
-      if (d.mode === 'open' && !d.moved) return;
+      // Open directly on pointer release for a plain mini-player tap.
+      // Some mobile browsers lose or delay the synthetic click after pointer
+      // capture, which makes the first tap appear to do nothing after a swipe.
+      // Suppress that follow-up click so the full player isn't toggled twice.
+      if (d.mode === 'open' && !d.moved) {
+        suppressMiniClickUntil = Date.now() + 250;
+        openFull();
+        return;
+      }
       if (shouldOpen) {
         if (!(history.state && history.state.playerExpanded)) {
           history.pushState({ ...(history.state || {}), playerExpanded: true }, '', window.location.href);
