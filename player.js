@@ -28,7 +28,7 @@
         footerFill = $('footerFill'), footerCur = $('footerCur'), footerTot = $('footerTot'),
         footerProgress = $('footerProgress'), footerPlay = $('footerPlay'), footerPrev = $('footerPrev'), footerNext = $('footerNext'), footerRepeat = $('footerRepeat'),
         volumeSlider = $('volumeSlider'), volumeIcon = $('volumeIcon'),
-        pmArt = $('pmArt'), pmTitle = $('pmTitle'), pmArtist = $('pmArtist'), pmPlay = $('pmPlay'), pmNext = $('pmNext'), pmRepeat = $('pmRepeat'), pmExpand = $('pmExpand'),
+        pmArt = $('pmArt'), pmTitle = $('pmTitle'), pmArtist = $('pmArtist'), pmPlay = $('pmPlay'), pmNext = $('pmNext'), pmExpand = $('pmExpand'),
         pf = $('playerFull'), pfArt = $('pfArt'), pfTitle = $('pfTitle'), pfArtist = $('pfArtist'),
         pfFill = $('pfFill'), pfCur = $('pfCur'), pfTot = $('pfTot'), pfProgress = $('pfProgress'),
         pfPlay = $('pfPlay'), pfPrev = $('pfPrev'), pfNext = $('pfNext'), pfRepeat = $('pfRepeat'), pfClose = $('pfClose');
@@ -410,7 +410,7 @@
   }
 
   function updateRepeatButtons() {
-    [footerRepeat, pfRepeat, pmRepeat].forEach(button => {
+    [footerRepeat, pfRepeat].forEach(button => {
       if (!button) return;
       button.classList.toggle('repeat-active', repeatTrack);
       button.setAttribute('aria-label', repeatTrack ? 'Repeat track on' : 'Repeat track off');
@@ -630,7 +630,6 @@
   if (pfPrev) pfPrev.onclick = prevTrack;
   if (pfNext) pfNext.onclick = nextTrack;
   if (pfRepeat) pfRepeat.onclick = toggleRepeatTrack;
-  if (pmRepeat) pmRepeat.onclick = toggleRepeatTrack;
   if (pfClose) pfClose.onclick = closeFull;
   if (backBtn) backBtn.onclick = () => goBack({ push: true });
   const policyLinks = $('policyLinks');
