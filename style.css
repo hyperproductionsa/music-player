@@ -229,6 +229,7 @@ body.info-mode #infoPage{height:100%}
 
 
 /* Repeat-track toggle */
-#footerRepeat,#pfRepeat { color:#777; cursor:pointer; transition:color .15s ease; position:absolute; left:-34px; }
+#footerRepeat { color:#777; cursor:pointer; transition:color .15s ease; position:absolute; left:-34px; }
+#pfRepeat { color:#777; cursor:pointer; transition:color .15s ease; }
 #footerRepeat.repeat-active,#pfRepeat.repeat-active { color:#e5de69; }
 
