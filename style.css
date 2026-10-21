@@ -224,3 +224,9 @@ body.info-mode #infoPage{height:100%}
  #infoPage h1{font-size:1.1rem}
  #infoPage .info-copy{font-size:.82rem;line-height:1.65}
 }
+
+
+/* Repeat-track toggle */
+#footerRepeat,#pfRepeat { color:#777; cursor:pointer; transition:color .15s ease; }
+#footerRepeat.repeat-active,#pfRepeat.repeat-active { color:#e5de69; }
+#pfRepeat { font-size:1.15rem; }
